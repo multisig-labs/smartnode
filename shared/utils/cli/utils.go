@@ -131,12 +131,12 @@ func PrintNetwork(rp *rocketpool.Client) error {
 		return fmt.Errorf("Error loading global config: %w", err)
 	}
 
-	if cfg.Chains.Eth1.ChainID == "5" {
+	if cfg.Chains.Platform.ChainID == "5" {
 		fmt.Printf("Your Smartnode is currently using the %sPrater Test Network.%s\n\n", colorLightBlue, colorReset)
-	} else if cfg.Chains.Eth1.ChainID == "1" {
+	} else if cfg.Chains.Platform.ChainID == "1" {
 		fmt.Printf("Your Smartnode is currently using the %sEthereum Mainnet.%s\n\n", colorGreen, colorReset)
 	} else {
-		fmt.Printf("%sYou are on an unexpected network with ID %s.%s\n\n", colorYellow, cfg.Chains.Eth1.ChainID, colorReset)
+		fmt.Printf("%sYou are on an unexpected network with ID %s.%s\n\n", colorYellow, cfg.Chains.Platform.ChainID, colorReset)
 	}
 
 	return nil

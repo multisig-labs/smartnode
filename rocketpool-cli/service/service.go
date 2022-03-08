@@ -255,7 +255,7 @@ func checkForValidatorChange(rp *rocketpool.Client, userConfig config.RocketPool
 	if err != nil {
 		return fmt.Errorf("Error loading global settings: %w", err)
 	}
-	newClient := globalConfig.Chains.Eth2.GetClientById(userConfig.Chains.Eth2.Client.Selected)
+	newClient := globalConfig.Chains.Platform.GetClientById(userConfig.Chains.Platform.Client.Selected)
 	if newClient == nil {
 		return fmt.Errorf("Error getting selected client - either it does not exist (user has not run `rocketpool service config` yet) or the selected client is invalid.")
 	}
@@ -417,10 +417,10 @@ func pruneExecutionClient(c *cli.Context) error {
 	fmt.Println("This will shut down your main ETH1 client and prune its database, freeing up disk space.")
 	fmt.Println("Once pruning is complete, your ETH1 client will restart automatically.\n")
 
-	if cfg.Chains.Eth1Fallback.Client.Selected == "" {
+	if cfg.Chains.Platform.Client.Selected == "" {
 		fmt.Printf("%sYou do not have a fallback ETH1 client configured.\nYou will continue attesting while ETH1 prunes, but block proposals and most of Rocket Pool's commands will not work.\nPlease configure a fallback client with `rocketpool service config` before running this.%s\n", colorRed, colorReset)
 	} else {
-		fmt.Printf("You have a fallback ETH1 client configured (%s). Rocket Pool (and your ETH2 client) will use that while the main client is pruning.\n", cfg.Chains.Eth1Fallback.Client.Selected)
+		fmt.Printf("You have a fallback ETH1 client configured (%s). Rocket Pool (and your ETH2 client) will use that while the main client is pruning.\n", cfg.Chains.Platform.Client.Selected)
 	}
 
 	// Get the container prefix
@@ -430,7 +430,7 @@ func pruneExecutionClient(c *cli.Context) error {
 	}
 
 	// Prompt for stopping the node container if using Infura to prevent people from hitting the rate limit
-	if cfg.Chains.Eth1Fallback.Client.Selected == "infura" {
+	if cfg.Chains.Platform.Client.Selected == "infura" {
 		fmt.Printf("\n%s=== NOTE ===\n\n", colorYellow)
 		fmt.Printf("If you are using Infura's free tier, you may hit its rate limit if pruning takes a long time.\n")
 		fmt.Printf("If this happens, you should temporarily disable the `%s` container until pruning is complete. This will:\n", prefix+NodeContainerSuffix)
@@ -447,7 +447,7 @@ func pruneExecutionClient(c *cli.Context) error {
 	}
 
 	// Get the prune provisioner image
-	pruneProvisioner := cfg.Chains.Eth1.PruneProvisioner
+	pruneProvisioner := cfg.Chains.Platform.PruneProvisioner
 	if pruneProvisioner == "" {
 		return fmt.Errorf("Prune provisioner was not found in your configuration; are you running an old version of Rocket Pool?")
 	}
@@ -679,11 +679,11 @@ func resyncEth1(c *cli.Context) error {
 	fmt.Println("This will delete the chain data of your primary ETH1 client and resync it from scratch.")
 	fmt.Printf("%sYou should only do this if your ETH1 client has failed and can no longer start or sync properly.\nThis is meant to be a last resort.%s\n", colorYellow, colorReset)
 
-	if cfg.Chains.Eth1Fallback.Client.Selected == "" {
+	if cfg.Chains.Platform.Client.Selected == "" {
 		fmt.Printf("%sYou do not have a fallback ETH1 client configured.\nPlease configure a fallback client with `rocketpool service config` before running this.%s\n", colorRed, colorReset)
 		return nil
 	} else {
-		fmt.Printf("You have a fallback ETH1 client configured (%s). Rocket Pool (and your ETH2 client) will use that while the main client is resyncing.\n", cfg.Chains.Eth1Fallback.Client.Selected)
+		fmt.Printf("You have a fallback ETH1 client configured (%s). Rocket Pool (and your ETH2 client) will use that while the main client is resyncing.\n", cfg.Chains.Platform.Client.Selected)
 	}
 
 	// Get the container prefix
@@ -693,7 +693,7 @@ func resyncEth1(c *cli.Context) error {
 	}
 
 	// Prompt for stopping the node container if using Infura to prevent people from hitting the rate limit
-	if cfg.Chains.Eth1Fallback.Client.Selected == "infura" {
+	if cfg.Chains.Platform.Client.Selected == "infura" {
 		fmt.Printf("\n%s=== NOTE ===\n\n", colorYellow)
 		fmt.Printf("If you are using Infura's free tier, you will very likely hit its rate limit while resyncing.\n")
 		fmt.Printf("You should temporarily disable the `%s` container until resyncing is complete. This will:\n", prefix+NodeContainerSuffix)
@@ -791,7 +791,7 @@ func resyncEth2(c *cli.Context) error {
 	} else {
 		// Get the current checkpoint sync URL
 		checkpointSyncUrl := ""
-		for _, param := range cfg.Chains.Eth2.Client.Params {
+		for _, param := range cfg.Chains.Platform.Client.Params {
 			if param.Env == checkpointSyncSetting {
 				checkpointSyncUrl = param.Value
 				break

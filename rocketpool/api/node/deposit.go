@@ -186,7 +186,7 @@ func canNodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt
 				"\tDomain Type: 0x%s\n"+
 				"\tGenesis Fork Version: 0x%s\n"+
 				"\tGenesis Validator Root: 0x%s\n"+
-				"\tDeposit Amount: %s gwei\n"+
+				//"\tDeposit Amount: %s gwei\n"+
 				"\tValidator Pubkey: %s\n"+
 				"\tWithdrawal Credentials: %s\n"+
 				"\tSignature: %s\n",
@@ -194,7 +194,7 @@ func canNodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt
 				hex.EncodeToString(eth2types.DomainDeposit[:]),
 				hex.EncodeToString(eth2Config.GenesisForkVersion),
 				hex.EncodeToString(eth2types.ZeroGenesisValidatorsRoot),
-				uint64(validator.DepositAmount),
+				//uint64(validator.DepositAmount),
 				pubKey.Hex(),
 				withdrawalCredentials.Hex(),
 				signature.Hex(),

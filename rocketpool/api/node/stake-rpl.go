@@ -56,6 +56,10 @@ func canNodeStakeRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeStakeRplRe
 
 	// Get gas estimates
 	opts, err := w.GetNodeAccountTransactor()
+	opts.GasPrice = big.NewInt(225000000000)
+	opts.GasLimit = uint64(225000000000)
+	opts.GasFeeCap = big.NewInt(225000000000)
+	opts.GasTipCap = big.NewInt(225000000000)
 	if err != nil {
 		return nil, err
 	}
@@ -237,6 +241,7 @@ func stakeRpl(c *cli.Context, amountWei *big.Int) (*api.NodeStakeRplStakeRespons
 
 	// Stake RPL
 	opts, err := w.GetNodeAccountTransactor()
+	fmt.Println(opts.From.String())
 	if err != nil {
 		return nil, err
 	}

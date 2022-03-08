@@ -753,17 +753,17 @@ func (c *Client) compose(composeFiles []string, args string) (string, error) {
 		fmt.Sprintf("ETH2_IMAGE=%s", shellescape.Quote(cfg.GetSelectedEth2Client().GetBeaconImage())),
 		fmt.Sprintf("VALIDATOR_CLIENT=%s", shellescape.Quote(cfg.GetSelectedEth2Client().ID)),
 		fmt.Sprintf("VALIDATOR_IMAGE=%s", shellescape.Quote(cfg.GetSelectedEth2Client().GetValidatorImage())),
-		fmt.Sprintf("ETH1_PROVIDER=%s", shellescape.Quote(cfg.Chains.Eth1.Provider)),
-		fmt.Sprintf("ETH1_WS_PROVIDER=%s", shellescape.Quote(cfg.Chains.Eth1.WsProvider)),
-		fmt.Sprintf("ETH2_PROVIDER=%s", shellescape.Quote(cfg.Chains.Eth2.Provider)),
+		fmt.Sprintf("ETH1_PROVIDER=%s", shellescape.Quote(cfg.Chains.Platform.Provider)),
+		fmt.Sprintf("ETH1_WS_PROVIDER=%s", shellescape.Quote(cfg.Chains.Platform.WsProvider)),
+		fmt.Sprintf("ETH2_PROVIDER=%s", shellescape.Quote(cfg.Chains.Platform.Provider)),
 		fmt.Sprintf("EXTERNAL_IP=%s", shellescape.Quote(externalIP)),
 	}
 
-	if cfg.Chains.Eth1Fallback.Client.Selected != "" {
+	if cfg.Chains.Platform.Client.Selected != "" {
 		env = append(env, fmt.Sprintf("ETH1_FALLBACK_CLIENT=%s", shellescape.Quote(cfg.GetSelectedEth1FallbackClient().ID)))
 		env = append(env, fmt.Sprintf("ETH1_FALLBACK_IMAGE=%s", shellescape.Quote(cfg.GetSelectedEth1FallbackClient().Image)))
-		env = append(env, fmt.Sprintf("ETH1_FALLBACK_PROVIDER=%s", shellescape.Quote(cfg.Chains.Eth1.FallbackProvider)))
-		env = append(env, fmt.Sprintf("ETH1_FALLBACK_WS_PROVIDER=%s", shellescape.Quote(cfg.Chains.Eth1.FallbackWsProvider)))
+		env = append(env, fmt.Sprintf("ETH1_FALLBACK_PROVIDER=%s", shellescape.Quote(cfg.Chains.Platform.FallbackProvider)))
+		env = append(env, fmt.Sprintf("ETH1_FALLBACK_WS_PROVIDER=%s", shellescape.Quote(cfg.Chains.Platform.FallbackWsProvider)))
 	}
 
 	if cfg.Metrics.Enabled {
@@ -773,11 +773,11 @@ func (c *Client) compose(composeFiles []string, args string) (string, error) {
 	}
 
 	paramsSet := map[string]bool{}
-	for _, param := range cfg.Chains.Eth1.Client.Params {
+	for _, param := range cfg.Chains.Platform.Client.Params {
 		env = append(env, fmt.Sprintf("%s=%s", param.Env, shellescape.Quote(param.Value)))
 		paramsSet[param.Env] = true
 	}
-	for _, param := range cfg.Chains.Eth2.Client.Params {
+	for _, param := range cfg.Chains.Platform.Client.Params {
 		env = append(env, fmt.Sprintf("%s=%s", param.Env, shellescape.Quote(param.Value)))
 		paramsSet[param.Env] = true
 	}
@@ -786,8 +786,8 @@ func (c *Client) compose(composeFiles []string, args string) (string, error) {
 		paramsSet[setting.Env] = true
 	}
 
-	if cfg.Chains.Eth1Fallback.Client.Selected != "" {
-		for _, param := range cfg.Chains.Eth1Fallback.Client.Params {
+	if cfg.Chains.Platform.Client.Selected != "" {
+		for _, param := range cfg.Chains.Platform.Client.Params {
 			env = append(env, fmt.Sprintf("FALLBACK_%s=%s", param.Env, shellescape.Quote(param.Value)))
 			paramsSet[param.Env] = true
 		}
@@ -827,7 +827,7 @@ func (c *Client) compose(composeFiles []string, args string) (string, error) {
 	if cfg.Metrics.Enabled {
 		builtInFileCount++
 	}
-	if cfg.Chains.Eth1Fallback.Client.Selected != "" {
+	if cfg.Chains.Platform.Client.Selected != "" {
 		builtInFileCount++
 	}
 
@@ -850,7 +850,7 @@ func (c *Client) compose(composeFiles []string, args string) (string, error) {
 	}
 
 	// Add docker-compose-fallback.yml if fallback is enabled
-	if cfg.Chains.Eth1Fallback.Client.Selected != "" {
+	if cfg.Chains.Platform.Client.Selected != "" {
 		composeFileFlags[index] = fmt.Sprintf("-f %s", shellescape.Quote((fmt.Sprintf("%s/%s", expandedConfigPath, FallbackComposeFile))))
 		index++
 	}

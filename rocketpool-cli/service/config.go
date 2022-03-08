@@ -50,13 +50,13 @@ func configureService(c *cli.Context) error {
 	}
 
 	// Configure eth1
-	if err := configureChain(&(globalConfig.Chains.Eth1), &(userConfig.Chains.Eth1), "Eth 1.0", false, false, []string{}, true, showAdvanced); err != nil {
+	if err := configureChain(&(globalconfig.Chains.Platform), &(userconfig.Chains.Platform), "Eth 1.0", false, false, []string{}, true, showAdvanced); err != nil {
 		return err
 	}
 
 	// Get the list of fallback eth1 clients
 	var fallbackEth1Clients []string
-	for _, eth1Client := range globalConfig.Chains.Eth1.Client.Options {
+	for _, eth1Client := range globalconfig.Chains.Platform.Client.Options {
 		if eth1Client.Fallback {
 			fallbackEth1Clients = append(fallbackEth1Clients, eth1Client.ID)
 		}
@@ -64,22 +64,22 @@ func configureService(c *cli.Context) error {
 
 	// Get the list of compatible eth2 clients for the primary
 	var compatibleEth2Clients []string
-	compatibleString := globalConfig.Chains.Eth1.GetSelectedClient().CompatibleEth2Clients
+	compatibleString := globalconfig.Chains.Platform.GetSelectedClient().CompatibleEth2Clients
 	if compatibleString != "" {
-		compatibleEth2Clients = strings.Split(globalConfig.Chains.Eth1.GetSelectedClient().CompatibleEth2Clients, ";")
+		compatibleEth2Clients = strings.Split(globalconfig.Chains.Platform.GetSelectedClient().CompatibleEth2Clients, ";")
 	}
 
 	// Configure eth1 fallback
 	if cliutils.Confirm("Would you like to configure a second Eth 1.0 client to act as a fallback in case your primary Eth 1.0 client is unavailable?") {
-		if err := configureChain(&(globalConfig.Chains.Eth1), &(userConfig.Chains.Eth1Fallback), "Eth 1.0 Fallback", false, true, fallbackEth1Clients, true, showAdvanced); err != nil {
+		if err := configureChain(&(globalconfig.Chains.Platform), &(userconfig.Chains.PlatformFallback), "Eth 1.0 Fallback", false, true, fallbackEth1Clients, true, showAdvanced); err != nil {
 			return err
 		}
 
 		// Get the list of compatible eth2 clients for the fallback
 		var fallbackCompatibleEth2Clients []string
-		fallbackCompatibleString := globalConfig.Chains.Eth1.GetClientById(userConfig.Chains.Eth1Fallback.Client.Selected).CompatibleEth2Clients
+		fallbackCompatibleString := globalconfig.Chains.Platform.GetClientById(userconfig.Chains.PlatformFallback.Client.Selected).CompatibleEth2Clients
 		if fallbackCompatibleString != "" {
-			fallbackCompatibleEth2Clients = strings.Split(globalConfig.Chains.Eth1.GetSelectedClient().CompatibleEth2Clients, ";")
+			fallbackCompatibleEth2Clients = strings.Split(globalconfig.Chains.Platform.GetSelectedClient().CompatibleEth2Clients, ";")
 		}
 
 		if len(fallbackCompatibleEth2Clients) == 0 {
@@ -105,11 +105,11 @@ func configureService(c *cli.Context) error {
 			}
 		}
 	} else {
-		userConfig.Chains.Eth1Fallback = config.Chain{}
+		userconfig.Chains.PlatformFallback = config.Chain{}
 	}
 
 	// Configure eth2
-	if err := configureChain(&(globalConfig.Chains.Eth2), &(userConfig.Chains.Eth2), "Eth 2.0", true, false, compatibleEth2Clients, true, showAdvanced); err != nil {
+	if err := configureChain(&(globalConfig.Chains.Platform), &(userConfig.Chains.Platform), "Eth 2.0", true, false, compatibleEth2Clients, true, showAdvanced); err != nil {
 		return err
 	}
 
@@ -125,9 +125,9 @@ func configureService(c *cli.Context) error {
 
 	// Print settings
 	fmt.Println("=== ETH1 Settings ===")
-	eth1Client := globalConfig.Chains.Eth1.GetClientById(userConfig.Chains.Eth1.Client.Selected)
+	eth1Client := globalconfig.Chains.Platform.GetClientById(userconfig.Chains.Platform.Client.Selected)
 	fmt.Printf("Selected client: %s\n", eth1Client.Name)
-	for _, param := range userConfig.Chains.Eth1.Client.Params {
+	for _, param := range userconfig.Chains.Platform.Client.Params {
 		globalParam := eth1Client.GetParamByEnvName(param.Env)
 		if globalParam != nil {
 			fmt.Printf("%s: %s\n", globalParam.Name, param.Value)
@@ -135,11 +135,11 @@ func configureService(c *cli.Context) error {
 	}
 	fmt.Println()
 
-	if userConfig.Chains.Eth1Fallback.Client.Selected != "" {
+	if userconfig.Chains.PlatformFallback.Client.Selected != "" {
 		fmt.Println("=== ETH1 Fallback Settings ===")
-		eth1FallbackClient := globalConfig.Chains.Eth1.GetClientById(userConfig.Chains.Eth1Fallback.Client.Selected)
+		eth1FallbackClient := globalconfig.Chains.Platform.GetClientById(userconfig.Chains.PlatformFallback.Client.Selected)
 		fmt.Printf("Selected client: %s\n", eth1FallbackClient.Name)
-		for _, param := range userConfig.Chains.Eth1Fallback.Client.Params {
+		for _, param := range userconfig.Chains.PlatformFallback.Client.Params {
 			globalParam := eth1FallbackClient.GetParamByEnvName(param.Env)
 			if globalParam != nil {
 				fmt.Printf("%s: %s\n", globalParam.Name, param.Value)
@@ -149,9 +149,9 @@ func configureService(c *cli.Context) error {
 	}
 
 	fmt.Println("=== ETH2 Settings ===")
-	eth2Client := globalConfig.Chains.Eth2.GetClientById(userConfig.Chains.Eth2.Client.Selected)
+	eth2Client := globalConfig.Chains.Platform.GetClientById(userConfig.Chains.Platform.Client.Selected)
 	fmt.Printf("Selected client: %s\n", eth2Client.Name)
-	for _, param := range userConfig.Chains.Eth2.Client.Params {
+	for _, param := range userConfig.Chains.Platform.Client.Params {
 		globalParam := eth2Client.GetParamByEnvName(param.Env)
 		if globalParam != nil {
 			fmt.Printf("%s: %s\n", globalParam.Name, param.Value)

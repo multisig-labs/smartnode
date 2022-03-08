@@ -177,7 +177,7 @@ func getWallet(cfg config.RocketPoolConfig, pm *passwords.PasswordManager) (*wal
 		if err != nil {
 			return
 		}
-		nodeWallet, err = wallet.NewWallet(os.ExpandEnv(cfg.Smartnode.WalletPath), cfg.Chains.Eth1.ChainID, maxFee, maxPriorityFee, gasLimit, pm)
+		nodeWallet, err = wallet.NewWallet(os.ExpandEnv(cfg.Smartnode.WalletPath), cfg.Chains.Platform.ChainID, maxFee, maxPriorityFee, gasLimit, pm)
 		if err != nil {
 			return
 		}
@@ -196,14 +196,14 @@ func getWallet(cfg config.RocketPoolConfig, pm *passwords.PasswordManager) (*wal
 func getEthClientProxy(cfg config.RocketPoolConfig) (*uc.EthClientProxy, error) {
 	var err error
 	initEthClientProxy.Do(func() {
-		reconnectDelay, err := time.ParseDuration(cfg.Chains.Eth1.ReconnectDelay)
+		reconnectDelay, err := time.ParseDuration(cfg.Chains.Platform.ReconnectDelay)
 		if err != nil {
 			return
 		}
-		if cfg.Chains.Eth1Fallback.Client.Selected == "" {
-			ethClientProxy = uc.NewEth1ClientProxy(reconnectDelay, cfg.Chains.Eth1.Provider)
+		if cfg.Chains.Platform.Client.Selected == "" {
+			ethClientProxy = uc.NewEth1ClientProxy(reconnectDelay, cfg.Chains.Platform.Provider)
 		} else {
-			ethClientProxy = uc.NewEth1ClientProxy(reconnectDelay, cfg.Chains.Eth1.Provider, cfg.Chains.Eth1.FallbackProvider)
+			ethClientProxy = uc.NewEth1ClientProxy(reconnectDelay, cfg.Chains.Platform.Provider, cfg.Chains.Platform.FallbackProvider)
 		}
 	})
 	return ethClientProxy, err
@@ -236,17 +236,17 @@ func getRplFaucet(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*cont
 func getBeaconClient(cfg config.RocketPoolConfig) (beacon.Client, error) {
 	var err error
 	initBeaconClient.Do(func() {
-		switch cfg.Chains.Eth2.Client.Selected {
+		switch cfg.Chains.Platform.Client.Selected {
 		case "lighthouse":
-			beaconClient = lighthouse.NewClient(cfg.Chains.Eth2.Provider)
+			beaconClient = lighthouse.NewClient(cfg.Chains.Platform.Provider)
 		case "nimbus":
-			beaconClient = nimbus.NewClient(cfg.Chains.Eth2.Provider)
+			beaconClient = nimbus.NewClient(cfg.Chains.Platform.Provider)
 		case "prysm":
-			beaconClient = prysm.NewClient(cfg.Chains.Eth2.Provider)
+			beaconClient = prysm.NewClient(cfg.Chains.Platform.Provider)
 		case "teku":
-			beaconClient = teku.NewClient(cfg.Chains.Eth2.Provider)
+			beaconClient = teku.NewClient(cfg.Chains.Platform.Provider)
 		default:
-			err = fmt.Errorf("Unknown Eth 2.0 client '%s' selected", cfg.Chains.Eth2.Client.Selected)
+			err = fmt.Errorf("Unknown Eth 2.0 client '%s' selected", cfg.Chains.Platform.Client.Selected)
 		}
 	})
 	return beaconClient, err

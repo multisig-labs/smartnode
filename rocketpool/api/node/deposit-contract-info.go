@@ -32,10 +32,10 @@ func getDepositContractInfo(c *cli.Context) (*api.DepositContractInfoResponse, e
 	if err != nil {
 		return nil, fmt.Errorf("Error getting configuration: %w", err)
 	}
-	rpNetwork, err := strconv.ParseUint(config.Chains.Eth1.ChainID, 0, 64)
+	rpNetwork, err := strconv.ParseUint(config.Chains.Platform.ChainID, 0, 64)
 	if err != nil {
 		return nil, fmt.Errorf("%s is not a valid ETH1 chain ID (in the config file): %w",
-			config.Chains.Eth1.ChainID, err)
+			config.Chains.Platform.ChainID, err)
 	}
 	response.RPNetwork = rpNetwork
 

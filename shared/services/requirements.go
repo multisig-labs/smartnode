@@ -76,9 +76,9 @@ func RequireBeaconClientSynced(c *cli.Context) error {
 }
 
 func RequireRocketStorage(c *cli.Context) error {
-	if err := RequireEthClientSynced(c); err != nil {
-		return err
-	}
+	//if err := RequireEthClientSynced(c); err != nil {
+	//	return err
+	//}
 	rocketStorageLoaded, err := getRocketStorageLoaded(c)
 	if err != nil {
 		return err

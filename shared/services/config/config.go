@@ -39,9 +39,8 @@ type RocketPoolConfig struct {
 		StakeUrl                  string  `yaml:"stakeUrl,omitempty"`
 	} `yaml:"smartnode,omitempty"`
 	Chains struct {
-		Eth1         Chain `yaml:"eth1,omitempty"`
+		Platform     Chain `yaml:"platform,omitempty"`
 		Eth1Fallback Chain `yaml:"eth1Fallback,omitempty"`
-		Eth2         Chain `yaml:"eth2,omitempty"`
 	} `yaml:"chains,omitempty"`
 	Metrics Metrics `yaml:"metrics,omitempty"`
 }
@@ -97,13 +96,13 @@ type Metrics struct {
 
 // Get the selected clients from a config
 func (config *RocketPoolConfig) GetSelectedEth1Client() *ClientOption {
-	return config.Chains.Eth1.GetSelectedClient()
+	return config.Chains.Platform.GetSelectedClient()
 }
 func (config *RocketPoolConfig) GetSelectedEth1FallbackClient() *ClientOption {
-	return config.Chains.Eth1.GetClientById(config.Chains.Eth1Fallback.Client.Selected)
+	return config.Chains.Platform.GetClientById(config.Chains.Platform.Client.Selected)
 }
 func (config *RocketPoolConfig) GetSelectedEth2Client() *ClientOption {
-	return config.Chains.Eth2.GetSelectedClient()
+	return config.Chains.Platform.GetSelectedClient()
 }
 func (chain *Chain) GetSelectedClient() *ClientOption {
 	for _, option := range chain.Client.Options {
@@ -181,10 +180,10 @@ func Parse(bytes []byte) (RocketPoolConfig, error) {
 	}
 
 	// Validate the defaults
-	if err := ValidateDefaults(config.Chains.Eth1, "eth1"); err != nil {
+	if err := ValidateDefaults(config.Chains.Platform, "eth1"); err != nil {
 		return RocketPoolConfig{}, err
 	}
-	if err := ValidateDefaults(config.Chains.Eth2, "eth2"); err != nil {
+	if err := ValidateDefaults(config.Chains.Platform, "eth2"); err != nil {
 		return RocketPoolConfig{}, err
 	}
 	if err := ValidateMetricDefaults(config.Metrics.Params); err != nil {
@@ -323,8 +322,8 @@ func getCliConfig(c *cli.Context) RocketPoolConfig {
 	config.Smartnode.MaxFee = c.GlobalFloat64("maxFee")
 	config.Smartnode.MaxPriorityFee = c.GlobalFloat64("maxPrioFee")
 	config.Smartnode.GasLimit = c.GlobalUint64("gasLimit")
-	config.Chains.Eth1.Provider = c.GlobalString("eth1Provider")
-	config.Chains.Eth2.Provider = c.GlobalString("eth2Provider")
+	config.Chains.Platform.Provider = c.GlobalString("eth1Provider")
+	config.Chains.Platform.Provider = c.GlobalString("eth2Provider")
 	return config
 }
 
