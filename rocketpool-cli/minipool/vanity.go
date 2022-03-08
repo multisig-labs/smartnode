@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/big"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -74,11 +73,9 @@ func findVanitySalt(c *cli.Context) error {
 	if c.String("amount") != "" {
 
 		// Parse amount
-		depositAmount, err := strconv.ParseFloat(c.String("amount"), 64)
-		if err != nil {
-			return fmt.Errorf("Invalid deposit amount '%s': %w", c.String("amount"), err)
+		if amount, err = cliutils.ValidateDepositEthAmount("deposit", c.String("amount")); err != nil {
+			return err
 		}
-		amount = depositAmount
 
 	} else {
 
@@ -161,8 +158,10 @@ func findVanitySalt(c *cli.Context) error {
 func runWorker(report bool, stop *bool, targetPrefix *big.Int, nodeAddress []byte, minipoolManagerAddress common.Address, initHash []byte, salt *big.Int, increment int64, shiftAmount uint) (*big.Int, common.Address) {
 	saltBytes := [32]byte{}
 	hashInt := big.NewInt(0)
-	zero := big.NewInt(0)
 	incrementInt := big.NewInt(increment)
+	hasher := crypto.NewKeccakState()
+	nodeSalt := common.Hash{}
+	addressResult := common.Hash{}
 
 	// Set up the reporting ticker if requested
 	var ticker *time.Ticker
@@ -196,20 +195,36 @@ func runWorker(report bool, stop *bool, targetPrefix *big.Int, nodeAddress []byt
 			return nil, common.Address{}
 		}
 
+		// Some speed optimizations -
+		// This block is the fast way to do `nodeSalt := crypto.Keccak256Hash(nodeAddress, saltBytes)`
 		salt.FillBytes(saltBytes[:])
-		nodeSalt := crypto.Keccak256Hash(nodeAddress, saltBytes[:])
+		hasher.Write(nodeAddress)
+		hasher.Write(saltBytes[:])
+		hasher.Read(nodeSalt[:])
+		hasher.Reset()
 
-		address := crypto.CreateAddress2(minipoolManagerAddress, nodeSalt, initHash)
-		hashInt.SetBytes(address.Bytes())
+		// This block is the fast way to do `crypto.CreateAddress2(minipoolManagerAddress, nodeSalt, initHash)`
+		// except instead of capturing the returned value as an address, we keep it as bytes. The first 12 bytes
+		// are ignored, since they are not part of the resulting address.
+		//
+		// Because we didn't call CreateAddress2 here, we have to call common.BytesToAddress below, but we can
+		// postpone that until we find the correct salt.
+		hasher.Write([]byte{0xff})
+		hasher.Write(minipoolManagerAddress.Bytes())
+		hasher.Write(nodeSalt[:])
+		hasher.Write(initHash)
+		hasher.Read(addressResult[:])
+		hasher.Reset()
+
+		hashInt.SetBytes(addressResult[12:])
 		hashInt.Rsh(hashInt, shiftAmount*4)
-		hashInt.Xor(hashInt, targetPrefix)
-		if hashInt.Cmp(zero) == 0 {
+		if hashInt.Cmp(targetPrefix) == 0 {
 			if report {
 				close(tickerChan)
 			}
+			address := common.BytesToAddress(addressResult[12:])
 			return salt, address
-		} else {
-			salt.Add(salt, incrementInt)
 		}
+		salt.Add(salt, incrementInt)
 	}
 }
