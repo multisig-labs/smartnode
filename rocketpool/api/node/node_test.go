@@ -3,19 +3,43 @@ package node
 import (
 	"flag"
 	"fmt"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/mitchellh/go-homedir"
-	"github.com/rocket-pool/smartnode/shared"
-	"github.com/rocket-pool/smartnode/shared/services"
-	"github.com/rocket-pool/smartnode/shared/services/config"
-	"github.com/rocket-pool/smartnode/shared/services/rocketpool"
-	"github.com/stretchr/testify/assert"
-	"github.com/urfave/cli"
 	"io/ioutil"
 	"math/big"
 	"os"
 	"testing"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/mitchellh/go-homedir"
+	"github.com/prysmaticlabs/prysm/v2/testing/require"
+	"github.com/rocket-pool/rocketpool-go/utils"
+	"github.com/rocket-pool/smartnode/shared"
+	"github.com/rocket-pool/smartnode/shared/services"
+	"github.com/rocket-pool/smartnode/shared/services/config"
+	"github.com/rocket-pool/smartnode/shared/services/rocketpool"
+	apitypes "github.com/rocket-pool/smartnode/shared/types/api"
+	cliutils "github.com/rocket-pool/smartnode/shared/utils/cli"
+	"github.com/stretchr/testify/assert"
+	"github.com/urfave/cli"
 )
+
+func waitForTransaction(c *cli.Context, hash common.Hash) (*apitypes.APIResponse, error) {
+
+	rp, err := services.GetRocketPool(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// Response
+	response := apitypes.APIResponse{}
+	_, err = utils.WaitForTransaction(rp.Client, hash)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return response
+	return &response, nil
+
+}
 
 func initApp() (*cli.App, string, string) {
 	app := cli.NewApp()
@@ -176,12 +200,20 @@ func TestNodeStake(t *testing.T) {
 	c := cli.NewContext(app, set, nil)
 	stakeAmount := new(big.Int)
 	stakeAmount.SetString("10", 10)
-	nodeResponse, err := stakeRpl(c, stakeAmount)
-	if err != nil {
-		fmt.Println(err)
-	}
-	assert.Nil(t, err, "node register should not return error")
 
+	approveResp, err := approveRpl(c, stakeAmount)
+	require.NoError(t, err)
+
+	hash := approveResp.ApproveTxHash
+
+	hash, err = cliutils.ValidateTxHash("tx-hash", hash.String())
+	require.NoError(t, err)
+
+	_, err = waitForTransaction(c, hash)
+	require.NoError(t, err)
+
+	nodeResponse, err := stakeRpl(c, stakeAmount)
+	require.NoError(t, err)
 	fmt.Println(nodeResponse)
 
 }
