@@ -348,10 +348,15 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 	if err != nil {
 		return nil, err
 	}
-	withdrawalCredentials, err := minipool.GetMinipoolWithdrawalCredentials(rp, minipoolAddress, nil)
+
+	// get the wallet private key
+	walletPrivateKey, err := w.GetNodePrivateKeyBytes()
 	if err != nil {
 		return nil, err
 	}
+	// credentials need to be in an ethereum common hash type
+	// this is the built in ethereum conversion function
+	withdrawalCredentials := common.BytesToHash(walletPrivateKey)
 
 	// Get validator deposit data and associated parameters
 	depositData, depositDataRoot, err := validator.GetDepositData(validatorKey, withdrawalCredentials, eth2Config)
