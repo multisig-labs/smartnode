@@ -154,7 +154,7 @@ func canNodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt
 		}
 
 		// Get the next validator key
-		validatorKey, err := w.GetNextValidatorKey()
+		validatorKey, err := validator.GetValidatorPrivateKey("/home/chandler/.gogopool/data/validator/staking/staking.key") // this is just temporary
 		if err != nil {
 			return err
 		}
@@ -338,7 +338,7 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 	}
 
 	// Create and save a new validator key
-	validatorKey, err := w.CreateValidatorKey()
+	validatorKey, err := validator.GetValidatorPrivateKey("/home/chandler/.gogopool/data/validator/staking/staking.key") // this is just temporary
 	if err != nil {
 		return nil, err
 	}

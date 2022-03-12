@@ -96,11 +96,16 @@ func canStakeMinipool(c *cli.Context, minipoolAddress common.Address) (*api.CanS
 		}
 
 		// Get the validator key for the minipool
-		validatorPubkey, err := minipool.GetMinipoolPubkey(rp, mp.Address, nil)
-		if err != nil {
-			return nil, err
-		}
-		validatorKey, err := w.GetValidatorKeyByPubkey(validatorPubkey)
+		// validatorPubkey, err := minipool.GetMinipoolPubkey(rp, mp.Address, nil)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// validatorKey, err := w.GetValidatorKeyByPubkey(validatorPubkey)
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		validatorKey, err := validator.GetValidatorPrivateKey("") // figure out where it is.
 		if err != nil {
 			return nil, err
 		}
@@ -183,11 +188,16 @@ func stakeMinipool(c *cli.Context, minipoolAddress common.Address) (*api.StakeMi
 	}
 
 	// Get the validator key for the minipool
-	validatorPubkey, err := minipool.GetMinipoolPubkey(rp, mp.Address, nil)
-	if err != nil {
-		return nil, err
-	}
-	validatorKey, err := w.GetValidatorKeyByPubkey(validatorPubkey)
+	// validatorPubkey, err := minipool.GetMinipoolPubkey(rp, mp.Address, nil)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// validatorKey, err := w.GetValidatorKeyByPubkey(validatorPubkey)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	validatorKey, err := validator.GetValidatorPrivateKey("") // figure out where it is.
 	if err != nil {
 		return nil, err
 	}
