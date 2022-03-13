@@ -154,7 +154,7 @@ func canNodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt
 		}
 
 		// Get the next validator key
-		validatorKey, err := w.GetNextValidatorKey()
+		validatorKey, err := validator.GetValidatorPrivateKey("/home/chandler/.gogopool/data/validator/staking/staking.key") // this is just temporary
 		if err != nil {
 			return err
 		}
@@ -338,7 +338,7 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 	}
 
 	// Create and save a new validator key
-	validatorKey, err := w.CreateValidatorKey()
+	validatorKey, err := validator.GetValidatorPrivateKey("/home/chandler/.gogopool/data/validator/staking/staking.key") // this is just temporary
 	if err != nil {
 		return nil, err
 	}
@@ -348,10 +348,11 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 	if err != nil {
 		return nil, err
 	}
-	withdrawalCredentials, err := minipool.GetMinipoolWithdrawalCredentials(rp, minipoolAddress, nil)
-	if err != nil {
-		return nil, err
-	}
+
+	// convert nodeAccount.Address to bytes
+	nodeAccountAddressBytes := nodeAccount.Address.Bytes()
+	// convert it to a common Hash
+	withdrawalCredentials := common.BytesToHash(nodeAccountAddressBytes)
 
 	// Get validator deposit data and associated parameters
 	depositData, depositDataRoot, err := validator.GetDepositData(validatorKey, withdrawalCredentials, eth2Config)

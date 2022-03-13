@@ -1,6 +1,11 @@
 package validator
 
 import (
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/rocket-pool/smartnode/shared/types/eth2"
 	eth2types "github.com/wealdtech/go-eth2-types/v2"
@@ -12,11 +17,11 @@ import (
 const DepositAmount = 16000000000 // gwei
 
 // Get deposit data & root for a given validator key and withdrawal credentials
-func GetDepositData(validatorKey *eth2types.BLSPrivateKey, withdrawalCredentials common.Hash, eth2Config beacon.Eth2Config) (eth2.DepositData, common.Hash, error) {
+func GetDepositData(validatorKey *rsa.PrivateKey, withdrawalCredentials common.Hash, eth2Config beacon.Eth2Config) (eth2.DepositData, common.Hash, error) {
 
 	// Build deposit data
 	dd := eth2.DepositDataNoSignature{
-		PublicKey:             validatorKey.PublicKey().Marshal(),
+		PublicKey:             x509.MarshalPKCS1PublicKey(&validatorKey.PublicKey),
 		WithdrawalCredentials: withdrawalCredentials[:],
 		Amount:                DepositAmount,
 	}
@@ -38,12 +43,17 @@ func GetDepositData(validatorKey *eth2types.BLSPrivateKey, withdrawalCredentials
 		return eth2.DepositData{}, common.Hash{}, err
 	}
 
+	sig, err := validatorKey.Sign(rand.Reader, srHash[:], crypto.SHA256)
+	if err != nil {
+		return eth2.DepositData{}, common.Hash{}, err
+	}
+
 	// Build deposit data struct (with signature)
 	var depositData = eth2.DepositData{
 		PublicKey:             dd.PublicKey,
 		WithdrawalCredentials: dd.WithdrawalCredentials,
 		Amount:                dd.Amount,
-		Signature:             validatorKey.Sign(srHash[:]).Marshal(),
+		Signature:             sig,
 	}
 
 	// Get deposit data root

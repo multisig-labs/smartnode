@@ -4,8 +4,14 @@ import (
 	"crypto/rand"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"math/big"
+	"os"
+	"testing"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/mitchellh/go-homedir"
+	"github.com/prysmaticlabs/prysm/v2/testing/require"
 	"github.com/rocket-pool/rocketpool-go/utils"
 	"github.com/rocket-pool/smartnode/shared"
 	"github.com/rocket-pool/smartnode/shared/services"
@@ -15,11 +21,26 @@ import (
 	apitypes "github.com/rocket-pool/smartnode/shared/types/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
-	"io/ioutil"
-	"math/big"
-	"os"
-	"testing"
 )
+
+func waitForTransaction(c *cli.Context, hash common.Hash) (*apitypes.APIResponse, error) {
+
+	rp, err := services.GetRocketPool(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// Response
+	response := apitypes.APIResponse{}
+	_, err = utils.WaitForTransaction(rp.Client, hash)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return response
+	return &response, nil
+
+}
 
 func initApp() (*cli.App, string, string) {
 	app := cli.NewApp()
@@ -211,7 +232,7 @@ func TestNodeStakeRPL(t *testing.T) {
 		fmt.Println(err)
 	}
 	assert.Nil(t, err, "node register should not return error")
-
+	require.NoError(t, err)
 	fmt.Println(nodeResponse)
 
 }
@@ -260,26 +281,6 @@ func TestNodeDepositAVAX(t *testing.T) {
 	}
 
 	fmt.Println(depositResponse)
-
-}
-
-// Waits for an auction transaction
-func waitForTransaction(c *cli.Context, hash common.Hash) (*apitypes.APIResponse, error) {
-
-	rp, err := services.GetRocketPool(c)
-	if err != nil {
-		return nil, err
-	}
-
-	// Response
-	response := apitypes.APIResponse{}
-	_, err = utils.WaitForTransaction(rp.Client, hash)
-	if err != nil {
-		return nil, err
-	}
-
-	// Return response
-	return &response, nil
 
 }
 

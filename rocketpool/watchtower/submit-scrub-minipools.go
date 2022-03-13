@@ -2,11 +2,15 @@ package watchtower
 
 import (
 	"context"
+	"crypto"
+	"crypto/rsa"
+	"crypto/x509"
 	"fmt"
 	"math/big"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/prysm/v2/beacon-chain/core/signing"
 	prdeposit "github.com/prysmaticlabs/prysm/v2/contracts/deposit"
 	"github.com/rocket-pool/rocketpool-go/dao/trustednode"
@@ -671,4 +675,32 @@ func (t *submitScrubMinipools) printFinalTally() {
 		t.coll.UncoveredMinipools = float64(len(t.it.minipools))
 		t.coll.LatestBlockTime = float64(t.it.latestBlockTime.Unix())
 	}
+}
+
+// VerifyDepositSignature verifies the correctness of Eth1 deposit BLS signature
+func VerifyDepositSignature(dd *ethpb.Deposit_Data, domain []byte) error {
+	ddCopy := ethpb.CopyDepositData(dd)
+	publicKey, err := x509.ParsePKCS1PublicKey(ddCopy.PublicKey)
+	if err != nil {
+		return errors.Wrap(err, "could not convert bytes to public key")
+	}
+	di := &ethpb.DepositMessage{
+		PublicKey:             ddCopy.PublicKey,
+		WithdrawalCredentials: ddCopy.WithdrawalCredentials,
+		Amount:                ddCopy.Amount,
+	}
+	root, err := di.HashTreeRoot()
+	if err != nil {
+		return errors.Wrap(err, "could not get signing root")
+	}
+	signingData := &ethpb.SigningData{
+		ObjectRoot: root[:],
+		Domain:     domain,
+	}
+	ctrRoot, err := signingData.HashTreeRoot()
+	if err != nil {
+		return errors.Wrap(err, "could not get container root")
+	}
+
+	return rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, ctrRoot[:], ddCopy.Signature)
 }
