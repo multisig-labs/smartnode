@@ -1,14 +1,18 @@
 package node
 
 import (
+	"crypto/rand"
 	"flag"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/mitchellh/go-homedir"
+	"github.com/rocket-pool/rocketpool-go/utils"
 	"github.com/rocket-pool/smartnode/shared"
 	"github.com/rocket-pool/smartnode/shared/services"
 	"github.com/rocket-pool/smartnode/shared/services/config"
 	"github.com/rocket-pool/smartnode/shared/services/rocketpool"
+	"github.com/rocket-pool/smartnode/shared/types/api"
+	apitypes "github.com/rocket-pool/smartnode/shared/types/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
 	"io/ioutil"
@@ -168,14 +172,40 @@ func TestNodeStatus(t *testing.T) {
 	fmt.Println(nodeResponse)
 
 }
-func TestNodeStake(t *testing.T) {
+func TestNodeStakeRPL(t *testing.T) {
 	app, configPath, settingsPath := initApp()
+
 	set := flag.NewFlagSet("config-path", 0)
 	set.String("config", configPath, "doc")
 	set.String("settings", settingsPath, "doc")
 	c := cli.NewContext(app, set, nil)
+	_, err := services.GetRocketPool(c)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("10", 10)
+	stakeAmount.SetString("100000000", 10)
+
+	// Calculate max uint256 value
+	maxApproval := big.NewInt(2)
+	maxApproval = maxApproval.Exp(maxApproval, big.NewInt(256), nil)
+	maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
+
+	// Approve RPL for staking
+	response, err := approveRpl(c, maxApproval)
+	if err != nil {
+		fmt.Println(err)
+	}
+	hash := response.ApproveTxHash
+
+	fmt.Printf("Approving RPL for staking...\n")
+
+	if _, err = waitForTransaction(c, hash); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Successfully approved staking access to RPL.")
+
 	nodeResponse, err := stakeRpl(c, stakeAmount)
 	if err != nil {
 		fmt.Println(err)
@@ -183,6 +213,73 @@ func TestNodeStake(t *testing.T) {
 	assert.Nil(t, err, "node register should not return error")
 
 	fmt.Println(nodeResponse)
+
+}
+
+const DefaultMaxNodeFeeSlippage = 0.01 // 1% below current network fee
+
+func TestNodeDepositAVAX(t *testing.T) {
+	app, configPath, settingsPath := initApp()
+
+	set := flag.NewFlagSet("config-path", 0)
+	set.String("config", configPath, "doc")
+	set.String("settings", settingsPath, "doc")
+	c := cli.NewContext(app, set, nil)
+	_, err := services.GetRocketPool(c)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	stakeAmount := new(big.Int)
+	stakeAmount.SetString("100000000", 10)
+
+	// Calculate max uint256 value
+	maxApproval := big.NewInt(2)
+	maxApproval = maxApproval.Exp(maxApproval, big.NewInt(256), nil)
+	maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
+
+	buffer := make([]byte, 32)
+	_, err = rand.Read(buffer)
+	if err != nil {
+		fmt.Println(fmt.Errorf("Error generating random salt: %w", err))
+	}
+	var salt = big.NewInt(0).SetBytes(buffer)
+	var minNodeFee float64
+
+	nodeFees := api.NodeFeeResponse{}
+	nodeFees.MaxNodeFee = 100
+	nodeFees.MaxNodeFee = 20
+
+	// Use default max slippage
+
+	minNodeFee = nodeFees.NodeFee - DefaultMaxNodeFeeSlippage
+
+	depositResponse, err := nodeDeposit(c, stakeAmount, minNodeFee, salt)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(depositResponse)
+
+}
+
+// Waits for an auction transaction
+func waitForTransaction(c *cli.Context, hash common.Hash) (*apitypes.APIResponse, error) {
+
+	rp, err := services.GetRocketPool(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// Response
+	response := apitypes.APIResponse{}
+	_, err = utils.WaitForTransaction(rp.Client, hash)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return response
+	return &response, nil
 
 }
 
