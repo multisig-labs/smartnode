@@ -349,14 +349,10 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 		return nil, err
 	}
 
-	// get the wallet private key
-	walletPrivateKey, err := w.GetNodePrivateKeyBytes()
-	if err != nil {
-		return nil, err
-	}
-	// credentials need to be in an ethereum common hash type
-	// this is the built in ethereum conversion function
-	withdrawalCredentials := common.BytesToHash(walletPrivateKey)
+	// convert nodeAccount.Address to bytes
+	nodeAccountAddressBytes := nodeAccount.Address.Bytes()
+	// convert it to a common Hash
+	withdrawalCredentials := common.BytesToHash(nodeAccountAddressBytes)
 
 	// Get validator deposit data and associated parameters
 	depositData, depositDataRoot, err := validator.GetDepositData(validatorKey, withdrawalCredentials, eth2Config)
