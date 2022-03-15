@@ -473,7 +473,7 @@ type DataOne struct {
 
 // Get genesis information
 func (c *Client) getGenesis() (GenesisResponse, error) {
-	dataOne := DataOne{uinteger(10), byteArray{0}, byteArray{0}}
+	dataOne := DataOne{uinteger(10), byteArray{0, 0, 0, 0}, byteArray{0}}
 	return GenesisResponse{dataOne}, nil
 	//responseBody, status, err := c.getRequest(RequestGenesisPath)
 	//if err != nil {

@@ -27,11 +27,13 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prysmaticlabs/prysm/v2 v2.0.1
 	github.com/rocket-pool/rocketpool-go v1.1.2
 	github.com/sethvargo/go-password v0.2.0
 	github.com/shirou/gopsutil/v3 v3.21.11
+	github.com/stretchr/testify v1.7.0
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/urfave/cli v1.22.5
 	github.com/wealdtech/go-eth2-types/v2 v2.6.0

@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/rocket-pool/rocketpool-go/network"
+	"github.com/rocket-pool/rocketpool-go/settings/protocol"
+	"github.com/rocket-pool/smartnode/shared/types/api"
+	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -18,7 +22,6 @@ import (
 	"github.com/rocket-pool/smartnode/shared/services"
 	"github.com/rocket-pool/smartnode/shared/services/config"
 	"github.com/rocket-pool/smartnode/shared/services/rocketpool"
-	"github.com/rocket-pool/smartnode/shared/types/api"
 	apitypes "github.com/rocket-pool/smartnode/shared/types/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
@@ -217,7 +220,7 @@ func TestNodeStakeRPL(t *testing.T) {
 	}
 
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("100000000", 10)
+	stakeAmount.SetString("1800000000000000000000", 10)
 
 	// Calculate max uint256 value
 	maxApproval := big.NewInt(2)
@@ -263,7 +266,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 	}
 
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("100000000", 10)
+	stakeAmount.SetString("32000000000000000000", 10)
 
 	// Calculate max uint256 value
 	maxApproval := big.NewInt(2)
@@ -276,11 +279,14 @@ func TestNodeDepositAVAX(t *testing.T) {
 		fmt.Println(fmt.Errorf("Error generating random salt: %w", err))
 	}
 	var salt = big.NewInt(0).SetBytes(buffer)
-	var minNodeFee float64
 
-	nodeFees := api.NodeFeeResponse{}
-	nodeFees.MaxNodeFee = 100
-	nodeFees.MaxNodeFee = 20
+	nodeFees, err := getNodeFee(c)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var minNodeFee float64
 
 	// Use default max slippage
 
@@ -295,6 +301,62 @@ func TestNodeDepositAVAX(t *testing.T) {
 
 }
 
+func getNodeFee(c *cli.Context) (*api.NodeFeeResponse, error) {
+
+	// Get services
+	if err := services.RequireRocketStorage(c); err != nil {
+		return nil, err
+	}
+	rp, err := services.GetRocketPool(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// Response
+	response := api.NodeFeeResponse{}
+
+	// Sync
+	var wg errgroup.Group
+
+	// Get data
+	wg.Go(func() error {
+		nodeFee, err := network.GetNodeFee(rp, nil)
+		if err == nil {
+			response.NodeFee = nodeFee
+		}
+		return err
+	})
+	wg.Go(func() error {
+		minNodeFee, err := protocol.GetMinimumNodeFee(rp, nil)
+		if err == nil {
+			response.MinNodeFee = minNodeFee
+		}
+		return err
+	})
+	wg.Go(func() error {
+		targetNodeFee, err := protocol.GetTargetNodeFee(rp, nil)
+		if err == nil {
+			response.TargetNodeFee = targetNodeFee
+		}
+		return err
+	})
+	wg.Go(func() error {
+		maxNodeFee, err := protocol.GetMaximumNodeFee(rp, nil)
+		if err == nil {
+			response.MaxNodeFee = maxNodeFee
+		}
+		return err
+	})
+
+	// Wait for data
+	if err := wg.Wait(); err != nil {
+		return nil, err
+	}
+
+	// Return response
+	return &response, nil
+
+}
 func TestContractCall(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
