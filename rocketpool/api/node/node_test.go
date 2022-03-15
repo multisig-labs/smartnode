@@ -2,6 +2,7 @@ package node
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -176,6 +177,17 @@ func TestCanNodeStake(t *testing.T) {
 	fmt.Println(nodeResponse)
 
 }
+
+func prettyPrintResponse(response interface{}) {
+	formattedResponse, err := json.MarshalIndent(response, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(formattedResponse))
+
+}
+
 func TestNodeStatus(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
@@ -188,9 +200,8 @@ func TestNodeStatus(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	prettyPrintResponse(nodeResponse)
 	assert.Nil(t, err, "node register should not return error")
-
-	fmt.Println(nodeResponse)
 
 }
 func TestNodeStakeRPL(t *testing.T) {
@@ -280,7 +291,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 		return
 	}
 
-	fmt.Println(depositResponse)
+	prettyPrintResponse(depositResponse)
 
 }
 

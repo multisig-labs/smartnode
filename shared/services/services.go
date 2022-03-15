@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/rocket-pool/smartnode/shared/services/beacon/avalanchego"
 	"math/big"
 	"os"
 	"sync"
@@ -245,6 +246,8 @@ func getBeaconClient(cfg config.RocketPoolConfig) (beacon.Client, error) {
 			beaconClient = prysm.NewClient(cfg.Chains.Platform.Provider)
 		case "teku":
 			beaconClient = teku.NewClient(cfg.Chains.Platform.Provider)
+		case "avalanchego":
+			beaconClient = avalanchego.NewClient(cfg.Chains.Platform.Provider)
 		default:
 			err = fmt.Errorf("Unknown Eth 2.0 client '%s' selected", cfg.Chains.Platform.Client.Selected)
 		}
