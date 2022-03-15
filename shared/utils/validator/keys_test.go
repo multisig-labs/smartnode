@@ -1,32 +1,32 @@
 package validator
 
 import (
-	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
+	"fmt"
 	"io/ioutil"
+	"testing"
 )
 
-func GetValidatorPrivateKey(path string) (*rsa.PrivateKey, error) {
+func TestGetValidatorPrivateKey(t *testing.T) {
 	// read file at path, put into raw bytes
-	raw, err := ioutil.ReadFile(path)
+	raw, err := ioutil.ReadFile("/home/chandler/Downloads/staker1.key")
 	if err != nil {
-		return nil, err
+		t.Error(err)
 	}
 
 	// decode raw bytes into private key
 	block, _ := pem.Decode(raw)
 
+	fmt.Println(block.Type)
+
 	if block.Type != "RSA PRIVATE KEY" {
-		return nil, errors.New("private key not found")
+		t.Error("private key not found")
 	}
 
 	// decode into x509 private key
-	rsaKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	_, err = x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		t.Error(err)
 	}
-
-	return rsaKey, nil
 }
