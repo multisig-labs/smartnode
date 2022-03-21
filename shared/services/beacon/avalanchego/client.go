@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/KeisukeYamashita/go-jsonrpc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/rocket-pool/rocketpool-go/types"
 	"github.com/rocket-pool/smartnode/shared/services/beacon"
 	"github.com/rocket-pool/smartnode/shared/utils/eth2"
-	hexutil "github.com/rocket-pool/smartnode/shared/utils/hex"
 	eth2types "github.com/wealdtech/go-eth2-types/v2"
 	"golang.org/x/sync/errgroup"
 	"io/ioutil"
@@ -518,8 +518,56 @@ func (c *Client) getFork(stateId string) (ForkResponse, error) {
 	return fork, nil
 }
 
+func (c *Client) GetNodeId() (beacon.ResultResponse, error) {
+
+	// make RPC call to local node
+	rpcClient := jsonrpc.NewRPCClient("http://127.0.0.1:9650/ext/info")
+
+	response, err := rpcClient.Call("info.getNodeID")
+	if err != nil {
+		return beacon.ResultResponse{}, err
+	}
+	if response.Error != nil {
+		return beacon.ResultResponse{}, err
+	}
+
+	responseObject := beacon.ResultResponse{}
+	err = response.GetObject(&responseObject)
+	if err != nil {
+		return beacon.ResultResponse{}, err
+	}
+
+	return responseObject, nil
+}
+
+func (c *Client) MakeRPCCall(method string, chainExt string, jsonParams string) (beacon.TransactionResponse, error) {
+
+	// Unmarshall jsonParams
+	var jsonMap map[string]interface{}
+	json.Unmarshal([]byte(jsonParams), &jsonMap)
+
+	// make RPC call to local node
+	rpcClient := jsonrpc.NewRPCClient("http://127.0.0.1:9650" + chainExt)
+
+	response, err := rpcClient.Call(method, jsonMap)
+	if err != nil {
+		return beacon.TransactionResponse{}, err
+	}
+	if response.Error != nil {
+		return beacon.TransactionResponse{}, err
+	}
+
+	responseObject := beacon.TransactionResponse{}
+	err = response.GetObject(&responseObject)
+	if err != nil {
+		return beacon.TransactionResponse{}, err
+	}
+
+	return responseObject, nil
+}
+
 // Get validators
-func (c *Client) getValidators(stateId string, pubkeys []string) (ValidatorsResponse, error) {
+func (c *Client) makeTransaction(stateId string, pubkeys []string, chainId string) (ValidatorsResponse, error) {
 	var query string
 	if len(pubkeys) > 0 {
 		query = fmt.Sprintf("?id=%s", strings.Join(pubkeys, ","))
@@ -539,51 +587,7 @@ func (c *Client) getValidators(stateId string, pubkeys []string) (ValidatorsResp
 
 // Get validators by pubkeys and status options
 func (c *Client) getValidatorsByOpts(pubkeys []types.ValidatorPubkey, opts *beacon.ValidatorStatusOptions) (ValidatorsResponse, error) {
-
-	// Get state ID
-	var stateId string
-	if opts == nil {
-		stateId = "head"
-	} else {
-
-		// Get eth2 config
-		eth2Config, err := c.getEth2Config()
-		if err != nil {
-			return ValidatorsResponse{}, err
-		}
-
-		// Get slot nuimber
-		slot := opts.Epoch * uint64(eth2Config.Data.SlotsPerEpoch)
-		stateId = strconv.FormatInt(int64(slot), 10)
-
-	}
-
-	// Load validator data in batches & return
-	data := make([]Validator, 0, len(pubkeys))
-	for bsi := 0; bsi < len(pubkeys); bsi += MaxRequestValidatorsCount {
-
-		// Get batch start & end index
-		vsi := bsi
-		vei := bsi + MaxRequestValidatorsCount
-		if vei > len(pubkeys) {
-			vei = len(pubkeys)
-		}
-
-		// Get validator pubkeys for batch request
-		pubkeysHex := make([]string, vei-vsi)
-		for vi := vsi; vi < vei; vi++ {
-			pubkeysHex[vi-vsi] = hexutil.AddPrefix(pubkeys[vi].Hex())
-		}
-
-		// Get & add validators
-		validators, err := c.getValidators(stateId, pubkeysHex)
-		if err != nil {
-			return ValidatorsResponse{}, err
-		}
-		data = append(data, validators.Data...)
-
-	}
-	return ValidatorsResponse{Data: data}, nil
+	return ValidatorsResponse{}, nil
 
 }
 

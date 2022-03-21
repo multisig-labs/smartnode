@@ -145,24 +145,6 @@ func TestCanNodeRegister(t *testing.T) {
 
 }
 
-func TestNodeRegister(t *testing.T) {
-	timezone := "Etc/UTC"
-	app, configPath, settingsPath := initApp()
-	set := flag.NewFlagSet("config-path", 0)
-	set.String("config", configPath, "doc")
-	set.String("settings", settingsPath, "doc")
-	c := cli.NewContext(app, set, nil)
-
-	nodeResponse, err := registerNode(c, timezone)
-	if err != nil {
-		fmt.Println(err)
-	}
-	assert.Nil(t, err, "node register should not return error")
-
-	fmt.Println(nodeResponse)
-
-}
-
 func TestCanNodeStake(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
@@ -171,7 +153,7 @@ func TestCanNodeStake(t *testing.T) {
 	c := cli.NewContext(app, set, nil)
 	stakeAmount := new(big.Int)
 	stakeAmount.SetString("100", 10)
-	nodeResponse, err := canNodeStakeRpl(c, stakeAmount)
+	nodeResponse, err := canNodeStakeGgp(c, stakeAmount)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -191,6 +173,14 @@ func prettyPrintResponse(response interface{}) {
 
 }
 
+func TestFirstSetup(t *testing.T) {
+	//TestNodeRegister(t)
+	TestNodeStatus(t)
+
+	TestNodeStakeGGP(t)
+	//TestNodeDepositAVAX(t)
+}
+
 func TestNodeStatus(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
@@ -204,10 +194,28 @@ func TestNodeStatus(t *testing.T) {
 		fmt.Println(err)
 	}
 	prettyPrintResponse(nodeResponse)
-	assert.Nil(t, err, "node register should not return error")
+	assert.Nil(t, err, "node status should not return error")
 
 }
-func TestNodeStakeRPL(t *testing.T) {
+
+func TestNodeRegister(t *testing.T) {
+	timezone := "Etc/UTC"
+	app, configPath, settingsPath := initApp()
+	set := flag.NewFlagSet("config-path", 0)
+	set.String("config", configPath, "doc")
+	set.String("settings", settingsPath, "doc")
+	c := cli.NewContext(app, set, nil)
+
+	nodeResponse, err := registerNode(c, timezone)
+	if err != nil {
+		fmt.Println(err)
+	}
+	assert.Nil(t, err, "node register should not return error")
+
+	fmt.Println(nodeResponse)
+
+}
+func TestNodeStakeGGP(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 
 	set := flag.NewFlagSet("config-path", 0)
@@ -227,25 +235,25 @@ func TestNodeStakeRPL(t *testing.T) {
 	maxApproval = maxApproval.Exp(maxApproval, big.NewInt(256), nil)
 	maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
 
-	// Approve RPL for staking
-	response, err := approveRpl(c, maxApproval)
+	// Approve GGP for staking
+	response, err := approveGgp(c, maxApproval)
 	if err != nil {
 		fmt.Println(err)
 	}
 	hash := response.ApproveTxHash
 
-	fmt.Printf("Approving RPL for staking...\n")
+	fmt.Printf("Approving GGP for staking...\n")
 
 	if _, err = waitForTransaction(c, hash); err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Successfully approved staking access to RPL.")
+	fmt.Println("Successfully approved staking access to GGP.")
 
-	nodeResponse, err := stakeRpl(c, stakeAmount)
+	nodeResponse, err := stakeGgp(c, stakeAmount)
 	if err != nil {
 		fmt.Println(err)
 	}
-	assert.Nil(t, err, "node register should not return error")
+	assert.Nil(t, err, "node stake-rpl should not return error")
 	require.NoError(t, err)
 	fmt.Println(nodeResponse)
 
@@ -294,6 +302,8 @@ func TestNodeDepositAVAX(t *testing.T) {
 
 	depositResponse, err := nodeDeposit(c, stakeAmount, minNodeFee, salt)
 	if err != nil {
+		fmt.Println(err)
+
 		return
 	}
 
@@ -481,7 +491,7 @@ func setNewBondPrice(c *cli.Context) {
 
 	newBond := big.NewInt(0)
 	newBond.SetString("1000000000000000000000", 10)
-	if err := contract.Call(nil, newBond, "setSettingUint", "members.rplbond", newBond); err != nil {
+	if err := contract.Call(nil, newBond, "setSettingUint", "members.ggpbond", newBond); err != nil {
 		fmt.Errorf("Could not get bond amount: %w", err)
 	}
 
@@ -499,7 +509,7 @@ func getAndPrintBond(c *cli.Context) {
 	}
 
 	bond := new(*big.Int)
-	if err := contract.Call(nil, bond, "getRPLBond"); err != nil {
+	if err := contract.Call(nil, bond, "getGGPBond"); err != nil {
 		fmt.Errorf("Could not get bond amount: %w", err)
 	}
 

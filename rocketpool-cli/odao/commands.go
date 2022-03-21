@@ -157,7 +157,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 									},
 									cli.StringFlag{
 										Name:  "fine, f",
-										Usage: "The amount of RPL to fine the member (or 'max')",
+										Usage: "The amount of GGP to fine the member (or 'max')",
 									},
 								},
 								Action: func(c *cli.Context) error {
@@ -215,23 +215,23 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 								},
 							},
 							{
-								Name:      "members-rplbond",
+								Name:      "members-ggpbond",
 								Aliases:   []string{"b"},
-								Usage:     "Propose updating the members.rplbond setting - takes an RPL amount (e.g. 5000)",
-								UsageText: "rocketpool odao propose setting members-rplbond value",
+								Usage:     "Propose updating the members.ggpbond setting - takes an GGP amount (e.g. 5000)",
+								UsageText: "rocketpool odao propose setting members-ggpbond value",
 								Action: func(c *cli.Context) error {
 
 									// Validate args
 									if err := cliutils.ValidateArgCount(c, 1); err != nil {
 										return err
 									}
-									bondAmountEth, err := cliutils.ValidateEthAmount("RPL bond amount", c.Args().Get(0))
+									bondAmountEth, err := cliutils.ValidateEthAmount("GGP bond amount", c.Args().Get(0))
 									if err != nil {
 										return err
 									}
 
 									// Run
-									return proposeSettingMembersRplBond(c, bondAmountEth)
+									return proposeSettingMembersGgpBond(c, bondAmountEth)
 
 								},
 							},
@@ -537,7 +537,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					},
 					cli.BoolFlag{
 						Name:  "swap, s",
-						Usage: "Automatically confirm swapping old RPL before joining",
+						Usage: "Automatically confirm swapping old GGP before joining",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -561,7 +561,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "refund-address, r",
-						Usage: "The address to refund the node's RPL bond to (or 'node')",
+						Usage: "The address to refund the node's GGP bond to (or 'node')",
 					},
 					cli.BoolFlag{
 						Name:  "yes, y",

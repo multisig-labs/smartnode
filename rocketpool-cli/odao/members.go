@@ -41,7 +41,7 @@ func getMembers(c *cli.Context) error {
 		fmt.Printf("Node address:         %s\n", member.Address.Hex())
 		fmt.Printf("Joined at:            %s\n", cliutils.GetDateTimeString(member.JoinedTime))
 		fmt.Printf("Last proposal:        %s\n", cliutils.GetDateTimeString(member.LastProposalTime))
-		fmt.Printf("RPL bond amount:      %.6f\n", math.RoundDown(eth.WeiToEth(member.RPLBondAmount), 6))
+		fmt.Printf("GGP bond amount:      %.6f\n", math.RoundDown(eth.WeiToEth(member.GGPBondAmount), 6))
 		fmt.Printf("Unbonded minipools:   %d\n", member.UnbondedValidatorCount)
 		fmt.Printf("\n")
 	}

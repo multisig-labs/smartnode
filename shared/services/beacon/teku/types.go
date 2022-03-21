@@ -26,6 +26,16 @@ type SyncStatusResponse struct {
 		SyncDistance uinteger `json:"sync_distance"`
 	} `json:"data"`
 }
+
+type ResultResponse struct {
+	NodeID string `json:"nodeID"`
+}
+type GetNodeIdResponse struct {
+	JsonRPC string         `json:"jsonrpc"`
+	Result  ResultResponse `json:"result"`
+	Id      int            `json:"id"`
+}
+
 type Eth2ConfigResponse struct {
 	Data struct {
 		SecondsPerSlot               uinteger `json:"SECONDS_PER_SLOT"`

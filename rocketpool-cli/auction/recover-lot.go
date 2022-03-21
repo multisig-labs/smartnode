@@ -15,7 +15,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func recoverRplFromLot(c *cli.Context) error {
+func recoverGgpFromLot(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -33,14 +33,14 @@ func recoverRplFromLot(c *cli.Context) error {
 	// Get recoverable lots
 	recoverableLots := []api.LotDetails{}
 	for _, lot := range lots.Lots {
-		if lot.RPLRecoveryAvailable {
+		if lot.GGPRecoveryAvailable {
 			recoverableLots = append(recoverableLots, lot)
 		}
 	}
 
 	// Check for recoverable lots
 	if len(recoverableLots) == 0 {
-		fmt.Println("No lots are available for RPL recovery.")
+		fmt.Println("No lots are available for GGP recovery.")
 		return nil
 	}
 
@@ -69,7 +69,7 @@ func recoverRplFromLot(c *cli.Context) error {
 			}
 		}
 		if !found {
-			return fmt.Errorf("Lot %d is not available for RPL recovery.", selectedIndex)
+			return fmt.Errorf("Lot %d is not available for GGP recovery.", selectedIndex)
 		}
 
 	} else {
@@ -78,9 +78,9 @@ func recoverRplFromLot(c *cli.Context) error {
 		options := make([]string, len(recoverableLots)+1)
 		options[0] = "All available lots"
 		for li, lot := range recoverableLots {
-			options[li+1] = fmt.Sprintf("lot %d (%.6f RPL unclaimed)", lot.Details.Index, math.RoundDown(eth.WeiToEth(lot.Details.RemainingRPLAmount), 6))
+			options[li+1] = fmt.Sprintf("lot %d (%.6f GGP unclaimed)", lot.Details.Index, math.RoundDown(eth.WeiToEth(lot.Details.RemainingGGPAmount), 6))
 		}
-		selected, _ := cliutils.Select("Please select a lot to recover unclaimed RPL from:", options)
+		selected, _ := cliutils.Select("Please select a lot to recover unclaimed GGP from:", options)
 
 		// Get lots
 		if selected == 0 {
@@ -96,7 +96,7 @@ func recoverRplFromLot(c *cli.Context) error {
 	var totalSafeGas uint64 = 0
 	var gasInfo rocketpoolapi.GasInfo
 	for _, lot := range selectedLots {
-		canResponse, err := rp.CanRecoverUnclaimedRPLFromLot(lot.Details.Index)
+		canResponse, err := rp.CanRecoverUnclaimedGGPFromLot(lot.Details.Index)
 		if err != nil {
 			return fmt.Errorf("Error checking if recovering lot %d is possible: %w", lot.Details.Index, err)
 		} else {
@@ -120,20 +120,20 @@ func recoverRplFromLot(c *cli.Context) error {
 		return nil
 	}
 
-	// Claim RPL from lots
+	// Claim GGP from lots
 	for _, lot := range selectedLots {
-		response, err := rp.RecoverUnclaimedRPLFromLot(lot.Details.Index)
+		response, err := rp.RecoverUnclaimedGGPFromLot(lot.Details.Index)
 		if err != nil {
-			fmt.Printf("Could not recover unclaimed RPL from lot %d: %s.\n", lot.Details.Index, err)
+			fmt.Printf("Could not recover unclaimed GGP from lot %d: %s.\n", lot.Details.Index, err)
 			continue
 		}
 
 		fmt.Printf("Recovering lot %d...\n", lot.Details.Index)
 		cliutils.PrintTransactionHash(rp, response.TxHash)
 		if _, err = rp.WaitForTransaction(response.TxHash); err != nil {
-			fmt.Printf("Could not recover unclaimed RPL from lot %d: %s.\n", lot.Details.Index, err)
+			fmt.Printf("Could not recover unclaimed GGP from lot %d: %s.\n", lot.Details.Index, err)
 		} else {
-			fmt.Printf("Successfully recovered unclaimed RPL from lot %d.\n", lot.Details.Index)
+			fmt.Printf("Successfully recovered unclaimed GGP from lot %d.\n", lot.Details.Index)
 		}
 	}
 

@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+	"crypto/x509"
 	"encoding/hex"
 	"fmt"
 	"math/big"
@@ -215,7 +216,7 @@ func canNodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt
 	}
 
 	// Check data
-	response.InsufficientRplStake = (minipoolCount >= minipoolLimit)
+	response.InsufficientGgpStake = (minipoolCount >= minipoolLimit)
 	response.MinipoolAddress = minipoolAddress
 	response.InvalidAmount = (!isTrusted && amountIsZero)
 
@@ -250,7 +251,7 @@ func canNodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt
 	}
 
 	// Update & return response
-	response.CanDeposit = !(response.InsufficientBalance || response.InsufficientRplStake || response.InvalidAmount || response.UnbondedMinipoolsAtMax || response.DepositDisabled || !response.InConsensus)
+	response.CanDeposit = !(response.InsufficientBalance || response.InsufficientGgpStake || response.InvalidAmount || response.UnbondedMinipoolsAtMax || response.DepositDisabled || !response.InConsensus)
 	return &response, nil
 
 }
@@ -301,21 +302,22 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 		}
 		salt.SetUint64(nonce)
 	}
-
-	// Make sure ETH2 is on the correct chain
-	depositContractInfo, err := getDepositContractInfo(c)
-	if err != nil {
-		return nil, err
-	}
-	if depositContractInfo.RPNetwork != depositContractInfo.BeaconNetwork ||
-		depositContractInfo.RPDepositContract != depositContractInfo.BeaconDepositContract {
-		return nil, fmt.Errorf("Beacon network mismatch! Expected %s on chain %d, but beacon is using %s on chain %d.",
-			depositContractInfo.RPDepositContract.Hex(),
-			depositContractInfo.RPNetwork,
-			depositContractInfo.BeaconDepositContract.Hex(),
-			depositContractInfo.BeaconNetwork)
-	}
-
+	// TODO: add validation that node is synced to the correct P + C chains
+	/*
+		// Make sure ETH2 is on the correct chain
+		depositContractInfo, err := getDepositContractInfo(c)
+		if err != nil {
+			return nil, err
+		}
+		if depositContractInfo.RPNetwork != depositContractInfo.BeaconNetwork ||
+			depositContractInfo.RPDepositContract != depositContractInfo.BeaconDepositContract {
+			return nil, fmt.Errorf("Beacon network mismatch! Expected %s on chain %d, but beacon is using %s on chain %d.",
+				depositContractInfo.RPDepositContract.Hex(),
+				depositContractInfo.RPNetwork,
+				depositContractInfo.BeaconDepositContract.Hex(),
+				depositContractInfo.BeaconNetwork)
+		}
+	*/
 	// Get the scrub period
 	scrubPeriodUnix, err := trustednode.GetScrubPeriod(rp, nil)
 	if err != nil {
@@ -338,11 +340,12 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 	}
 
 	// Create and save a new validator key
+	// TODO: move staking key to config
 	validatorKey, err := validator.GetValidatorPrivateKey("/Users/pisti/GolandProjects/avalanchego/staking/local/staker1.key") // this is just temporary
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println(validatorKey.PublicKey)
 	// Get the next minipool address and withdrawal credentials
 	minipoolAddress, err := utils.GenerateAddress(rp, nodeAccount.Address, depositType, salt, nil)
 	if err != nil {
@@ -355,12 +358,12 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 	withdrawalCredentials := common.BytesToHash(nodeAccountAddressBytes)
 
 	// Get validator deposit data and associated parameters
-	depositData, depositDataRoot, err := validator.GetDepositData(validatorKey, withdrawalCredentials, eth2Config)
+	depositData, _, err := validator.GetDepositData(validatorKey, withdrawalCredentials, eth2Config)
 	if err != nil {
 		return nil, err
 	}
-	pubKey := rptypes.BytesToValidatorPubkey(depositData.PublicKey)
-	signature := rptypes.BytesToValidatorSignature(depositData.Signature)
+	pubKey := rptypes.BytesToValidatorPubkey(x509.MarshalPKCS1PublicKey(&validatorKey.PublicKey))
+	_ = rptypes.BytesToValidatorSignature(depositData.Signature)
 
 	// Make sure a validator with this pubkey doesn't already exist
 	status := beacon.ValidatorStatus{
@@ -419,8 +422,14 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 		return nil, fmt.Errorf("Error checking for nonce override: %w", err)
 	}
 
+	// Get avalanche-go NodeId
+	nodeIdResponse, err := bc.GetNodeId()
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(nodeIdResponse.NodeID)
 	// Deposit
-	hash, err := node.Deposit(rp, minNodeFee, pubKey, signature, depositDataRoot, salt, minipoolAddress, opts)
+	hash, err := node.Deposit(rp, minNodeFee, pubKey, salt, minipoolAddress, nodeIdResponse.NodeID, opts)
 	if err != nil {
 		return nil, err
 	}

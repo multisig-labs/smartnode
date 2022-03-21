@@ -84,7 +84,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			{
 				Name:      "rewards",
 				Aliases:   []string{"e"},
-				Usage:     "Get the time and your expected RPL rewards of the next checkpoint",
+				Usage:     "Get the time and your expected GGP rewards of the next checkpoint",
 				UsageText: "rocketpool node rewards",
 				Action: func(c *cli.Context) error {
 
@@ -187,14 +187,14 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			},
 
 			{
-				Name:      "swap-rpl",
+				Name:      "swap-ggp",
 				Aliases:   []string{"p"},
-				Usage:     "Swap old RPL for new RPL",
-				UsageText: "rocketpool node swap-rpl [options]",
+				Usage:     "Swap old GGP for new GGP",
+				UsageText: "rocketpool node swap-ggp [options]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "amount, a",
-						Usage: "The amount of old RPL to swap (or 'all')",
+						Usage: "The amount of old GGP to swap (or 'all')",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -212,28 +212,28 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return nodeSwapRpl(c)
+					return nodeSwapGgp(c)
 
 				},
 			},
 
 			{
-				Name:      "stake-rpl",
+				Name:      "stake-ggp",
 				Aliases:   []string{"k"},
-				Usage:     "Stake RPL against the node",
-				UsageText: "rocketpool node stake-rpl [options]",
+				Usage:     "Stake GGP against the node",
+				UsageText: "rocketpool node stake-ggp [options]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "amount, a",
-						Usage: "The amount of RPL to stake (or 'min', 'max', or 'all')",
+						Usage: "The amount of GGP to stake (or 'min', 'max', or 'all')",
 					},
 					cli.BoolFlag{
 						Name:  "yes, y",
-						Usage: "Automatically confirm RPL stake",
+						Usage: "Automatically confirm GGP stake",
 					},
 					cli.BoolFlag{
 						Name:  "swap, s",
-						Usage: "Automatically confirm swapping old RPL before staking",
+						Usage: "Automatically confirm swapping old GGP before staking",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -251,20 +251,20 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return nodeStakeRpl(c)
+					return nodeStakeGgp(c)
 
 				},
 			},
 
 			{
-				Name:      "claim-rpl",
+				Name:      "claim-ggp",
 				Aliases:   []string{"c"},
-				Usage:     "Claim available RPL rewards for the current checkpoint",
-				UsageText: "rocketpool node claim-rpl [options]",
+				Usage:     "Claim available GGP rewards for the current checkpoint",
+				UsageText: "rocketpool node claim-ggp [options]",
 				Flags: []cli.Flag{
 					cli.BoolFlag{
 						Name:  "yes, y",
-						Usage: "Automatically confirm RPL claim",
+						Usage: "Automatically confirm GGP claim",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -275,24 +275,24 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return nodeClaimRpl(c)
+					return nodeClaimGgp(c)
 
 				},
 			},
 
 			{
-				Name:      "withdraw-rpl",
+				Name:      "withdraw-ggp",
 				Aliases:   []string{"i"},
-				Usage:     "Withdraw RPL staked against the node",
-				UsageText: "rocketpool node withdraw-rpl [options]",
+				Usage:     "Withdraw GGP staked against the node",
+				UsageText: "rocketpool node withdraw-ggp [options]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "amount, a",
-						Usage: "The amount of RPL to withdraw (or 'max')",
+						Usage: "The amount of GGP to withdraw (or 'max')",
 					},
 					cli.BoolFlag{
 						Name:  "yes, y",
-						Usage: "Automatically confirm RPL withdrawal",
+						Usage: "Automatically confirm GGP withdrawal",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -310,7 +310,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return nodeWithdrawRpl(c)
+					return nodeWithdrawGgp(c)
 
 				},
 			},

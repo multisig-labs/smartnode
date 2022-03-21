@@ -67,7 +67,7 @@ func getRewards(c *cli.Context) (*api.NodeRewardsResponse, error) {
 	}
 
 	var totalEffectiveStake *big.Int
-	var totalRplSupply *big.Int
+	var totalGgpSupply *big.Int
 	var inflationInterval *big.Int
 	var odaoSize uint64
 	var nodeOperatorRewardsPercent float64
@@ -136,43 +136,43 @@ func getRewards(c *cli.Context) (*api.NodeRewardsResponse, error) {
 
 	// Get the node's effective stake
 	wg.Go(func() error {
-		effectiveStake, err := node.GetNodeEffectiveRPLStake(rp, nodeAccount.Address, nil)
+		effectiveStake, err := node.GetNodeEffectiveGGPStake(rp, nodeAccount.Address, nil)
 		if err == nil {
-			response.EffectiveRplStake = eth.WeiToEth(effectiveStake)
+			response.EffectiveGgpStake = eth.WeiToEth(effectiveStake)
 		}
 		return err
 	})
 
 	// Get the node's total stake
 	wg.Go(func() error {
-		stake, err := node.GetNodeRPLStake(rp, nodeAccount.Address, nil)
+		stake, err := node.GetNodeGGPStake(rp, nodeAccount.Address, nil)
 		if err == nil {
-			response.TotalRplStake = eth.WeiToEth(stake)
+			response.TotalGgpStake = eth.WeiToEth(stake)
 		}
 		return err
 	})
 
 	// Get the total network effective stake
 	wg.Go(func() error {
-		totalEffectiveStake, err = node.GetTotalEffectiveRPLStake(rp, nil)
+		totalEffectiveStake, err = node.GetTotalEffectiveGGPStake(rp, nil)
 		if err != nil {
 			return err
 		}
 		return nil
 	})
 
-	// Get the total RPL supply
+	// Get the total GGP supply
 	wg.Go(func() error {
-		totalRplSupply, err = tokens.GetRPLTotalSupply(rp, nil)
+		totalGgpSupply, err = tokens.GetGGPTotalSupply(rp, nil)
 		if err != nil {
 			return err
 		}
 		return nil
 	})
 
-	// Get the RPL inflation interval
+	// Get the GGP inflation interval
 	wg.Go(func() error {
-		inflationInterval, err = tokens.GetRPLInflationIntervalRate(rp, nil)
+		inflationInterval, err = tokens.GetGGPInflationIntervalRate(rp, nil)
 		if err != nil {
 			return err
 		}
@@ -236,13 +236,13 @@ func getRewards(c *cli.Context) (*api.NodeRewardsResponse, error) {
 	// Calculate the estimated rewards
 	rewardsIntervalDays := response.RewardsInterval.Seconds() / (60 * 60 * 24)
 	inflationPerDay := eth.WeiToEth(inflationInterval)
-	totalRplAtNextCheckpoint := (math.Pow(inflationPerDay, float64(rewardsIntervalDays)) - 1) * eth.WeiToEth(totalRplSupply)
-	if totalRplAtNextCheckpoint < 0 {
-		totalRplAtNextCheckpoint = 0
+	totalGgpAtNextCheckpoint := (math.Pow(inflationPerDay, float64(rewardsIntervalDays)) - 1) * eth.WeiToEth(totalGgpSupply)
+	if totalGgpAtNextCheckpoint < 0 {
+		totalGgpAtNextCheckpoint = 0
 	}
 
 	if totalEffectiveStake.Cmp(big.NewInt(0)) == 1 {
-		response.EstimatedRewards = response.EffectiveRplStake / eth.WeiToEth(totalEffectiveStake) * totalRplAtNextCheckpoint * nodeOperatorRewardsPercent
+		response.EstimatedRewards = response.EffectiveGgpStake / eth.WeiToEth(totalEffectiveStake) * totalGgpAtNextCheckpoint * nodeOperatorRewardsPercent
 	}
 
 	if response.Trusted {
@@ -285,11 +285,11 @@ func getRewards(c *cli.Context) (*api.NodeRewardsResponse, error) {
 			return nil
 		})
 
-		// Get the node's oDAO RPL stake
+		// Get the node's oDAO GGP stake
 		wg2.Go(func() error {
-			bond, err := trustednode.GetMemberRPLBondAmount(rp, nodeAccount.Address, nil)
+			bond, err := trustednode.GetMemberGGPBondAmount(rp, nodeAccount.Address, nil)
 			if err == nil {
-				response.TrustedRplBond = eth.WeiToEth(bond)
+				response.TrustedGgpBond = eth.WeiToEth(bond)
 			}
 			return err
 		})
@@ -308,7 +308,7 @@ func getRewards(c *cli.Context) (*api.NodeRewardsResponse, error) {
 			return nil, err
 		}
 
-		response.EstimatedTrustedRewards = totalRplAtNextCheckpoint * trustedNodeOperatorRewardsPercent / float64(odaoSize)
+		response.EstimatedTrustedRewards = totalGgpAtNextCheckpoint * trustedNodeOperatorRewardsPercent / float64(odaoSize)
 
 	}
 

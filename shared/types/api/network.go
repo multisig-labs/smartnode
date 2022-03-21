@@ -13,13 +13,13 @@ type NodeFeeResponse struct {
 	MaxNodeFee    float64 `json:"maxNodeFee"`
 }
 
-type RplPriceResponse struct {
+type GgpPriceResponse struct {
 	Status                 string   `json:"status"`
 	Error                  string   `json:"error"`
-	RplPrice               *big.Int `json:"rplPrice"`
-	RplPriceBlock          uint64   `json:"rplPriceBlock"`
-	MinPerMinipoolRplStake *big.Int `json:"minPerMinipoolRplStake"`
-	MaxPerMinipoolRplStake *big.Int `json:"maxPerMinipoolRplStake"`
+	GgpPrice               *big.Int `json:"ggpPrice"`
+	GgpPriceBlock          uint64   `json:"ggpPriceBlock"`
+	MinPerMinipoolGgpStake *big.Int `json:"minPerMinipoolGgpStake"`
+	MaxPerMinipoolGgpStake *big.Int `json:"maxPerMinipoolGgpStake"`
 }
 
 type NetworkStatsResponse struct {
@@ -37,10 +37,10 @@ type NetworkStatsResponse struct {
 	WithdrawableMinipoolCount uint64  `json:"withdrawableMinipoolCount"`
 	DissolvedMinipoolCount    uint64  `json:"dissolvedMinipoolCount"`
 	FinalizedMinipoolCount    uint64  `json:"finalizedMinipoolCount"`
-	RplPrice                  float64 `json:"rplPrice"`
-	TotalRplStaked            float64 `json:"totalRplStaked"`
-	EffectiveRplStaked        float64 `json:"effectiveRplStaked"`
-	RethPrice                 float64 `json:"rethPrice"`
+	GgpPrice                  float64 `json:"ggpPrice"`
+	TotalGgpStaked            float64 `json:"totalGgpStaked"`
+	EffectiveGgpStaked        float64 `json:"effectiveGgpStaked"`
+	GgpavaxPrice              float64 `json:"ggpavaxPrice"`
 }
 
 type NetworkTimezonesResponse struct {

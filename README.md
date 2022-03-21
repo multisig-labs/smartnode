@@ -50,9 +50,9 @@ The following commands are available via the smart node client:
 - `rocketpool node register` - Register the node with the Rocket Pool network
 - `rocketpool node set-withdrawal-address [address]` - Set the address which node rewards & refunds are sent to
 - `rocketpool node set-timezone` - Update the node's timezone location
-- `rocketpool node swap-rpl` - Swap old RPL tokens for new RPL
-- `rocketpool node stake-rpl` - Stake RPL against the node to collateralize minipools
-- `rocketpool node withdraw-rpl` - Withdraw RPL staked against the node
+- `rocketpool node swap-ggp` - Swap old GGP tokens for new GGP
+- `rocketpool node stake-ggp` - Stake GGP against the node to collateralize minipools
+- `rocketpool node withdraw-ggp` - Withdraw GGP staked against the node
 - `rocketpool node deposit` - Make a deposit to create a minipool and begin staking
 - `rocketpool node send [amount] [token] [to]` - Send an amount of ETH or tokens to an address
 - `rocketpool node burn [amount] [token]` - Burn reward tokens for ETH
@@ -63,12 +63,12 @@ The following commands are available via the smart node client:
 - `rocketpool minipool exit` - Exit active minipool validators from the beacon chainand close them
 - `rocketpool minipool close` - Close minipools which have timed out and been dissolved
 
-- `rocketpool auction status` - Display the current status of the RPL auction contract and lots
-- `rocketpool auction lots` - Display the details of all RPL lots
-- `rocketpool auction create-lot` - Create a new RPL lot from RPL in the auction contract
-- `rocketpool auction bid-lot` - Bid ETH on an active RPL lot
-- `rocketpool auction claim-lot` - Clean RPL from a cleared lot you bid on
-- `rocketpool auction recover-lot` - Recover unclaimed RPL from a cleared lot back to the auction contract
+- `rocketpool auction status` - Display the current status of the GGP auction contract and lots
+- `rocketpool auction lots` - Display the details of all GGP lots
+- `rocketpool auction create-lot` - Create a new GGP lot from GGP in the auction contract
+- `rocketpool auction bid-lot` - Bid ETH on an active GGP lot
+- `rocketpool auction claim-lot` - Clean GGP from a cleared lot you bid on
+- `rocketpool auction recover-lot` - Recover unclaimed GGP from a cleared lot back to the auction contract
 
 - `rocketpool odao status` - Display the current status of the oracle DAO
 - `rocketpool odao members` - Display the details of all oracle DAO members
@@ -85,7 +85,7 @@ The following commands are available via the smart node client:
 - `rocketpool odao replace` - Replace your position in the oracle DAO (requires an executed replace proposal)
 
 - `rocketpool network node-fee` - Display the current network node commission rate for new minipools
-- `rocketpool network rpl-price` - Display the current network RPL price information
+- `rocketpool network ggp-price` - Display the current network GGP price information
 
 - `rocketpool queue status` - Display the current status of the deposit pool
 - `rocketpool queue process` - Process the deposit pool by assigning user-deposited ETH to available minipools

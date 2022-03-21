@@ -20,7 +20,7 @@ func leave(c *cli.Context) error {
 	}
 	defer rp.Close()
 
-	// Get the RPL bond refund address
+	// Get the GGP bond refund address
 	var bondRefundAddress common.Address
 	if c.String("refund-address") == "node" {
 
@@ -45,12 +45,12 @@ func leave(c *cli.Context) error {
 		}
 
 		// Prompt for node address
-		if cliutils.Confirm(fmt.Sprintf("Would you like to refund your RPL bond to your node account (%s)?", wallet.AccountAddress.Hex())) {
+		if cliutils.Confirm(fmt.Sprintf("Would you like to refund your GGP bond to your node account (%s)?", wallet.AccountAddress.Hex())) {
 			bondRefundAddress = wallet.AccountAddress
 		} else {
 
 			// Prompt for custom address
-			inputAddress := cliutils.Prompt("Please enter the address to refund your RPL bond to:", "^0x[0-9a-fA-F]{40}$", "Invalid address")
+			inputAddress := cliutils.Prompt("Please enter the address to refund your GGP bond to:", "^0x[0-9a-fA-F]{40}$", "Invalid address")
 			bondRefundAddress = common.HexToAddress(inputAddress)
 
 		}
@@ -80,7 +80,7 @@ func leave(c *cli.Context) error {
 	}
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to leave the oracle DAO and refund your RPL bond to %s? This action cannot be undone!", bondRefundAddress.Hex()))) {
+	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to leave the oracle DAO and refund your GGP bond to %s? This action cannot be undone!", bondRefundAddress.Hex()))) {
 		fmt.Println("Cancelled.")
 		return nil
 	}

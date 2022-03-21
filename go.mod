@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
+	github.com/KeisukeYamashita/go-jsonrpc v1.0.1 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/a8m/envsubst v1.2.0
 	github.com/alessio/shellescape v1.4.1
@@ -16,7 +17,7 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0
-	github.com/ethereum/go-ethereum v1.10.15
+	github.com/ethereum/go-ethereum v1.10.16
 	github.com/fatih/color v1.13.0
 	github.com/ferranbt/fastssz v0.0.0-20220103083642-bc5fefefa28b
 	github.com/glendc/go-external-ip v0.0.0-20200601212049-c872357d968e
@@ -47,4 +48,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-//replace github.com/rocket-pool/rocketpool-go => ../rocketpool-go
+replace github.com/rocket-pool/rocketpool-go => ../rocketpool-go

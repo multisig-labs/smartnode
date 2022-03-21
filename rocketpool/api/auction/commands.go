@@ -12,13 +12,13 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 	command.Subcommands = append(command.Subcommands, cli.Command{
 		Name:    name,
 		Aliases: aliases,
-		Usage:   "Manage Rocket Pool RPL auctions",
+		Usage:   "Manage Rocket Pool GGP auctions",
 		Subcommands: []cli.Command{
 
 			{
 				Name:      "status",
 				Aliases:   []string{"s"},
-				Usage:     "Get RPL auction status",
+				Usage:     "Get GGP auction status",
 				UsageText: "rocketpool api auction status",
 				Action: func(c *cli.Context) error {
 
@@ -37,7 +37,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			{
 				Name:      "lots",
 				Aliases:   []string{"l"},
-				Usage:     "Get RPL lots for auction",
+				Usage:     "Get GGP lots for auction",
 				UsageText: "rocketpool api auction lots",
 				Action: func(c *cli.Context) error {
 
@@ -143,7 +143,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 
 			{
 				Name:      "can-claim-lot",
-				Usage:     "Check whether the node can claim RPL from a lot",
+				Usage:     "Check whether the node can claim GGP from a lot",
 				UsageText: "rocketpool api auction can-claim-lot lot-id",
 				Action: func(c *cli.Context) error {
 
@@ -165,7 +165,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			{
 				Name:      "claim-lot",
 				Aliases:   []string{"c"},
-				Usage:     "Claim RPL from a lot",
+				Usage:     "Claim GGP from a lot",
 				UsageText: "rocketpool api auction claim-lot lot-id",
 				Action: func(c *cli.Context) error {
 
@@ -187,7 +187,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 
 			{
 				Name:      "can-recover-lot",
-				Usage:     "Check whether the node can recover unclaimed RPL from a lot",
+				Usage:     "Check whether the node can recover unclaimed GGP from a lot",
 				UsageText: "rocketpool api auction can-recover-lot lot-id",
 				Action: func(c *cli.Context) error {
 
@@ -201,7 +201,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(canRecoverRplFromLot(c, lotIndex))
+					api.PrintResponse(canRecoverGgpFromLot(c, lotIndex))
 					return nil
 
 				},
@@ -209,7 +209,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			{
 				Name:      "recover-lot",
 				Aliases:   []string{"r"},
-				Usage:     "Recover unclaimed RPL from a lot (returning it to the auction contract)",
+				Usage:     "Recover unclaimed GGP from a lot (returning it to the auction contract)",
 				UsageText: "rocketpool api auction recover-lot lot-id",
 				Action: func(c *cli.Context) error {
 
@@ -223,7 +223,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(recoverRplFromLot(c, lotIndex))
+					api.PrintResponse(recoverGgpFromLot(c, lotIndex))
 					return nil
 
 				},

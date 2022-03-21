@@ -84,7 +84,7 @@ func GetPrettyAddress(address common.Address) string {
 
 // Temporary table for replacing revert messages with more useful versions until we can refactor
 var errorMap = map[string]string{
-	"Could not get can node deposit status: Minipool count after deposit exceeds limit based on node RPL stake": "Cannot create a new minipool: you do not have enough RPL staked to create another minipool.",
+	"Could not get can node deposit status: Minipool count after deposit exceeds limit based on node GGP stake": "Cannot create a new minipool: you do not have enough GGP staked to create another minipool.",
 }
 
 // Prints an error in a prettier format, removing the "stack trace" if it represents

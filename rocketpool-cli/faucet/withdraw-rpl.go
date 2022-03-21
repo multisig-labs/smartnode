@@ -12,7 +12,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func withdrawRpl(c *cli.Context) error {
+func withdrawGgp(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -21,15 +21,15 @@ func withdrawRpl(c *cli.Context) error {
 	}
 	defer rp.Close()
 
-	// Check RPL can be withdrawn
-	canWithdraw, err := rp.CanFaucetWithdrawRpl()
+	// Check GGP can be withdrawn
+	canWithdraw, err := rp.CanFaucetWithdrawGgp()
 	if err != nil {
 		return err
 	}
 	if !canWithdraw.CanWithdraw {
-		fmt.Println("Cannot withdraw legacy RPL from the faucet:")
+		fmt.Println("Cannot withdraw legacy GGP from the faucet:")
 		if canWithdraw.InsufficientFaucetBalance {
-			fmt.Println("The faucet does not have any legacy RPL for withdrawal")
+			fmt.Println("The faucet does not have any legacy GGP for withdrawal")
 		}
 		if canWithdraw.InsufficientAllowance {
 			fmt.Println("You don't have any allowance remaining for the withdrawal period")
@@ -47,25 +47,25 @@ func withdrawRpl(c *cli.Context) error {
 	}
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm("Are you sure you want to withdraw legacy RPL from the faucet?")) {
+	if !(c.Bool("yes") || cliutils.Confirm("Are you sure you want to withdraw legacy GGP from the faucet?")) {
 		fmt.Println("Cancelled.")
 		return nil
 	}
 
-	// Withdraw RPL
-	response, err := rp.FaucetWithdrawRpl()
+	// Withdraw GGP
+	response, err := rp.FaucetWithdrawGgp()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Withdrawing legacy RPL...\n")
+	fmt.Printf("Withdrawing legacy GGP...\n")
 	cliutils.PrintTransactionHash(rp, response.TxHash)
 	if _, err = rp.WaitForTransaction(response.TxHash); err != nil {
 		return err
 	}
 
 	// Log & return
-	fmt.Printf("Successfully withdrew %.6f legacy RPL from the faucet.\n", math.RoundDown(eth.WeiToEth(response.Amount), 6))
+	fmt.Printf("Successfully withdrew %.6f legacy GGP from the faucet.\n", math.RoundDown(eth.WeiToEth(response.Amount), 6))
 	return nil
 
 }

@@ -43,8 +43,8 @@ func canJoin(c *cli.Context) (*api.CanJoinTNDAOResponse, error) {
 
 	// Data
 	var wg errgroup.Group
-	var nodeRplBalance *big.Int
-	var rplBondAmount *big.Int
+	var nodeGgpBalance *big.Int
+	var ggpBondAmount *big.Int
 
 	// Check proposal actionable status
 	wg.Go(func() error {
@@ -64,17 +64,17 @@ func canJoin(c *cli.Context) (*api.CanJoinTNDAOResponse, error) {
 		return err
 	})
 
-	// Get node RPL balance
+	// Get node GGP balance
 	wg.Go(func() error {
 		var err error
-		nodeRplBalance, err = tokens.GetRPLBalance(rp, nodeAccount.Address, nil)
+		nodeGgpBalance, err = tokens.GetGGPBalance(rp, nodeAccount.Address, nil)
 		return err
 	})
 
-	// Get RPL bond amount
+	// Get GGP bond amount
 	wg.Go(func() error {
 		var err error
-		rplBondAmount, err = tnsettings.GetRPLBond(rp, nil)
+		ggpBondAmount, err = tnsettings.GetGGPBond(rp, nil)
 		return err
 	})
 
@@ -88,11 +88,11 @@ func canJoin(c *cli.Context) (*api.CanJoinTNDAOResponse, error) {
 		if err != nil {
 			return err
 		}
-		rplBondAmount, err := tnsettings.GetRPLBond(rp, nil)
+		ggpBondAmount, err := tnsettings.GetGGPBond(rp, nil)
 		if err != nil {
 			return err
 		}
-		approveGasInfo, err := tokens.EstimateApproveRPLGas(rp, *rocketDAONodeTrustedActionsAddress, rplBondAmount, opts)
+		approveGasInfo, err := tokens.EstimateApproveGGPGas(rp, *rocketDAONodeTrustedActionsAddress, ggpBondAmount, opts)
 		if err != nil {
 			return err
 		}
@@ -110,15 +110,15 @@ func canJoin(c *cli.Context) (*api.CanJoinTNDAOResponse, error) {
 	}
 
 	// Check data
-	response.InsufficientRplBalance = (nodeRplBalance.Cmp(rplBondAmount) < 0)
+	response.InsufficientGgpBalance = (nodeGgpBalance.Cmp(ggpBondAmount) < 0)
 
 	// Update & return response
-	response.CanJoin = !(response.ProposalExpired || response.AlreadyMember || response.InsufficientRplBalance)
+	response.CanJoin = !(response.ProposalExpired || response.AlreadyMember || response.InsufficientGgpBalance)
 	return &response, nil
 
 }
 
-func approveRpl(c *cli.Context) (*api.JoinTNDAOApproveResponse, error) {
+func approveGgp(c *cli.Context) (*api.JoinTNDAOApproveResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeRegistered(c); err != nil {
@@ -139,7 +139,7 @@ func approveRpl(c *cli.Context) (*api.JoinTNDAOApproveResponse, error) {
 	// Data
 	var wg errgroup.Group
 	var rocketDAONodeTrustedActionsAddress *common.Address
-	var rplBondAmount *big.Int
+	var ggpBondAmount *big.Int
 
 	// Get oracle node actions contract address
 	wg.Go(func() error {
@@ -148,10 +148,10 @@ func approveRpl(c *cli.Context) (*api.JoinTNDAOApproveResponse, error) {
 		return err
 	})
 
-	// Get RPL bond amount
+	// Get GGP bond amount
 	wg.Go(func() error {
 		var err error
-		rplBondAmount, err = tnsettings.GetRPLBond(rp, nil)
+		ggpBondAmount, err = tnsettings.GetGGPBond(rp, nil)
 		return err
 	})
 
@@ -160,7 +160,7 @@ func approveRpl(c *cli.Context) (*api.JoinTNDAOApproveResponse, error) {
 		return nil, err
 	}
 
-	// Approve RPL allowance
+	// Approve GGP allowance
 	opts, err := w.GetNodeAccountTransactor()
 	if err != nil {
 		return nil, err
@@ -169,7 +169,7 @@ func approveRpl(c *cli.Context) (*api.JoinTNDAOApproveResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error checking for nonce override: %w", err)
 	}
-	if hash, err := tokens.ApproveRPL(rp, *rocketDAONodeTrustedActionsAddress, rplBondAmount, opts); err != nil {
+	if hash, err := tokens.ApproveGGP(rp, *rocketDAONodeTrustedActionsAddress, ggpBondAmount, opts); err != nil {
 		return nil, err
 	} else {
 		response.ApproveTxHash = hash
@@ -195,7 +195,7 @@ func waitForApprovalAndJoin(c *cli.Context, hash common.Hash) (*api.JoinTNDAOJoi
 		return nil, err
 	}
 
-	// Wait for the RPL approval TX to successfully get mined
+	// Wait for the GGP approval TX to successfully get mined
 	_, err = utils.WaitForTransaction(rp.Client, hash)
 	if err != nil {
 		return nil, err

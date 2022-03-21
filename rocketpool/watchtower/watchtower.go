@@ -23,8 +23,8 @@ const (
 	MaxConcurrentEth1Requests = 200
 
 	RespondChallengesColor           = color.FgWhite
-	ClaimRplRewardsColor             = color.FgGreen
-	SubmitRplPriceColor              = color.FgYellow
+	ClaimGgpRewardsColor             = color.FgGreen
+	SubmitGgpPriceColor              = color.FgYellow
 	SubmitNetworkBalancesColor       = color.FgYellow
 	SubmitWithdrawableMinipoolsColor = color.FgBlue
 	DissolveTimedOutMinipoolsColor   = color.FgMagenta
@@ -65,11 +65,11 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	claimRplRewards, err := newClaimRplRewards(c, log.NewColorLogger(ClaimRplRewardsColor))
+	claimGgpRewards, err := newClaimGgpRewards(c, log.NewColorLogger(ClaimGgpRewardsColor))
 	if err != nil {
 		return err
 	}
-	submitRplPrice, err := newSubmitRplPrice(c, log.NewColorLogger(SubmitRplPriceColor))
+	submitGgpPrice, err := newSubmitGgpPrice(c, log.NewColorLogger(SubmitGgpPriceColor))
 	if err != nil {
 		return err
 	}
@@ -115,11 +115,11 @@ func run(c *cli.Context) error {
 				errorLog.Println(err)
 			}
 			time.Sleep(taskCooldown)
-			if err := claimRplRewards.run(); err != nil {
+			if err := claimGgpRewards.run(); err != nil {
 				errorLog.Println(err)
 			}
 			time.Sleep(taskCooldown)
-			if err := submitRplPrice.run(); err != nil {
+			if err := submitGgpPrice.run(); err != nil {
 				errorLog.Println(err)
 			}
 			time.Sleep(taskCooldown)

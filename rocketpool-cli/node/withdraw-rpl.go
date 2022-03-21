@@ -14,7 +14,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func nodeWithdrawRpl(c *cli.Context) error {
+func nodeWithdrawGgp(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -35,8 +35,8 @@ func nodeWithdrawRpl(c *cli.Context) error {
 
 		// Set amount to maximum withdrawable amount
 		var maxAmount big.Int
-		if status.RplStake.Cmp(status.MinimumRplStake) > 0 {
-			maxAmount.Sub(status.RplStake, status.MinimumRplStake)
+		if status.GgpStake.Cmp(status.MinimumGgpStake) > 0 {
+			maxAmount.Sub(status.GgpStake, status.MinimumGgpStake)
 		}
 		amountWei = &maxAmount
 
@@ -59,15 +59,15 @@ func nodeWithdrawRpl(c *cli.Context) error {
 
 		// Get maximum withdrawable amount
 		var maxAmount big.Int
-		maxAmount.Sub(status.RplStake, status.MaximumRplStake)
+		maxAmount.Sub(status.GgpStake, status.MaximumGgpStake)
 		if maxAmount.Sign() == 1 {
 			// Prompt for maximum amount
-			if cliutils.Confirm(fmt.Sprintf("Would you like to withdraw the maximum amount of staked RPL (%.6f RPL)?", math.RoundDown(eth.WeiToEth(&maxAmount), 6))) {
+			if cliutils.Confirm(fmt.Sprintf("Would you like to withdraw the maximum amount of staked GGP (%.6f GGP)?", math.RoundDown(eth.WeiToEth(&maxAmount), 6))) {
 				amountWei = &maxAmount
 			} else {
 
 				// Prompt for custom amount
-				inputAmount := cliutils.Prompt("Please enter an amount of staked RPL to withdraw:", "^\\d+(\\.\\d+)?$", "Invalid amount")
+				inputAmount := cliutils.Prompt("Please enter an amount of staked GGP to withdraw:", "^\\d+(\\.\\d+)?$", "Invalid amount")
 				withdrawalAmount, err := strconv.ParseFloat(inputAmount, 64)
 				if err != nil {
 					return fmt.Errorf("Invalid withdrawal amount '%s': %w", inputAmount, err)
@@ -76,32 +76,32 @@ func nodeWithdrawRpl(c *cli.Context) error {
 
 			}
 		} else {
-			fmt.Printf("Cannot withdraw staked RPL - you have %.6f RPL staked, but are not allowed to withdraw below %.6f RPL (150%% collateral).\n",
-				math.RoundDown(eth.WeiToEth(status.RplStake), 6),
-				math.RoundDown(eth.WeiToEth(status.MaximumRplStake), 6))
+			fmt.Printf("Cannot withdraw staked GGP - you have %.6f GGP staked, but are not allowed to withdraw below %.6f GGP (150%% collateral).\n",
+				math.RoundDown(eth.WeiToEth(status.GgpStake), 6),
+				math.RoundDown(eth.WeiToEth(status.MaximumGgpStake), 6))
 			return nil
 		}
 
 	}
 
-	// Check RPL can be withdrawn
-	canWithdraw, err := rp.CanNodeWithdrawRpl(amountWei)
+	// Check GGP can be withdrawn
+	canWithdraw, err := rp.CanNodeWithdrawGgp(amountWei)
 	if err != nil {
 		return err
 	}
 	if !canWithdraw.CanWithdraw {
-		fmt.Println("Cannot withdraw staked RPL:")
+		fmt.Println("Cannot withdraw staked GGP:")
 		if canWithdraw.InsufficientBalance {
-			fmt.Println("The node's staked RPL balance is insufficient.")
+			fmt.Println("The node's staked GGP balance is insufficient.")
 		}
 		if canWithdraw.MinipoolsUndercollateralized {
-			fmt.Println("Remaining staked RPL is not enough to collateralize the node's minipools.")
+			fmt.Println("Remaining staked GGP is not enough to collateralize the node's minipools.")
 		}
 		if canWithdraw.WithdrawalDelayActive {
 			fmt.Println("The withdrawal delay period has not passed.")
 		}
 		if !canWithdraw.InConsensus {
-			fmt.Println("The RPL price and total effective staked RPL of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
+			fmt.Println("The GGP price and total effective staked GGP of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
 		}
 		return nil
 	}
@@ -113,25 +113,25 @@ func nodeWithdrawRpl(c *cli.Context) error {
 	}
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to withdraw %.6f staked RPL? This may decrease your node's RPL rewards.", math.RoundDown(eth.WeiToEth(amountWei), 6)))) {
+	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to withdraw %.6f staked GGP? This may decrease your node's GGP rewards.", math.RoundDown(eth.WeiToEth(amountWei), 6)))) {
 		fmt.Println("Cancelled.")
 		return nil
 	}
 
-	// Withdraw RPL
-	response, err := rp.NodeWithdrawRpl(amountWei)
+	// Withdraw GGP
+	response, err := rp.NodeWithdrawGgp(amountWei)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Withdrawing RPL...\n")
+	fmt.Printf("Withdrawing GGP...\n")
 	cliutils.PrintTransactionHash(rp, response.TxHash)
 	if _, err = rp.WaitForTransaction(response.TxHash); err != nil {
 		return err
 	}
 
 	// Log & return
-	fmt.Printf("Successfully withdrew %.6f staked RPL.\n", math.RoundDown(eth.WeiToEth(amountWei), 6))
+	fmt.Printf("Successfully withdrew %.6f staked GGP.\n", math.RoundDown(eth.WeiToEth(amountWei), 6))
 	return nil
 
 }

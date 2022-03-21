@@ -50,11 +50,11 @@ func canProposeKick(c *cli.Context, memberAddress common.Address, fineAmountWei 
 		return err
 	})
 
-	// Check member's RPL bond amount
+	// Check member's GGP bond amount
 	wg.Go(func() error {
-		rplBondAmount, err := trustednode.GetMemberRPLBondAmount(rp, memberAddress, nil)
+		ggpBondAmount, err := trustednode.GetMemberGGPBondAmount(rp, memberAddress, nil)
 		if err == nil {
-			response.InsufficientRplBond = (fineAmountWei.Cmp(rplBondAmount) > 0)
+			response.InsufficientGgpBond = (fineAmountWei.Cmp(ggpBondAmount) > 0)
 		}
 		return err
 	})
@@ -73,7 +73,7 @@ func canProposeKick(c *cli.Context, memberAddress common.Address, fineAmountWei 
 		if err != nil {
 			return err
 		}
-		message := fmt.Sprintf("kick %s (%s) with %.6f RPL fine", memberId, memberUrl, math.RoundDown(eth.WeiToEth(fineAmountWei), 6))
+		message := fmt.Sprintf("kick %s (%s) with %.6f GGP fine", memberId, memberUrl, math.RoundDown(eth.WeiToEth(fineAmountWei), 6))
 		gasInfo, err := trustednode.EstimateProposeKickMemberGas(rp, message, memberAddress, fineAmountWei, opts)
 		if err == nil {
 			response.GasInfo = gasInfo
@@ -87,7 +87,7 @@ func canProposeKick(c *cli.Context, memberAddress common.Address, fineAmountWei 
 	}
 
 	// Update & return response
-	response.CanPropose = !(response.ProposalCooldownActive || response.InsufficientRplBond)
+	response.CanPropose = !(response.ProposalCooldownActive || response.InsufficientGgpBond)
 	return &response, nil
 
 }
@@ -145,7 +145,7 @@ func proposeKick(c *cli.Context, memberAddress common.Address, fineAmountWei *bi
 	}
 
 	// Submit proposal
-	message := fmt.Sprintf("kick %s (%s) with %.6f RPL fine", memberId, memberUrl, math.RoundDown(eth.WeiToEth(fineAmountWei), 6))
+	message := fmt.Sprintf("kick %s (%s) with %.6f GGP fine", memberId, memberUrl, math.RoundDown(eth.WeiToEth(fineAmountWei), 6))
 	proposalId, hash, err := trustednode.ProposeKickMember(rp, message, memberAddress, fineAmountWei, opts)
 	if err != nil {
 		return nil, err

@@ -14,7 +14,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func nodeStakeRpl(c *cli.Context) error {
+func nodeStakeGgp(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -34,21 +34,21 @@ func nodeStakeRpl(c *cli.Context) error {
 		cliutils.PrintMultiTransactionNonceWarning()
 	}
 
-	// Check for fixed-supply RPL balance
-	rplBalance := *(status.AccountBalances.RPL)
-	if status.AccountBalances.FixedSupplyRPL.Cmp(big.NewInt(0)) > 0 {
+	// Check for fixed-supply GGP balance
+	ggpBalance := *(status.AccountBalances.GGP)
+	if status.AccountBalances.FixedSupplyGGP.Cmp(big.NewInt(0)) > 0 {
 
-		// Confirm swapping RPL
-		if c.Bool("swap") || cliutils.Confirm(fmt.Sprintf("The node has a balance of %.6f old RPL. Would you like to swap it for new RPL before staking?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6))) {
+		// Confirm swapping GGP
+		if c.Bool("swap") || cliutils.Confirm(fmt.Sprintf("The node has a balance of %.6f old GGP. Would you like to swap it for new GGP before staking?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6))) {
 
 			// Check allowance
-			allowance, err := rp.GetNodeSwapRplAllowance()
+			allowance, err := rp.GetNodeSwapGgpAllowance()
 			if err != nil {
 				return err
 			}
 
-			if allowance.Allowance.Cmp(status.AccountBalances.FixedSupplyRPL) < 0 {
-				fmt.Println("Before swapping legacy RPL for new RPL, you must first give the new RPL contract approval to interact with your legacy RPL.")
+			if allowance.Allowance.Cmp(status.AccountBalances.FixedSupplyGGP) < 0 {
+				fmt.Println("Before swapping legacy GGP for new GGP, you must first give the new GGP contract approval to interact with your legacy GGP.")
 				fmt.Println("This only needs to be done once for your node.")
 
 				// If a custom nonce is set, print the multi-transaction warning
@@ -62,7 +62,7 @@ func nodeStakeRpl(c *cli.Context) error {
 				maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
 
 				// Get approval gas
-				approvalGas, err := rp.NodeSwapRplApprovalGas(maxApproval)
+				approvalGas, err := rp.NodeSwapGgpApprovalGas(maxApproval)
 				if err != nil {
 					return err
 				}
@@ -73,23 +73,23 @@ func nodeStakeRpl(c *cli.Context) error {
 				}
 
 				// Prompt for confirmation
-				if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the new RPL contract interact with your legacy RPL?"))) {
+				if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the new GGP contract interact with your legacy GGP?"))) {
 					fmt.Println("Cancelled.")
 					return nil
 				}
 
-				// Approve RPL for swapping
-				response, err := rp.NodeSwapRplApprove(maxApproval)
+				// Approve GGP for swapping
+				response, err := rp.NodeSwapGgpApprove(maxApproval)
 				if err != nil {
 					return err
 				}
 				hash := response.ApproveTxHash
-				fmt.Printf("Approving legacy RPL for swapping...\n")
+				fmt.Printf("Approving legacy GGP for swapping...\n")
 				cliutils.PrintTransactionHash(rp, hash)
 				if _, err = rp.WaitForTransaction(hash); err != nil {
 					return err
 				}
-				fmt.Println("Successfully approved access to legacy RPL.")
+				fmt.Println("Successfully approved access to legacy GGP.")
 
 				// If a custom nonce is set, increment it for the next transaction
 				if c.GlobalUint64("nonce") != 0 {
@@ -97,19 +97,19 @@ func nodeStakeRpl(c *cli.Context) error {
 				}
 			}
 
-			// Check RPL can be swapped
-			canSwap, err := rp.CanNodeSwapRpl(status.AccountBalances.FixedSupplyRPL)
+			// Check GGP can be swapped
+			canSwap, err := rp.CanNodeSwapGgp(status.AccountBalances.FixedSupplyGGP)
 			if err != nil {
 				return err
 			}
 			if !canSwap.CanSwap {
-				fmt.Println("Cannot swap RPL:")
+				fmt.Println("Cannot swap GGP:")
 				if canSwap.InsufficientBalance {
-					fmt.Println("The node's old RPL balance is insufficient.")
+					fmt.Println("The node's old GGP balance is insufficient.")
 				}
 				return nil
 			}
-			fmt.Println("RPL Swap Gas Info:")
+			fmt.Println("GGP Swap Gas Info:")
 			// Assign max fees
 			err = gas.AssignMaxFeeAndLimit(canSwap.GasInfo, rp, c.Bool("yes"))
 			if err != nil {
@@ -117,25 +117,25 @@ func nodeStakeRpl(c *cli.Context) error {
 			}
 
 			// Prompt for confirmation
-			if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to swap %.6f old RPL for new RPL?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6)))) {
+			if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to swap %.6f old GGP for new GGP?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6)))) {
 				fmt.Println("Cancelled.")
 				return nil
 			}
 
-			// Swap RPL
-			swapResponse, err := rp.NodeSwapRpl(status.AccountBalances.FixedSupplyRPL)
+			// Swap GGP
+			swapResponse, err := rp.NodeSwapGgp(status.AccountBalances.FixedSupplyGGP)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("Swapping old RPL for new RPL...\n")
+			fmt.Printf("Swapping old GGP for new GGP...\n")
 			cliutils.PrintTransactionHash(rp, swapResponse.SwapTxHash)
 			if _, err = rp.WaitForTransaction(swapResponse.SwapTxHash); err != nil {
 				return err
 			}
 
 			// Log
-			fmt.Printf("Successfully swapped %.6f old RPL for new RPL.\n", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6))
+			fmt.Printf("Successfully swapped %.6f old GGP for new GGP.\n", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6))
 			fmt.Println("")
 
 			// If a custom nonce is set, increment it for the next transaction
@@ -143,8 +143,8 @@ func nodeStakeRpl(c *cli.Context) error {
 				rp.IncrementCustomNonce()
 			}
 
-			// Get new account RPL balance
-			rplBalance.Add(status.AccountBalances.RPL, status.AccountBalances.FixedSupplyRPL)
+			// Get new account GGP balance
+			ggpBalance.Add(status.AccountBalances.GGP, status.AccountBalances.FixedSupplyGGP)
 
 		}
 
@@ -154,26 +154,26 @@ func nodeStakeRpl(c *cli.Context) error {
 	var amountWei *big.Int
 	if c.String("amount") == "min" {
 
-		// Set amount to min per minipool RPL stake
-		rplPrice, err := rp.RplPrice()
+		// Set amount to min per minipool GGP stake
+		ggpPrice, err := rp.GgpPrice()
 		if err != nil {
 			return err
 		}
-		amountWei = rplPrice.MinPerMinipoolRplStake
+		amountWei = ggpPrice.MinPerMinipoolGgpStake
 
 	} else if c.String("amount") == "max" {
 
-		// Set amount to max per minipool RPL stake
-		rplPrice, err := rp.RplPrice()
+		// Set amount to max per minipool GGP stake
+		ggpPrice, err := rp.GgpPrice()
 		if err != nil {
 			return err
 		}
-		amountWei = rplPrice.MaxPerMinipoolRplStake
+		amountWei = ggpPrice.MaxPerMinipoolGgpStake
 
 	} else if c.String("amount") == "all" {
 
-		// Set amount to node's entire RPL balance
-		amountWei = &rplBalance
+		// Set amount to node's entire GGP balance
+		amountWei = &ggpBalance
 
 	} else if c.String("amount") != "" {
 
@@ -186,34 +186,34 @@ func nodeStakeRpl(c *cli.Context) error {
 
 	} else {
 
-		// Get min/max per minipool RPL stake amounts
-		rplPrice, err := rp.RplPrice()
+		// Get min/max per minipool GGP stake amounts
+		ggpPrice, err := rp.GgpPrice()
 		if err != nil {
 			return err
 		}
-		minAmount := rplPrice.MinPerMinipoolRplStake
-		maxAmount := rplPrice.MaxPerMinipoolRplStake
+		minAmount := ggpPrice.MinPerMinipoolGgpStake
+		maxAmount := ggpPrice.MaxPerMinipoolGgpStake
 
 		// Prompt for amount option
 		amountOptions := []string{
-			fmt.Sprintf("The minimum minipool stake amount (%.6f RPL)?", math.RoundUp(eth.WeiToEth(minAmount), 6)),
-			fmt.Sprintf("The maximum effective minipool stake amount (%.6f RPL)?", math.RoundUp(eth.WeiToEth(maxAmount), 6)),
-			fmt.Sprintf("Your entire RPL balance (%.6f RPL)?", math.RoundDown(eth.WeiToEth(&rplBalance), 6)),
+			fmt.Sprintf("The minimum minipool stake amount (%.6f GGP)?", math.RoundUp(eth.WeiToEth(minAmount), 6)),
+			fmt.Sprintf("The maximum effective minipool stake amount (%.6f GGP)?", math.RoundUp(eth.WeiToEth(maxAmount), 6)),
+			fmt.Sprintf("Your entire GGP balance (%.6f GGP)?", math.RoundDown(eth.WeiToEth(&ggpBalance), 6)),
 			"A custom amount",
 		}
-		selected, _ := cliutils.Select("Please choose an amount of RPL to stake:", amountOptions)
+		selected, _ := cliutils.Select("Please choose an amount of GGP to stake:", amountOptions)
 		switch selected {
 		case 0:
 			amountWei = minAmount
 		case 1:
 			amountWei = maxAmount
 		case 2:
-			amountWei = &rplBalance
+			amountWei = &ggpBalance
 		}
 
 		// Prompt for custom amount
 		if amountWei == nil {
-			inputAmount := cliutils.Prompt("Please enter an amount of RPL to stake:", "^\\d+(\\.\\d+)?$", "Invalid amount")
+			inputAmount := cliutils.Prompt("Please enter an amount of GGP to stake:", "^\\d+(\\.\\d+)?$", "Invalid amount")
 			stakeAmount, err := strconv.ParseFloat(inputAmount, 64)
 			if err != nil {
 				return fmt.Errorf("Invalid stake amount '%s': %w", inputAmount, err)
@@ -224,13 +224,13 @@ func nodeStakeRpl(c *cli.Context) error {
 	}
 
 	// Check allowance
-	allowance, err := rp.GetNodeStakeRplAllowance()
+	allowance, err := rp.GetNodeStakeGgpAllowance()
 	if err != nil {
 		return err
 	}
 
 	if allowance.Allowance.Cmp(amountWei) < 0 {
-		fmt.Println("Before staking RPL, you must first give the staking contract approval to interact with your RPL.")
+		fmt.Println("Before staking GGP, you must first give the staking contract approval to interact with your GGP.")
 		fmt.Println("This only needs to be done once for your node.")
 
 		// If a custom nonce is set, print the multi-transaction warning
@@ -244,7 +244,7 @@ func nodeStakeRpl(c *cli.Context) error {
 		maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
 
 		// Get approval gas
-		approvalGas, err := rp.NodeStakeRplApprovalGas(maxApproval)
+		approvalGas, err := rp.NodeStakeGgpApprovalGas(maxApproval)
 		if err != nil {
 			return err
 		}
@@ -255,23 +255,23 @@ func nodeStakeRpl(c *cli.Context) error {
 		}
 
 		// Prompt for confirmation
-		if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the staking contract interact with your RPL?"))) {
+		if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the staking contract interact with your GGP?"))) {
 			fmt.Println("Cancelled.")
 			return nil
 		}
 
-		// Approve RPL for staking
-		response, err := rp.NodeStakeRplApprove(maxApproval)
+		// Approve GGP for staking
+		response, err := rp.NodeStakeGgpApprove(maxApproval)
 		if err != nil {
 			return err
 		}
 		hash := response.ApproveTxHash
-		fmt.Printf("Approving RPL for staking...\n")
+		fmt.Printf("Approving GGP for staking...\n")
 		cliutils.PrintTransactionHash(rp, hash)
 		if _, err = rp.WaitForTransaction(hash); err != nil {
 			return err
 		}
-		fmt.Println("Successfully approved staking access to RPL.")
+		fmt.Println("Successfully approved staking access to GGP.")
 
 		// If a custom nonce is set, increment it for the next transaction
 		if c.GlobalUint64("nonce") != 0 {
@@ -279,23 +279,23 @@ func nodeStakeRpl(c *cli.Context) error {
 		}
 	}
 
-	// Check RPL can be staked
-	canStake, err := rp.CanNodeStakeRpl(amountWei)
+	// Check GGP can be staked
+	canStake, err := rp.CanNodeStakeGgp(amountWei)
 	if err != nil {
 		return err
 	}
 	if !canStake.CanStake {
-		fmt.Println("Cannot stake RPL:")
+		fmt.Println("Cannot stake GGP:")
 		if canStake.InsufficientBalance {
-			fmt.Println("The node's RPL balance is insufficient.")
+			fmt.Println("The node's GGP balance is insufficient.")
 		}
 		if !canStake.InConsensus {
-			fmt.Println("The RPL price and total effective staked RPL of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
+			fmt.Println("The GGP price and total effective staked GGP of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
 		}
 		return nil
 	}
 
-	fmt.Println("RPL Stake Gas Info:")
+	fmt.Println("GGP Stake Gas Info:")
 	// Assign max fees
 	err = gas.AssignMaxFeeAndLimit(canStake.GasInfo, rp, c.Bool("yes"))
 	if err != nil {
@@ -303,25 +303,25 @@ func nodeStakeRpl(c *cli.Context) error {
 	}
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to stake %.6f RPL? You will not be able to unstake this RPL until you exit your validators and close your minipools, or reach over 150%% collateral!", math.RoundDown(eth.WeiToEth(amountWei), 6)))) {
+	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to stake %.6f GGP? You will not be able to unstake this GGP until you exit your validators and close your minipools, or reach over 150%% collateral!", math.RoundDown(eth.WeiToEth(amountWei), 6)))) {
 		fmt.Println("Cancelled.")
 		return nil
 	}
 
-	// Stake RPL
-	stakeResponse, err := rp.NodeStakeRpl(amountWei)
+	// Stake GGP
+	stakeResponse, err := rp.NodeStakeGgp(amountWei)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Staking RPL...\n")
+	fmt.Printf("Staking GGP...\n")
 	cliutils.PrintTransactionHash(rp, stakeResponse.StakeTxHash)
 	if _, err = rp.WaitForTransaction(stakeResponse.StakeTxHash); err != nil {
 		return err
 	}
 
 	// Log & return
-	fmt.Printf("Successfully staked %.6f RPL.\n", math.RoundDown(eth.WeiToEth(amountWei), 6))
+	fmt.Printf("Successfully staked %.6f GGP.\n", math.RoundDown(eth.WeiToEth(amountWei), 6))
 	return nil
 
 }

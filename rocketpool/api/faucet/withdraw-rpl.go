@@ -18,13 +18,13 @@ import (
 	"github.com/rocket-pool/smartnode/shared/types/api"
 )
 
-func canWithdrawRpl(c *cli.Context) (*api.CanFaucetWithdrawRplResponse, error) {
+func canWithdrawGgp(c *cli.Context) (*api.CanFaucetWithdrawGgpResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeWallet(c); err != nil {
 		return nil, err
 	}
-	if err := services.RequireRplFaucet(c); err != nil {
+	if err := services.RequireGgpFaucet(c); err != nil {
 		return nil, err
 	}
 	w, err := services.GetWallet(c)
@@ -35,13 +35,13 @@ func canWithdrawRpl(c *cli.Context) (*api.CanFaucetWithdrawRplResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	f, err := services.GetRplFaucet(c)
+	f, err := services.GetGgpFaucet(c)
 	if err != nil {
 		return nil, err
 	}
 
 	// Response
-	response := api.CanFaucetWithdrawRplResponse{}
+	response := api.CanFaucetWithdrawGgpResponse{}
 
 	// Get node account
 	nodeAccount, err := w.GetNodeAccount()
@@ -128,26 +128,26 @@ func canWithdrawRpl(c *cli.Context) (*api.CanFaucetWithdrawRplResponse, error) {
 
 }
 
-func withdrawRpl(c *cli.Context) (*api.FaucetWithdrawRplResponse, error) {
+func withdrawGgp(c *cli.Context) (*api.FaucetWithdrawGgpResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeWallet(c); err != nil {
 		return nil, err
 	}
-	if err := services.RequireRplFaucet(c); err != nil {
+	if err := services.RequireGgpFaucet(c); err != nil {
 		return nil, err
 	}
 	w, err := services.GetWallet(c)
 	if err != nil {
 		return nil, err
 	}
-	f, err := services.GetRplFaucet(c)
+	f, err := services.GetGgpFaucet(c)
 	if err != nil {
 		return nil, err
 	}
 
 	// Response
-	response := api.FaucetWithdrawRplResponse{}
+	response := api.FaucetWithdrawGgpResponse{}
 
 	// Get node account
 	nodeAccount, err := w.GetNodeAccount()
@@ -215,7 +215,7 @@ func withdrawRpl(c *cli.Context) (*api.FaucetWithdrawRplResponse, error) {
 
 }
 
-func estimateWithdrawGas(c *cli.Context, client *client.EthClientProxy, faucet *contracts.RPLFaucet, opts *bind.TransactOpts, amount *big.Int) (rocketpool.GasInfo, error) {
+func estimateWithdrawGas(c *cli.Context, client *client.EthClientProxy, faucet *contracts.GGPFaucet, opts *bind.TransactOpts, amount *big.Int) (rocketpool.GasInfo, error) {
 
 	response := rocketpool.GasInfo{}
 
@@ -224,10 +224,10 @@ func estimateWithdrawGas(c *cli.Context, client *client.EthClientProxy, faucet *
 	if err != nil {
 		return response, err
 	}
-	faucetAddress := common.HexToAddress(config.Rocketpool.RPLFaucetAddress)
+	faucetAddress := common.HexToAddress(config.Rocketpool.GGPFaucetAddress)
 
 	// Create a contract for the faucet
-	faucetAbi, err := abi.JSON(strings.NewReader(contracts.RPLFaucetABI))
+	faucetAbi, err := abi.JSON(strings.NewReader(contracts.GGPFaucetABI))
 	if err != nil {
 		return response, err
 	}

@@ -27,7 +27,7 @@ func createLot(c *cli.Context) error {
 	if !canCreate.CanCreate {
 		fmt.Println("Cannot create lot:")
 		if canCreate.InsufficientBalance {
-			fmt.Println("The auction contract does not have a sufficient RPL balance to create a lot.")
+			fmt.Println("The auction contract does not have a sufficient GGP balance to create a lot.")
 		}
 		if canCreate.CreateLotDisabled {
 			fmt.Println("Lot creation is currently disabled.")

@@ -37,12 +37,12 @@ func getStatus(c *cli.Context) error {
 
 	// Account address & balances
 	fmt.Printf(
-		"The node %s has a balance of %.6f ETH and %.6f RPL.\n",
+		"The node %s has a balance of %.6f ETH and %.6f GGP.\n",
 		status.AccountAddress.Hex(),
 		math.RoundDown(eth.WeiToEth(status.AccountBalances.ETH), 6),
-		math.RoundDown(eth.WeiToEth(status.AccountBalances.RPL), 6))
-	if status.AccountBalances.FixedSupplyRPL.Cmp(big.NewInt(0)) > 0 {
-		fmt.Printf("The node has a balance of %.6f old RPL which can be swapped for new RPL.\n", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6))
+		math.RoundDown(eth.WeiToEth(status.AccountBalances.GGP), 6))
+	if status.AccountBalances.FixedSupplyGGP.Cmp(big.NewInt(0)) > 0 {
+		fmt.Printf("The node has a balance of %.6f old GGP which can be swapped for new GGP.\n", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6))
 	}
 
 	// Registered node details
@@ -60,10 +60,10 @@ func getStatus(c *cli.Context) error {
 		colorYellow := "\033[33m"
 		if !bytes.Equal(status.AccountAddress.Bytes(), status.WithdrawalAddress.Bytes()) {
 			fmt.Printf(
-				"The node's withdrawal address %s has a balance of %.6f ETH and %.6f RPL.\n",
+				"The node's withdrawal address %s has a balance of %.6f ETH and %.6f GGP.\n",
 				status.WithdrawalAddress.Hex(),
 				math.RoundDown(eth.WeiToEth(status.WithdrawalBalances.ETH), 6),
-				math.RoundDown(eth.WeiToEth(status.WithdrawalBalances.RPL), 6))
+				math.RoundDown(eth.WeiToEth(status.WithdrawalBalances.GGP), 6))
 		} else {
 			fmt.Printf("%sThe node's withdrawal address has not been changed, so rewards and withdrawals will be sent to the node itself.\n", colorYellow)
 			fmt.Printf("Consider changing this to a cold wallet address that you control using the `set-withdrawal-address` command.\n%s", colorReset)
@@ -76,11 +76,11 @@ func getStatus(c *cli.Context) error {
 			fmt.Println("")
 		}
 
-		// RPL stake details
+		// GGP stake details
 		fmt.Printf(
-			"The node has a total stake of %.6f RPL and an effective stake of %.6f RPL, allowing it to run %d minipool(s) in total.\n",
-			math.RoundDown(eth.WeiToEth(status.RplStake), 6),
-			math.RoundDown(eth.WeiToEth(status.EffectiveRplStake), 6),
+			"The node has a total stake of %.6f GGP and an effective stake of %.6f GGP, allowing it to run %d minipool(s) in total.\n",
+			math.RoundDown(eth.WeiToEth(status.GgpStake), 6),
+			math.RoundDown(eth.WeiToEth(status.EffectiveGgpStake), 6),
 			status.MinipoolLimit)
 		if status.CollateralRatio > 0 {
 			fmt.Printf(
@@ -92,8 +92,8 @@ func getStatus(c *cli.Context) error {
 		// Minipool details
 		if status.MinipoolCounts.Total > 0 {
 
-			// RPL stake
-			fmt.Printf("The node must keep at least %.6f RPL staked to collateralize its minipools and claim RPL rewards.\n", math.RoundDown(eth.WeiToEth(status.MinimumRplStake), 6))
+			// GGP stake
+			fmt.Printf("The node must keep at least %.6f GGP staked to collateralize its minipools and claim GGP rewards.\n", math.RoundDown(eth.WeiToEth(status.MinimumGgpStake), 6))
 			fmt.Println("")
 
 			// Minipools

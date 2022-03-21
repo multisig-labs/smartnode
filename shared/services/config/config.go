@@ -19,8 +19,8 @@ type RocketPoolConfig struct {
 	Rocketpool struct {
 		StorageAddress       string `yaml:"storageAddress,omitempty"`
 		OneInchOracleAddress string `yaml:"oneInchOracleAddress,omitempty"`
-		RplTokenAddress      string `yaml:"rplTokenAddress,omitempty"`
-		RPLFaucetAddress     string `yaml:"rplFaucetAddress,omitempty"`
+		GgpTokenAddress      string `yaml:"ggpTokenAddress,omitempty"`
+		GGPFaucetAddress     string `yaml:"ggpFaucetAddress,omitempty"`
 	} `yaml:"rocketpool,omitempty"`
 	Smartnode struct {
 		ProjectName               string  `yaml:"projectName,omitempty"`
@@ -33,7 +33,7 @@ type RocketPoolConfig struct {
 		MaxFee                    float64 `yaml:"maxFee,omitempty"`
 		MaxPriorityFee            float64 `yaml:"maxPriorityFee,omitempty"`
 		GasLimit                  uint64  `yaml:"gasLimit,omitempty"`
-		RplClaimGasThreshold      float64 `yaml:"rplClaimGasThreshold,omitempty"`
+		GgpClaimGasThreshold      float64 `yaml:"ggpClaimGasThreshold,omitempty"`
 		MinipoolStakeGasThreshold float64 `yaml:"minipoolStakeGasThreshold,omitempty"`
 		TxWatchUrl                string  `yaml:"txWatchUrl,omitempty"`
 		StakeUrl                  string  `yaml:"stakeUrl,omitempty"`
@@ -314,8 +314,8 @@ func getCliConfig(c *cli.Context) RocketPoolConfig {
 	var config RocketPoolConfig
 	config.Rocketpool.StorageAddress = c.GlobalString("storageAddress")
 	config.Rocketpool.OneInchOracleAddress = c.GlobalString("oneInchOracleAddress")
-	config.Rocketpool.RplTokenAddress = c.GlobalString("rplTokenAddress")
-	config.Rocketpool.RPLFaucetAddress = c.GlobalString("rplFaucetAddress")
+	config.Rocketpool.GgpTokenAddress = c.GlobalString("ggpTokenAddress")
+	config.Rocketpool.GGPFaucetAddress = c.GlobalString("ggpFaucetAddress")
 	config.Smartnode.PasswordPath = c.GlobalString("password")
 	config.Smartnode.WalletPath = c.GlobalString("wallet")
 	config.Smartnode.ValidatorKeychainPath = c.GlobalString("validatorKeychain")

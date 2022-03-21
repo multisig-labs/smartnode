@@ -103,16 +103,16 @@ func RequireOneInchOracle(c *cli.Context) error {
 	return nil
 }
 
-func RequireRplFaucet(c *cli.Context) error {
+func RequireGgpFaucet(c *cli.Context) error {
 	if err := RequireEthClientSynced(c); err != nil {
 		return err
 	}
-	rplFaucetLoaded, err := getRplFaucetLoaded(c)
+	ggpFaucetLoaded, err := getGgpFaucetLoaded(c)
 	if err != nil {
 		return err
 	}
-	if !rplFaucetLoaded {
-		return errors.New("The RPL faucet contract was not found; the configured address may be incorrect, or the Eth 1.0 node may not be synced. Please try again later.")
+	if !ggpFaucetLoaded {
+		return errors.New("The GGP faucet contract was not found; the configured address may be incorrect, or the Eth 1.0 node may not be synced. Please try again later.")
 	}
 	return nil
 }
@@ -297,8 +297,8 @@ func getOneInchOracleLoaded(c *cli.Context) (bool, error) {
 	return (len(code) > 0), nil
 }
 
-// Check if the RPL faucet contract is loaded
-func getRplFaucetLoaded(c *cli.Context) (bool, error) {
+// Check if the GGP faucet contract is loaded
+func getGgpFaucetLoaded(c *cli.Context) (bool, error) {
 	cfg, err := GetConfig(c)
 	if err != nil {
 		return false, err
@@ -307,7 +307,7 @@ func getRplFaucetLoaded(c *cli.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Rocketpool.RPLFaucetAddress), nil)
+	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Rocketpool.GGPFaucetAddress), nil)
 	if err != nil {
 		return false, err
 	}

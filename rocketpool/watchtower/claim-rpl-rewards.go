@@ -19,8 +19,8 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-// Claim RPL rewards task
-type claimRplRewards struct {
+// Claim GGP rewards task
+type claimGgpRewards struct {
 	c              *cli.Context
 	log            log.ColorLogger
 	cfg            config.RocketPoolConfig
@@ -32,8 +32,8 @@ type claimRplRewards struct {
 	gasLimit       uint64
 }
 
-// Create claim RPL rewards task
-func newClaimRplRewards(c *cli.Context, logger log.ColorLogger) (*claimRplRewards, error) {
+// Create claim GGP rewards task
+func newClaimGgpRewards(c *cli.Context, logger log.ColorLogger) (*claimGgpRewards, error) {
 
 	// Get services
 	cfg, err := services.GetConfig(c)
@@ -50,9 +50,9 @@ func newClaimRplRewards(c *cli.Context, logger log.ColorLogger) (*claimRplReward
 	}
 
 	// Check if auto-claiming is disabled
-	gasThreshold := cfg.Smartnode.RplClaimGasThreshold
+	gasThreshold := cfg.Smartnode.GgpClaimGasThreshold
 	if gasThreshold == 0 {
-		logger.Println("RPL claim gas threshold is set to 0, automatic claims will be disabled.")
+		logger.Println("GGP claim gas threshold is set to 0, automatic claims will be disabled.")
 	}
 
 	// Get the user-requested max fee
@@ -78,7 +78,7 @@ func newClaimRplRewards(c *cli.Context, logger log.ColorLogger) (*claimRplReward
 	}
 
 	// Return task
-	return &claimRplRewards{
+	return &claimGgpRewards{
 		c:              c,
 		log:            logger,
 		cfg:            cfg,
@@ -92,8 +92,8 @@ func newClaimRplRewards(c *cli.Context, logger log.ColorLogger) (*claimRplReward
 
 }
 
-// Claim RPL rewards
-func (t *claimRplRewards) run() error {
+// Claim GGP rewards
+func (t *claimGgpRewards) run() error {
 
 	// Check to see if autoclaim is disabled
 	if t.gasThreshold == 0 {
@@ -121,7 +121,7 @@ func (t *claimRplRewards) run() error {
 	}
 
 	// Log
-	t.log.Println("Checking for RPL rewards to claim...")
+	t.log.Println("Checking for GGP rewards to claim...")
 
 	// Check for rewards
 	rewardsAmountWei, err := rewards.GetTrustedNodeClaimRewardsAmount(t.rp, nodeAccount.Address, nil)
@@ -133,7 +133,7 @@ func (t *claimRplRewards) run() error {
 	}
 
 	// Log
-	t.log.Printlnf("%.6f RPL is available to claim...", math.RoundDown(eth.WeiToEth(rewardsAmountWei), 6))
+	t.log.Printlnf("%.6f GGP is available to claim...", math.RoundDown(eth.WeiToEth(rewardsAmountWei), 6))
 
 	// Get transactor
 	opts, err := t.w.GetNodeAccountTransactor()
@@ -144,7 +144,7 @@ func (t *claimRplRewards) run() error {
 	// Get the gas limit
 	gasInfo, err := rewards.EstimateClaimTrustedNodeRewardsGas(t.rp, opts)
 	if err != nil {
-		return fmt.Errorf("Could not estimate the gas required to claim RPL: %w", err)
+		return fmt.Errorf("Could not estimate the gas required to claim GGP: %w", err)
 	}
 	var gas *big.Int
 	if t.gasLimit != 0 {
@@ -184,7 +184,7 @@ func (t *claimRplRewards) run() error {
 	}
 
 	// Log & return
-	t.log.Printlnf("Successfully claimed %.6f RPL in rewards.", math.RoundDown(eth.WeiToEth(rewardsAmountWei), 6))
+	t.log.Printlnf("Successfully claimed %.6f GGP in rewards.", math.RoundDown(eth.WeiToEth(rewardsAmountWei), 6))
 	return nil
 
 }

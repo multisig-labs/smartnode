@@ -10,7 +10,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func getRplPrice(c *cli.Context) error {
+func getGgpPrice(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -19,15 +19,15 @@ func getRplPrice(c *cli.Context) error {
 	}
 	defer rp.Close()
 
-	// Get RPL price
-	response, err := rp.RplPrice()
+	// Get GGP price
+	response, err := rp.GgpPrice()
 	if err != nil {
 		return err
 	}
 
 	// Print & return
-	fmt.Printf("The current network RPL price is %.6f ETH.\n", math.RoundDown(eth.WeiToEth(response.RplPrice), 6))
-	fmt.Printf("Prices last updated at block: %d\n", response.RplPriceBlock)
+	fmt.Printf("The current network GGP price is %.6f ETH.\n", math.RoundDown(eth.WeiToEth(response.GgpPrice), 6))
+	fmt.Printf("Prices last updated at block: %d\n", response.GgpPriceBlock)
 	return nil
 
 }

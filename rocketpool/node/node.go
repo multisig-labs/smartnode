@@ -19,7 +19,7 @@ var taskCooldown, _ = time.ParseDuration("10s")
 const (
 	MaxConcurrentEth1Requests = 200
 
-	ClaimRplRewardsColor         = color.FgGreen
+	ClaimGgpRewardsColor         = color.FgGreen
 	StakePrelaunchMinipoolsColor = color.FgBlue
 	MetricsColor                 = color.FgHiYellow
 	ErrorColor                   = color.FgRed
@@ -49,7 +49,7 @@ func run(c *cli.Context) error {
 	}
 
 	// Initialize tasks
-	claimRplRewards, err := newClaimRplRewards(c, log.NewColorLogger(ClaimRplRewardsColor))
+	claimGgpRewards, err := newClaimGgpRewards(c, log.NewColorLogger(ClaimGgpRewardsColor))
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func run(c *cli.Context) error {
 	// Run task loop
 	go func() {
 		for {
-			if err := claimRplRewards.run(); err != nil {
+			if err := claimGgpRewards.run(); err != nil {
 				errorLog.Println(err)
 			}
 			time.Sleep(taskCooldown)

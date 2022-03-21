@@ -24,38 +24,38 @@ func (c *Client) NodeStatus() (api.NodeStatusResponse, error) {
 	if response.Error != "" {
 		return api.NodeStatusResponse{}, fmt.Errorf("Could not get node status: %s", response.Error)
 	}
-	if response.RplStake == nil {
-		response.RplStake = big.NewInt(0)
+	if response.GgpStake == nil {
+		response.GgpStake = big.NewInt(0)
 	}
-	if response.EffectiveRplStake == nil {
-		response.EffectiveRplStake = big.NewInt(0)
+	if response.EffectiveGgpStake == nil {
+		response.EffectiveGgpStake = big.NewInt(0)
 	}
-	if response.MinimumRplStake == nil {
-		response.MinimumRplStake = big.NewInt(0)
+	if response.MinimumGgpStake == nil {
+		response.MinimumGgpStake = big.NewInt(0)
 	}
 	if response.AccountBalances.ETH == nil {
 		response.AccountBalances.ETH = big.NewInt(0)
 	}
-	if response.AccountBalances.RPL == nil {
-		response.AccountBalances.RPL = big.NewInt(0)
+	if response.AccountBalances.GGP == nil {
+		response.AccountBalances.GGP = big.NewInt(0)
 	}
-	if response.AccountBalances.RETH == nil {
-		response.AccountBalances.RETH = big.NewInt(0)
+	if response.AccountBalances.GGPAVAX == nil {
+		response.AccountBalances.GGPAVAX = big.NewInt(0)
 	}
-	if response.AccountBalances.FixedSupplyRPL == nil {
-		response.AccountBalances.FixedSupplyRPL = big.NewInt(0)
+	if response.AccountBalances.FixedSupplyGGP == nil {
+		response.AccountBalances.FixedSupplyGGP = big.NewInt(0)
 	}
 	if response.WithdrawalBalances.ETH == nil {
 		response.WithdrawalBalances.ETH = big.NewInt(0)
 	}
-	if response.WithdrawalBalances.RPL == nil {
-		response.WithdrawalBalances.RPL = big.NewInt(0)
+	if response.WithdrawalBalances.GGP == nil {
+		response.WithdrawalBalances.GGP = big.NewInt(0)
 	}
-	if response.WithdrawalBalances.RETH == nil {
-		response.WithdrawalBalances.RETH = big.NewInt(0)
+	if response.WithdrawalBalances.GGPAVAX == nil {
+		response.WithdrawalBalances.GGPAVAX = big.NewInt(0)
 	}
-	if response.WithdrawalBalances.FixedSupplyRPL == nil {
-		response.WithdrawalBalances.FixedSupplyRPL = big.NewInt(0)
+	if response.WithdrawalBalances.FixedSupplyGGP == nil {
+		response.WithdrawalBalances.FixedSupplyGGP = big.NewInt(0)
 	}
 	return response, nil
 }
@@ -188,226 +188,226 @@ func (c *Client) SetNodeTimezone(timezoneLocation string) (api.SetNodeTimezoneRe
 	return response, nil
 }
 
-// Check whether the node can swap RPL tokens
-func (c *Client) CanNodeSwapRpl(amountWei *big.Int) (api.CanNodeSwapRplResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node can-swap-rpl %s", amountWei.String()))
+// Check whether the node can swap GGP tokens
+func (c *Client) CanNodeSwapGgp(amountWei *big.Int) (api.CanNodeSwapGgpResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node can-swap-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.CanNodeSwapRplResponse{}, fmt.Errorf("Could not get can node swap RPL status: %w", err)
+		return api.CanNodeSwapGgpResponse{}, fmt.Errorf("Could not get can node swap GGP status: %w", err)
 	}
-	var response api.CanNodeSwapRplResponse
+	var response api.CanNodeSwapGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanNodeSwapRplResponse{}, fmt.Errorf("Could not decode can node swap RPL response: %w", err)
+		return api.CanNodeSwapGgpResponse{}, fmt.Errorf("Could not decode can node swap GGP response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanNodeSwapRplResponse{}, fmt.Errorf("Could not get can node swap RPL status: %s", response.Error)
+		return api.CanNodeSwapGgpResponse{}, fmt.Errorf("Could not get can node swap GGP status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Get the gas estimate for approving legacy RPL interaction
-func (c *Client) NodeSwapRplApprovalGas(amountWei *big.Int) (api.NodeSwapRplApproveGasResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node get-swap-rpl-approval-gas %s", amountWei.String()))
+// Get the gas estimate for approving legacy GGP interaction
+func (c *Client) NodeSwapGgpApprovalGas(amountWei *big.Int) (api.NodeSwapGgpApproveGasResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node get-swap-ggp-approval-gas %s", amountWei.String()))
 	if err != nil {
-		return api.NodeSwapRplApproveGasResponse{}, fmt.Errorf("Could not get old RPL approval gas: %w", err)
+		return api.NodeSwapGgpApproveGasResponse{}, fmt.Errorf("Could not get old GGP approval gas: %w", err)
 	}
-	var response api.NodeSwapRplApproveGasResponse
+	var response api.NodeSwapGgpApproveGasResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeSwapRplApproveGasResponse{}, fmt.Errorf("Could not decode node swap RPL approve gas response: %w", err)
+		return api.NodeSwapGgpApproveGasResponse{}, fmt.Errorf("Could not decode node swap GGP approve gas response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeSwapRplApproveGasResponse{}, fmt.Errorf("Could not get old RPL approval gas: %s", response.Error)
+		return api.NodeSwapGgpApproveGasResponse{}, fmt.Errorf("Could not get old GGP approval gas: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Approves old RPL for a token swap
-func (c *Client) NodeSwapRplApprove(amountWei *big.Int) (api.NodeSwapRplApproveResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node swap-rpl-approve-rpl %s", amountWei.String()))
+// Approves old GGP for a token swap
+func (c *Client) NodeSwapGgpApprove(amountWei *big.Int) (api.NodeSwapGgpApproveResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node swap-ggp-approve-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.NodeSwapRplApproveResponse{}, fmt.Errorf("Could not approve old RPL: %w", err)
+		return api.NodeSwapGgpApproveResponse{}, fmt.Errorf("Could not approve old GGP: %w", err)
 	}
-	var response api.NodeSwapRplApproveResponse
+	var response api.NodeSwapGgpApproveResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeSwapRplApproveResponse{}, fmt.Errorf("Could not decode node swap RPL approve response: %w", err)
+		return api.NodeSwapGgpApproveResponse{}, fmt.Errorf("Could not decode node swap GGP approve response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeSwapRplApproveResponse{}, fmt.Errorf("Could not approve old RPL tokens for swapping: %s", response.Error)
+		return api.NodeSwapGgpApproveResponse{}, fmt.Errorf("Could not approve old GGP tokens for swapping: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Swap node's old RPL tokens for new RPL tokens, waiting for the approval to be mined first
-func (c *Client) NodeWaitAndSwapRpl(amountWei *big.Int, approvalTxHash common.Hash) (api.NodeSwapRplSwapResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node wait-and-swap-rpl %s %s", amountWei.String(), approvalTxHash.String()))
+// Swap node's old GGP tokens for new GGP tokens, waiting for the approval to be mined first
+func (c *Client) NodeWaitAndSwapGgp(amountWei *big.Int, approvalTxHash common.Hash) (api.NodeSwapGgpSwapResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node wait-and-swap-ggp %s %s", amountWei.String(), approvalTxHash.String()))
 	if err != nil {
-		return api.NodeSwapRplSwapResponse{}, fmt.Errorf("Could not swap node's RPL tokens: %w", err)
+		return api.NodeSwapGgpSwapResponse{}, fmt.Errorf("Could not swap node's GGP tokens: %w", err)
 	}
-	var response api.NodeSwapRplSwapResponse
+	var response api.NodeSwapGgpSwapResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeSwapRplSwapResponse{}, fmt.Errorf("Could not decode node swap RPL tokens response: %w", err)
+		return api.NodeSwapGgpSwapResponse{}, fmt.Errorf("Could not decode node swap GGP tokens response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeSwapRplSwapResponse{}, fmt.Errorf("Could not swap node's RPL tokens: %s", response.Error)
+		return api.NodeSwapGgpSwapResponse{}, fmt.Errorf("Could not swap node's GGP tokens: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Swap node's old RPL tokens for new RPL tokens
-func (c *Client) NodeSwapRpl(amountWei *big.Int) (api.NodeSwapRplSwapResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node swap-rpl %s", amountWei.String()))
+// Swap node's old GGP tokens for new GGP tokens
+func (c *Client) NodeSwapGgp(amountWei *big.Int) (api.NodeSwapGgpSwapResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node swap-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.NodeSwapRplSwapResponse{}, fmt.Errorf("Could not swap node's RPL tokens: %w", err)
+		return api.NodeSwapGgpSwapResponse{}, fmt.Errorf("Could not swap node's GGP tokens: %w", err)
 	}
-	var response api.NodeSwapRplSwapResponse
+	var response api.NodeSwapGgpSwapResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeSwapRplSwapResponse{}, fmt.Errorf("Could not decode node swap RPL tokens response: %w", err)
+		return api.NodeSwapGgpSwapResponse{}, fmt.Errorf("Could not decode node swap GGP tokens response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeSwapRplSwapResponse{}, fmt.Errorf("Could not swap node's RPL tokens: %s", response.Error)
+		return api.NodeSwapGgpSwapResponse{}, fmt.Errorf("Could not swap node's GGP tokens: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Get a node's legacy RPL allowance for swapping on the new RPL contract
-func (c *Client) GetNodeSwapRplAllowance() (api.NodeSwapRplAllowanceResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node swap-rpl-allowance"))
+// Get a node's legacy GGP allowance for swapping on the new GGP contract
+func (c *Client) GetNodeSwapGgpAllowance() (api.NodeSwapGgpAllowanceResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node swap-ggp-allowance"))
 	if err != nil {
-		return api.NodeSwapRplAllowanceResponse{}, fmt.Errorf("Could not get node swap RPL allowance: %w", err)
+		return api.NodeSwapGgpAllowanceResponse{}, fmt.Errorf("Could not get node swap GGP allowance: %w", err)
 	}
-	var response api.NodeSwapRplAllowanceResponse
+	var response api.NodeSwapGgpAllowanceResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeSwapRplAllowanceResponse{}, fmt.Errorf("Could not decode node swap RPL allowance response: %w", err)
+		return api.NodeSwapGgpAllowanceResponse{}, fmt.Errorf("Could not decode node swap GGP allowance response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeSwapRplAllowanceResponse{}, fmt.Errorf("Could not get node swap RPL allowance: %s", response.Error)
+		return api.NodeSwapGgpAllowanceResponse{}, fmt.Errorf("Could not get node swap GGP allowance: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Check whether the node can stake RPL
-func (c *Client) CanNodeStakeRpl(amountWei *big.Int) (api.CanNodeStakeRplResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node can-stake-rpl %s", amountWei.String()))
+// Check whether the node can stake GGP
+func (c *Client) CanNodeStakeGgp(amountWei *big.Int) (api.CanNodeStakeGgpResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node can-stake-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.CanNodeStakeRplResponse{}, fmt.Errorf("Could not get can node stake RPL status: %w", err)
+		return api.CanNodeStakeGgpResponse{}, fmt.Errorf("Could not get can node stake GGP status: %w", err)
 	}
-	var response api.CanNodeStakeRplResponse
+	var response api.CanNodeStakeGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanNodeStakeRplResponse{}, fmt.Errorf("Could not decode can node stake RPL response: %w", err)
+		return api.CanNodeStakeGgpResponse{}, fmt.Errorf("Could not decode can node stake GGP response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanNodeStakeRplResponse{}, fmt.Errorf("Could not get can node stake RPL status: %s", response.Error)
+		return api.CanNodeStakeGgpResponse{}, fmt.Errorf("Could not get can node stake GGP status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Get the gas estimate for approving new RPL interaction
-func (c *Client) NodeStakeRplApprovalGas(amountWei *big.Int) (api.NodeStakeRplApproveGasResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node get-stake-rpl-approval-gas %s", amountWei.String()))
+// Get the gas estimate for approving new GGP interaction
+func (c *Client) NodeStakeGgpApprovalGas(amountWei *big.Int) (api.NodeStakeGgpApproveGasResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node get-stake-ggp-approval-gas %s", amountWei.String()))
 	if err != nil {
-		return api.NodeStakeRplApproveGasResponse{}, fmt.Errorf("Could not get new RPL approval gas: %w", err)
+		return api.NodeStakeGgpApproveGasResponse{}, fmt.Errorf("Could not get new GGP approval gas: %w", err)
 	}
-	var response api.NodeStakeRplApproveGasResponse
+	var response api.NodeStakeGgpApproveGasResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeStakeRplApproveGasResponse{}, fmt.Errorf("Could not decode node stake RPL approve gas response: %w", err)
+		return api.NodeStakeGgpApproveGasResponse{}, fmt.Errorf("Could not decode node stake GGP approve gas response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeStakeRplApproveGasResponse{}, fmt.Errorf("Could not get new RPL approval gas: %s", response.Error)
+		return api.NodeStakeGgpApproveGasResponse{}, fmt.Errorf("Could not get new GGP approval gas: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Approve RPL for staking against the node
-func (c *Client) NodeStakeRplApprove(amountWei *big.Int) (api.NodeStakeRplApproveResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node stake-rpl-approve-rpl %s", amountWei.String()))
+// Approve GGP for staking against the node
+func (c *Client) NodeStakeGgpApprove(amountWei *big.Int) (api.NodeStakeGgpApproveResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node stake-ggp-approve-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.NodeStakeRplApproveResponse{}, fmt.Errorf("Could not approve RPL for staking: %w", err)
+		return api.NodeStakeGgpApproveResponse{}, fmt.Errorf("Could not approve GGP for staking: %w", err)
 	}
-	var response api.NodeStakeRplApproveResponse
+	var response api.NodeStakeGgpApproveResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeStakeRplApproveResponse{}, fmt.Errorf("Could not decode stake node RPL approve response: %w", err)
+		return api.NodeStakeGgpApproveResponse{}, fmt.Errorf("Could not decode stake node GGP approve response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeStakeRplApproveResponse{}, fmt.Errorf("Could not approve RPL for staking: %s", response.Error)
+		return api.NodeStakeGgpApproveResponse{}, fmt.Errorf("Could not approve GGP for staking: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Stake RPL against the node waiting for approvalTxHash to be mined first
-func (c *Client) NodeWaitAndStakeRpl(amountWei *big.Int, approvalTxHash common.Hash) (api.NodeStakeRplStakeResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node wait-and-stake-rpl %s %s", amountWei.String(), approvalTxHash.String()))
+// Stake GGP against the node waiting for approvalTxHash to be mined first
+func (c *Client) NodeWaitAndStakeGgp(amountWei *big.Int, approvalTxHash common.Hash) (api.NodeStakeGgpStakeResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node wait-and-stake-ggp %s %s", amountWei.String(), approvalTxHash.String()))
 	if err != nil {
-		return api.NodeStakeRplStakeResponse{}, fmt.Errorf("Could not stake node RPL: %w", err)
+		return api.NodeStakeGgpStakeResponse{}, fmt.Errorf("Could not stake node GGP: %w", err)
 	}
-	var response api.NodeStakeRplStakeResponse
+	var response api.NodeStakeGgpStakeResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeStakeRplStakeResponse{}, fmt.Errorf("Could not decode stake node RPL response: %w", err)
+		return api.NodeStakeGgpStakeResponse{}, fmt.Errorf("Could not decode stake node GGP response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeStakeRplStakeResponse{}, fmt.Errorf("Could not stake node RPL: %s", response.Error)
+		return api.NodeStakeGgpStakeResponse{}, fmt.Errorf("Could not stake node GGP: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Stake RPL against the node
-func (c *Client) NodeStakeRpl(amountWei *big.Int) (api.NodeStakeRplStakeResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node stake-rpl %s", amountWei.String()))
+// Stake GGP against the node
+func (c *Client) NodeStakeGgp(amountWei *big.Int) (api.NodeStakeGgpStakeResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node stake-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.NodeStakeRplStakeResponse{}, fmt.Errorf("Could not stake node RPL: %w", err)
+		return api.NodeStakeGgpStakeResponse{}, fmt.Errorf("Could not stake node GGP: %w", err)
 	}
-	var response api.NodeStakeRplStakeResponse
+	var response api.NodeStakeGgpStakeResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeStakeRplStakeResponse{}, fmt.Errorf("Could not decode stake node RPL response: %w", err)
+		return api.NodeStakeGgpStakeResponse{}, fmt.Errorf("Could not decode stake node GGP response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeStakeRplStakeResponse{}, fmt.Errorf("Could not stake node RPL: %s", response.Error)
+		return api.NodeStakeGgpStakeResponse{}, fmt.Errorf("Could not stake node GGP: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Get a node's RPL allowance for the staking contract
-func (c *Client) GetNodeStakeRplAllowance() (api.NodeStakeRplAllowanceResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node stake-rpl-allowance"))
+// Get a node's GGP allowance for the staking contract
+func (c *Client) GetNodeStakeGgpAllowance() (api.NodeStakeGgpAllowanceResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node stake-ggp-allowance"))
 	if err != nil {
-		return api.NodeStakeRplAllowanceResponse{}, fmt.Errorf("Could not get node stake RPL allowance: %w", err)
+		return api.NodeStakeGgpAllowanceResponse{}, fmt.Errorf("Could not get node stake GGP allowance: %w", err)
 	}
-	var response api.NodeStakeRplAllowanceResponse
+	var response api.NodeStakeGgpAllowanceResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeStakeRplAllowanceResponse{}, fmt.Errorf("Could not decode node stake RPL allowance response: %w", err)
+		return api.NodeStakeGgpAllowanceResponse{}, fmt.Errorf("Could not decode node stake GGP allowance response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeStakeRplAllowanceResponse{}, fmt.Errorf("Could not get node stake RPL allowance: %s", response.Error)
+		return api.NodeStakeGgpAllowanceResponse{}, fmt.Errorf("Could not get node stake GGP allowance: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Check whether the node can withdraw RPL
-func (c *Client) CanNodeWithdrawRpl(amountWei *big.Int) (api.CanNodeWithdrawRplResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node can-withdraw-rpl %s", amountWei.String()))
+// Check whether the node can withdraw GGP
+func (c *Client) CanNodeWithdrawGgp(amountWei *big.Int) (api.CanNodeWithdrawGgpResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node can-withdraw-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.CanNodeWithdrawRplResponse{}, fmt.Errorf("Could not get can node withdraw RPL status: %w", err)
+		return api.CanNodeWithdrawGgpResponse{}, fmt.Errorf("Could not get can node withdraw GGP status: %w", err)
 	}
-	var response api.CanNodeWithdrawRplResponse
+	var response api.CanNodeWithdrawGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanNodeWithdrawRplResponse{}, fmt.Errorf("Could not decode can node withdraw RPL response: %w", err)
+		return api.CanNodeWithdrawGgpResponse{}, fmt.Errorf("Could not decode can node withdraw GGP response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanNodeWithdrawRplResponse{}, fmt.Errorf("Could not get can node withdraw RPL status: %s", response.Error)
+		return api.CanNodeWithdrawGgpResponse{}, fmt.Errorf("Could not get can node withdraw GGP status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Withdraw RPL staked against the node
-func (c *Client) NodeWithdrawRpl(amountWei *big.Int) (api.NodeWithdrawRplResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("node withdraw-rpl %s", amountWei.String()))
+// Withdraw GGP staked against the node
+func (c *Client) NodeWithdrawGgp(amountWei *big.Int) (api.NodeWithdrawGgpResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("node withdraw-ggp %s", amountWei.String()))
 	if err != nil {
-		return api.NodeWithdrawRplResponse{}, fmt.Errorf("Could not withdraw node RPL: %w", err)
+		return api.NodeWithdrawGgpResponse{}, fmt.Errorf("Could not withdraw node GGP: %w", err)
 	}
-	var response api.NodeWithdrawRplResponse
+	var response api.NodeWithdrawGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeWithdrawRplResponse{}, fmt.Errorf("Could not decode withdraw node RPL response: %w", err)
+		return api.NodeWithdrawGgpResponse{}, fmt.Errorf("Could not decode withdraw node GGP response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeWithdrawRplResponse{}, fmt.Errorf("Could not withdraw node RPL: %s", response.Error)
+		return api.NodeWithdrawGgpResponse{}, fmt.Errorf("Could not withdraw node GGP: %s", response.Error)
 	}
 	return response, nil
 }
@@ -524,39 +524,39 @@ func (c *Client) NodeSync() (api.NodeSyncProgressResponse, error) {
 	return response, nil
 }
 
-// Check whether the node has RPL rewards available to claim
-func (c *Client) CanNodeClaimRpl() (api.CanNodeClaimRplResponse, error) {
-	responseBytes, err := c.callAPI("node can-claim-rpl-rewards")
+// Check whether the node has GGP rewards available to claim
+func (c *Client) CanNodeClaimGgp() (api.CanNodeClaimGgpResponse, error) {
+	responseBytes, err := c.callAPI("node can-claim-ggp-rewards")
 	if err != nil {
-		return api.CanNodeClaimRplResponse{}, fmt.Errorf("Could not get can node claim rpl rewards status: %w", err)
+		return api.CanNodeClaimGgpResponse{}, fmt.Errorf("Could not get can node claim ggp rewards status: %w", err)
 	}
-	var response api.CanNodeClaimRplResponse
+	var response api.CanNodeClaimGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanNodeClaimRplResponse{}, fmt.Errorf("Could not decode can node claim rpl rewards response: %w", err)
+		return api.CanNodeClaimGgpResponse{}, fmt.Errorf("Could not decode can node claim ggp rewards response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanNodeClaimRplResponse{}, fmt.Errorf("Could not get can node claim rpl rewards status: %s", response.Error)
+		return api.CanNodeClaimGgpResponse{}, fmt.Errorf("Could not get can node claim ggp rewards status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Claim available RPL rewards
-func (c *Client) NodeClaimRpl() (api.NodeClaimRplResponse, error) {
-	responseBytes, err := c.callAPI("node claim-rpl-rewards")
+// Claim available GGP rewards
+func (c *Client) NodeClaimGgp() (api.NodeClaimGgpResponse, error) {
+	responseBytes, err := c.callAPI("node claim-ggp-rewards")
 	if err != nil {
-		return api.NodeClaimRplResponse{}, fmt.Errorf("Could not claim rpl rewards: %w", err)
+		return api.NodeClaimGgpResponse{}, fmt.Errorf("Could not claim ggp rewards: %w", err)
 	}
-	var response api.NodeClaimRplResponse
+	var response api.NodeClaimGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.NodeClaimRplResponse{}, fmt.Errorf("Could not decode node claim rpl rewards response: %w", err)
+		return api.NodeClaimGgpResponse{}, fmt.Errorf("Could not decode node claim ggp rewards response: %w", err)
 	}
 	if response.Error != "" {
-		return api.NodeClaimRplResponse{}, fmt.Errorf("Could not claim rpl rewards: %s", response.Error)
+		return api.NodeClaimGgpResponse{}, fmt.Errorf("Could not claim ggp rewards: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Get node RPL rewards status
+// Get node GGP rewards status
 func (c *Client) NodeRewards() (api.NodeRewardsResponse, error) {
 	responseBytes, err := c.callAPI("node rewards")
 	if err != nil {

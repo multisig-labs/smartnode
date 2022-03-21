@@ -8,7 +8,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/types/api"
 )
 
-// Get RPL auction status
+// Get GGP auction status
 func (c *Client) AuctionStatus() (api.AuctionStatusResponse, error) {
 	responseBytes, err := c.callAPI("auction status")
 	if err != nil {
@@ -21,19 +21,19 @@ func (c *Client) AuctionStatus() (api.AuctionStatusResponse, error) {
 	if response.Error != "" {
 		return api.AuctionStatusResponse{}, fmt.Errorf("Could not get auction status: %s", response.Error)
 	}
-	if response.TotalRPLBalance == nil {
-		response.TotalRPLBalance = big.NewInt(0)
+	if response.TotalGGPBalance == nil {
+		response.TotalGGPBalance = big.NewInt(0)
 	}
-	if response.AllottedRPLBalance == nil {
-		response.AllottedRPLBalance = big.NewInt(0)
+	if response.AllottedGGPBalance == nil {
+		response.AllottedGGPBalance = big.NewInt(0)
 	}
-	if response.RemainingRPLBalance == nil {
-		response.RemainingRPLBalance = big.NewInt(0)
+	if response.RemainingGGPBalance == nil {
+		response.RemainingGGPBalance = big.NewInt(0)
 	}
 	return response, nil
 }
 
-// Get RPL lots for auction
+// Get GGP lots for auction
 func (c *Client) AuctionLots() (api.AuctionLotsResponse, error) {
 	responseBytes, err := c.callAPI("auction lots")
 	if err != nil {
@@ -63,14 +63,14 @@ func (c *Client) AuctionLots() (api.AuctionLotsResponse, error) {
 		if details.CurrentPrice == nil {
 			details.CurrentPrice = big.NewInt(0)
 		}
-		if details.TotalRPLAmount == nil {
-			details.TotalRPLAmount = big.NewInt(0)
+		if details.TotalGGPAmount == nil {
+			details.TotalGGPAmount = big.NewInt(0)
 		}
-		if details.ClaimedRPLAmount == nil {
-			details.ClaimedRPLAmount = big.NewInt(0)
+		if details.ClaimedGGPAmount == nil {
+			details.ClaimedGGPAmount = big.NewInt(0)
 		}
-		if details.RemainingRPLAmount == nil {
-			details.RemainingRPLAmount = big.NewInt(0)
+		if details.RemainingGGPAmount == nil {
+			details.RemainingGGPAmount = big.NewInt(0)
 		}
 		if details.TotalBidAmount == nil {
 			details.TotalBidAmount = big.NewInt(0)
@@ -146,66 +146,66 @@ func (c *Client) BidOnLot(lotIndex uint64, amountWei *big.Int) (api.BidOnLotResp
 	return response, nil
 }
 
-// Check whether the node can claim RPL from a lot
+// Check whether the node can claim GGP from a lot
 func (c *Client) CanClaimFromLot(lotIndex uint64) (api.CanClaimFromLotResponse, error) {
 	responseBytes, err := c.callAPI(fmt.Sprintf("auction can-claim-lot %d", lotIndex))
 	if err != nil {
-		return api.CanClaimFromLotResponse{}, fmt.Errorf("Could not get can claim RPL from lot status: %w", err)
+		return api.CanClaimFromLotResponse{}, fmt.Errorf("Could not get can claim GGP from lot status: %w", err)
 	}
 	var response api.CanClaimFromLotResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanClaimFromLotResponse{}, fmt.Errorf("Could not decode can claim RPL from lot response: %w", err)
+		return api.CanClaimFromLotResponse{}, fmt.Errorf("Could not decode can claim GGP from lot response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanClaimFromLotResponse{}, fmt.Errorf("Could not get can claim RPL from lot status: %s", response.Error)
+		return api.CanClaimFromLotResponse{}, fmt.Errorf("Could not get can claim GGP from lot status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Claim RPL from a lot
+// Claim GGP from a lot
 func (c *Client) ClaimFromLot(lotIndex uint64) (api.ClaimFromLotResponse, error) {
 	responseBytes, err := c.callAPI(fmt.Sprintf("auction claim-lot %d", lotIndex))
 	if err != nil {
-		return api.ClaimFromLotResponse{}, fmt.Errorf("Could not claim RPL from lot: %w", err)
+		return api.ClaimFromLotResponse{}, fmt.Errorf("Could not claim GGP from lot: %w", err)
 	}
 	var response api.ClaimFromLotResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.ClaimFromLotResponse{}, fmt.Errorf("Could not decode claim RPL from lot response: %w", err)
+		return api.ClaimFromLotResponse{}, fmt.Errorf("Could not decode claim GGP from lot response: %w", err)
 	}
 	if response.Error != "" {
-		return api.ClaimFromLotResponse{}, fmt.Errorf("Could not claim RPL from lot: %s", response.Error)
+		return api.ClaimFromLotResponse{}, fmt.Errorf("Could not claim GGP from lot: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Check whether the node can recover unclaimed RPL from a lot
-func (c *Client) CanRecoverUnclaimedRPLFromLot(lotIndex uint64) (api.CanRecoverRPLFromLotResponse, error) {
+// Check whether the node can recover unclaimed GGP from a lot
+func (c *Client) CanRecoverUnclaimedGGPFromLot(lotIndex uint64) (api.CanRecoverGGPFromLotResponse, error) {
 	responseBytes, err := c.callAPI(fmt.Sprintf("auction can-recover-lot %d", lotIndex))
 	if err != nil {
-		return api.CanRecoverRPLFromLotResponse{}, fmt.Errorf("Could not get can recover unclaimed RPL from lot status: %w", err)
+		return api.CanRecoverGGPFromLotResponse{}, fmt.Errorf("Could not get can recover unclaimed GGP from lot status: %w", err)
 	}
-	var response api.CanRecoverRPLFromLotResponse
+	var response api.CanRecoverGGPFromLotResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanRecoverRPLFromLotResponse{}, fmt.Errorf("Could not decode can recover unclaimed RPL from lot response: %w", err)
+		return api.CanRecoverGGPFromLotResponse{}, fmt.Errorf("Could not decode can recover unclaimed GGP from lot response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanRecoverRPLFromLotResponse{}, fmt.Errorf("Could not get can recover unclaimed RPL from lot status: %s", response.Error)
+		return api.CanRecoverGGPFromLotResponse{}, fmt.Errorf("Could not get can recover unclaimed GGP from lot status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Recover unclaimed RPL from a lot (returning it to the auction contract)
-func (c *Client) RecoverUnclaimedRPLFromLot(lotIndex uint64) (api.RecoverRPLFromLotResponse, error) {
+// Recover unclaimed GGP from a lot (returning it to the auction contract)
+func (c *Client) RecoverUnclaimedGGPFromLot(lotIndex uint64) (api.RecoverGGPFromLotResponse, error) {
 	responseBytes, err := c.callAPI(fmt.Sprintf("auction recover-lot %d", lotIndex))
 	if err != nil {
-		return api.RecoverRPLFromLotResponse{}, fmt.Errorf("Could not recover unclaimed RPL from lot: %w", err)
+		return api.RecoverGGPFromLotResponse{}, fmt.Errorf("Could not recover unclaimed GGP from lot: %w", err)
 	}
-	var response api.RecoverRPLFromLotResponse
+	var response api.RecoverGGPFromLotResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.RecoverRPLFromLotResponse{}, fmt.Errorf("Could not decode recover unclaimed RPL from lot response: %w", err)
+		return api.RecoverGGPFromLotResponse{}, fmt.Errorf("Could not decode recover unclaimed GGP from lot response: %w", err)
 	}
 	if response.Error != "" {
-		return api.RecoverRPLFromLotResponse{}, fmt.Errorf("Could not recover unclaimed RPL from lot: %s", response.Error)
+		return api.RecoverGGPFromLotResponse{}, fmt.Errorf("Could not recover unclaimed GGP from lot: %s", response.Error)
 	}
 	return response, nil
 }

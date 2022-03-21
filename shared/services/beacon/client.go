@@ -51,6 +51,13 @@ type Eth1Data struct {
 	DepositCount uint64
 	BlockHash    common.Hash
 }
+type ResultResponse struct {
+	NodeID string `json:"nodeID"`
+}
+type GetNodeIdResponse struct {
+	Result ResultResponse `json:"result"`
+	Id     int            `json:"id"`
+}
 
 // Beacon client type
 type BeaconClientType int
@@ -66,6 +73,10 @@ const (
 	// within the same docker container)
 	SingleProcess
 )
+
+type TransactionResponse struct {
+	TxId string `json:"txID"`
+}
 
 // Beacon client interface
 type Client interface {
@@ -83,4 +94,6 @@ type Client interface {
 	ExitValidator(validatorIndex, epoch uint64, signature types.ValidatorSignature) error
 	Close() error
 	GetEth1DataForEth2Block(blockId string) (Eth1Data, error)
+	GetNodeId() (ResultResponse, error)
+	MakeRPCCall(method string, chainExt string, jsonParams string) (TransactionResponse, error)
 }

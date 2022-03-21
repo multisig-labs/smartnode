@@ -72,7 +72,7 @@ func bidOnLot(c *cli.Context) error {
 		// Prompt for lot selection
 		options := make([]string, len(openLots))
 		for li, lot := range openLots {
-			options[li] = fmt.Sprintf("lot %d (%.6f RPL available @ %.6f ETH per RPL)", lot.Details.Index, math.RoundDown(eth.WeiToEth(lot.Details.RemainingRPLAmount), 6), math.RoundDown(eth.WeiToEth(lot.Details.CurrentPrice), 6))
+			options[li] = fmt.Sprintf("lot %d (%.6f GGP available @ %.6f ETH per GGP)", lot.Details.Index, math.RoundDown(eth.WeiToEth(lot.Details.RemainingGGPAmount), 6), math.RoundDown(eth.WeiToEth(lot.Details.CurrentPrice), 6))
 		}
 		selected, _ := cliutils.Select("Please select a lot to bid on:", options)
 		selectedLot = openLots[selected]
@@ -86,7 +86,7 @@ func bidOnLot(c *cli.Context) error {
 		// Set bid amount to maximum
 		var tmp big.Int
 		var maxAmount big.Int
-		tmp.Mul(selectedLot.Details.RemainingRPLAmount, selectedLot.Details.CurrentPrice)
+		tmp.Mul(selectedLot.Details.RemainingGGPAmount, selectedLot.Details.CurrentPrice)
 		maxAmount.Quo(&tmp, eth.EthToWei(1))
 		amountWei = &maxAmount
 
@@ -104,7 +104,7 @@ func bidOnLot(c *cli.Context) error {
 		// Calculate maximum bid amount
 		var tmp big.Int
 		var maxAmount big.Int
-		tmp.Mul(selectedLot.Details.RemainingRPLAmount, selectedLot.Details.CurrentPrice)
+		tmp.Mul(selectedLot.Details.RemainingGGPAmount, selectedLot.Details.CurrentPrice)
 		maxAmount.Quo(&tmp, eth.EthToWei(1))
 
 		// Prompt for maximum amount

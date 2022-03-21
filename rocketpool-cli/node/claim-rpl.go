@@ -13,7 +13,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func nodeClaimRpl(c *cli.Context) error {
+func nodeClaimGgp(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -23,15 +23,15 @@ func nodeClaimRpl(c *cli.Context) error {
 	defer rp.Close()
 
 	// Check for rewards
-	canClaim, err := rp.CanNodeClaimRpl()
+	canClaim, err := rp.CanNodeClaimGgp()
 	if err != nil {
 		return err
 	}
-	if canClaim.RplAmount.Cmp(big.NewInt(0)) == 0 {
-		fmt.Println("The node does not have any available RPL rewards to claim.")
+	if canClaim.GgpAmount.Cmp(big.NewInt(0)) == 0 {
+		fmt.Println("The node does not have any available GGP rewards to claim.")
 		return nil
 	} else {
-		fmt.Printf("%.6f RPL is available to claim.\n", math.RoundDown(eth.WeiToEth(canClaim.RplAmount), 6))
+		fmt.Printf("%.6f GGP is available to claim.\n", math.RoundDown(eth.WeiToEth(canClaim.GgpAmount), 6))
 	}
 
 	// Assign max fees
@@ -41,25 +41,25 @@ func nodeClaimRpl(c *cli.Context) error {
 	}
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm("Are you sure you want to claim your RPL?")) {
+	if !(c.Bool("yes") || cliutils.Confirm("Are you sure you want to claim your GGP?")) {
 		fmt.Println("Cancelled.")
 		return nil
 	}
 
 	// Claim rewards
-	response, err := rp.NodeClaimRpl()
+	response, err := rp.NodeClaimGgp()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Claiming RPL...\n")
+	fmt.Printf("Claiming GGP...\n")
 	cliutils.PrintTransactionHash(rp, response.TxHash)
 	if _, err = rp.WaitForTransaction(response.TxHash); err != nil {
 		return err
 	}
 
 	// Log & return
-	fmt.Printf("Successfully claimed %.6f RPL in rewards.", math.RoundDown(eth.WeiToEth(canClaim.RplAmount), 6))
+	fmt.Printf("Successfully claimed %.6f GGP in rewards.", math.RoundDown(eth.WeiToEth(canClaim.GgpAmount), 6))
 	return nil
 
 }

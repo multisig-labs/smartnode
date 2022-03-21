@@ -390,10 +390,10 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 				},
 			},
 			{
-				Name:      "join-approve-rpl",
+				Name:      "join-approve-ggp",
 				Aliases:   []string{"j1"},
-				Usage:     "Approves the RPL bond transfer prior to join the oracle DAO",
-				UsageText: "rocketpool api odao join-approve-rpl",
+				Usage:     "Approves the GGP bond transfer prior to join the oracle DAO",
+				UsageText: "rocketpool api odao join-approve-ggp",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -402,7 +402,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(approveRpl(c))
+					api.PrintResponse(approveGgp(c))
 					return nil
 
 				},
@@ -514,43 +514,43 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			},
 
 			{
-				Name:      "can-propose-members-rplbond",
-				Usage:     "Check whether the node can propose the members.rplbond setting",
-				UsageText: "rocketpool api odao can-propose-members-rplbond value",
+				Name:      "can-propose-members-ggpbond",
+				Usage:     "Check whether the node can propose the members.ggpbond setting",
+				UsageText: "rocketpool api odao can-propose-members-ggpbond value",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
 					if err := cliutils.ValidateArgCount(c, 1); err != nil {
 						return err
 					}
-					bondAmountWei, err := cliutils.ValidateWeiAmount("RPL bond amount", c.Args().Get(0))
+					bondAmountWei, err := cliutils.ValidateWeiAmount("GGP bond amount", c.Args().Get(0))
 					if err != nil {
 						return err
 					}
 
 					// Run
-					api.PrintResponse(canProposeSettingMembersRplBond(c, bondAmountWei))
+					api.PrintResponse(canProposeSettingMembersGgpBond(c, bondAmountWei))
 					return nil
 
 				},
 			},
 			{
-				Name:      "propose-members-rplbond",
-				Usage:     "Propose updating the members.rplbond setting",
-				UsageText: "rocketpool api odao propose-members-rplbond value",
+				Name:      "propose-members-ggpbond",
+				Usage:     "Propose updating the members.ggpbond setting",
+				UsageText: "rocketpool api odao propose-members-ggpbond value",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
 					if err := cliutils.ValidateArgCount(c, 1); err != nil {
 						return err
 					}
-					bondAmountWei, err := cliutils.ValidateWeiAmount("RPL bond amount", c.Args().Get(0))
+					bondAmountWei, err := cliutils.ValidateWeiAmount("GGP bond amount", c.Args().Get(0))
 					if err != nil {
 						return err
 					}
 
 					// Run
-					api.PrintResponse(proposeSettingMembersRplBond(c, bondAmountWei))
+					api.PrintResponse(proposeSettingMembersGgpBond(c, bondAmountWei))
 					return nil
 
 				},

@@ -11,7 +11,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 	app.Commands = append(app.Commands, cli.Command{
 		Name:    name,
 		Aliases: aliases,
-		Usage:   "Access the legacy RPL faucet",
+		Usage:   "Access the legacy GGP faucet",
 		Subcommands: []cli.Command{
 
 			{
@@ -33,10 +33,10 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			},
 
 			{
-				Name:      "withdraw-rpl",
+				Name:      "withdraw-ggp",
 				Aliases:   []string{"w"},
-				Usage:     "Withdraw legacy RPL from the faucet",
-				UsageText: "rocketpool faucet withdraw-rpl",
+				Usage:     "Withdraw legacy GGP from the faucet",
+				UsageText: "rocketpool faucet withdraw-ggp",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -45,7 +45,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return withdrawRpl(c)
+					return withdrawGgp(c)
 
 				},
 			},

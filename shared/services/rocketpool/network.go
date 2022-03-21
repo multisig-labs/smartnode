@@ -24,27 +24,27 @@ func (c *Client) NodeFee() (api.NodeFeeResponse, error) {
 	return response, nil
 }
 
-// Get network RPL price
-func (c *Client) RplPrice() (api.RplPriceResponse, error) {
-	responseBytes, err := c.callAPI("network rpl-price")
+// Get network GGP price
+func (c *Client) GgpPrice() (api.GgpPriceResponse, error) {
+	responseBytes, err := c.callAPI("network ggp-price")
 	if err != nil {
-		return api.RplPriceResponse{}, fmt.Errorf("Could not get network RPL price: %w", err)
+		return api.GgpPriceResponse{}, fmt.Errorf("Could not get network GGP price: %w", err)
 	}
-	var response api.RplPriceResponse
+	var response api.GgpPriceResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.RplPriceResponse{}, fmt.Errorf("Could not decode network RPL price response: %w", err)
+		return api.GgpPriceResponse{}, fmt.Errorf("Could not decode network GGP price response: %w", err)
 	}
 	if response.Error != "" {
-		return api.RplPriceResponse{}, fmt.Errorf("Could not get network RPL price: %s", response.Error)
+		return api.GgpPriceResponse{}, fmt.Errorf("Could not get network GGP price: %s", response.Error)
 	}
-	if response.RplPrice == nil {
-		response.RplPrice = big.NewInt(0)
+	if response.GgpPrice == nil {
+		response.GgpPrice = big.NewInt(0)
 	}
-	if response.MinPerMinipoolRplStake == nil {
-		response.MinPerMinipoolRplStake = big.NewInt(0)
+	if response.MinPerMinipoolGgpStake == nil {
+		response.MinPerMinipoolGgpStake = big.NewInt(0)
 	}
-	if response.MaxPerMinipoolRplStake == nil {
-		response.MaxPerMinipoolRplStake = big.NewInt(0)
+	if response.MaxPerMinipoolGgpStake == nil {
+		response.MaxPerMinipoolGgpStake = big.NewInt(0)
 	}
 	return response, nil
 }

@@ -116,7 +116,7 @@ func proposeSettingMembersQuorum(c *cli.Context, quorum float64) (*api.ProposeTN
 
 }
 
-func canProposeSettingMembersRplBond(c *cli.Context, bondAmountWei *big.Int) (*api.CanProposeTNDAOSettingResponse, error) {
+func canProposeSettingMembersGgpBond(c *cli.Context, bondAmountWei *big.Int) (*api.CanProposeTNDAOSettingResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeTrusted(c); err != nil {
@@ -141,7 +141,7 @@ func canProposeSettingMembersRplBond(c *cli.Context, bondAmountWei *big.Int) (*a
 	if err != nil {
 		return nil, err
 	}
-	gasInfo, err := trustednode.EstimateProposeRPLBondGas(rp, bondAmountWei, opts)
+	gasInfo, err := trustednode.EstimateProposeGGPBondGas(rp, bondAmountWei, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func canProposeSettingMembersRplBond(c *cli.Context, bondAmountWei *big.Int) (*a
 
 }
 
-func proposeSettingMembersRplBond(c *cli.Context, bondAmountWei *big.Int) (*api.ProposeTNDAOSettingMembersRplBondResponse, error) {
+func proposeSettingMembersGgpBond(c *cli.Context, bondAmountWei *big.Int) (*api.ProposeTNDAOSettingMembersGgpBondResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeTrusted(c); err != nil {
@@ -167,7 +167,7 @@ func proposeSettingMembersRplBond(c *cli.Context, bondAmountWei *big.Int) (*api.
 	}
 
 	// Response
-	response := api.ProposeTNDAOSettingMembersRplBondResponse{}
+	response := api.ProposeTNDAOSettingMembersGgpBondResponse{}
 
 	// Get transactor
 	opts, err := w.GetNodeAccountTransactor()
@@ -182,7 +182,7 @@ func proposeSettingMembersRplBond(c *cli.Context, bondAmountWei *big.Int) (*api.
 	}
 
 	// Submit proposal
-	proposalId, hash, err := trustednode.ProposeRPLBond(rp, bondAmountWei, opts)
+	proposalId, hash, err := trustednode.ProposeGGPBond(rp, bondAmountWei, opts)
 	if err != nil {
 		return nil, err
 	}

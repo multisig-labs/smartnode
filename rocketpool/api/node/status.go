@@ -78,22 +78,22 @@ func getStatus(c *cli.Context) (*api.NodeStatusResponse, error) {
 	// Get staking details
 	wg.Go(func() error {
 		var err error
-		response.RplStake, err = node.GetNodeRPLStake(rp, nodeAccount.Address, nil)
+		response.GgpStake, err = node.GetNodeGGPStake(rp, nodeAccount.Address, nil)
 		return err
 	})
 	wg.Go(func() error {
 		var err error
-		response.EffectiveRplStake, err = node.GetNodeEffectiveRPLStake(rp, nodeAccount.Address, nil)
+		response.EffectiveGgpStake, err = node.GetNodeEffectiveGGPStake(rp, nodeAccount.Address, nil)
 		return err
 	})
 	wg.Go(func() error {
 		var err error
-		response.MinimumRplStake, err = node.GetNodeMinimumRPLStake(rp, nodeAccount.Address, nil)
+		response.MinimumGgpStake, err = node.GetNodeMinimumGGPStake(rp, nodeAccount.Address, nil)
 		return err
 	})
 	wg.Go(func() error {
 		var err error
-		response.MaximumRplStake, err = node.GetNodeMaximumRPLStake(rp, nodeAccount.Address, nil)
+		response.MaximumGgpStake, err = node.GetNodeMaximumGGPStake(rp, nodeAccount.Address, nil)
 		return err
 	})
 	wg.Go(func() error {
@@ -153,13 +153,13 @@ func getStatus(c *cli.Context) (*api.NodeStatusResponse, error) {
 	}
 
 	// Get the collateral ratio
-	rplPrice, err := network.GetRPLPrice(rp, nil)
+	ggpPrice, err := network.GetGGPPrice(rp, nil)
 	if err != nil {
 		return nil, err
 	}
 	activeMinipools := response.MinipoolCounts.Total - response.MinipoolCounts.Finalised
 	if activeMinipools > 0 {
-		response.CollateralRatio = eth.WeiToEth(rplPrice) * eth.WeiToEth(response.RplStake) / (float64(activeMinipools) * 16.0)
+		response.CollateralRatio = eth.WeiToEth(ggpPrice) * eth.WeiToEth(response.GgpStake) / (float64(activeMinipools) * 16.0)
 	} else {
 		response.CollateralRatio = -1
 	}

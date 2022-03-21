@@ -26,23 +26,23 @@ import (
 
 // Represents the collector for the user's node
 type NodeCollector struct {
-	// The total amount of RPL staked on the node
-	totalStakedRpl *prometheus.Desc
+	// The total amount of GGP staked on the node
+	totalStakedGgp *prometheus.Desc
 
-	// The effective amount of RPL staked on the node (honoring the 150% collateral cap)
-	effectiveStakedRpl *prometheus.Desc
+	// The effective amount of GGP staked on the node (honoring the 150% collateral cap)
+	effectiveStakedGgp *prometheus.Desc
 
-	// The RPL collateral level for the node
-	rplCollateral *prometheus.Desc
+	// The GGP collateral level for the node
+	ggpCollateral *prometheus.Desc
 
-	// The cumulative RPL rewards earned by the node
-	cumulativeRplRewards *prometheus.Desc
+	// The cumulative GGP rewards earned by the node
+	cumulativeGgpRewards *prometheus.Desc
 
-	// The expected RPL rewards for the node at the next rewards checkpoint
-	expectedRplRewards *prometheus.Desc
+	// The expected GGP rewards for the node at the next rewards checkpoint
+	expectedGgpRewards *prometheus.Desc
 
-	// The estimated APR of RPL for the node from the next rewards checkpoint
-	rplApr *prometheus.Desc
+	// The estimated APR of GGP for the node from the next rewards checkpoint
+	ggpApr *prometheus.Desc
 
 	// The token balances of your node wallet
 	balances *prometheus.Desc
@@ -59,7 +59,7 @@ type NodeCollector struct {
 	// The total balances of all this node's validators on the beacon chain
 	beaconBalance *prometheus.Desc
 
-	// The RPL rewards from the last period that have not been claimed yet
+	// The GGP rewards from the last period that have not been claimed yet
 	unclaimedRewards *prometheus.Desc
 
 	// The Rocket Pool contract manager
@@ -74,10 +74,10 @@ type NodeCollector struct {
 	// The event log interval for the current eth1 client
 	eventLogInterval *big.Int
 
-	// The next block to start from when looking at cumulative RPL rewards
+	// The next block to start from when looking at cumulative GGP rewards
 	nextRewardsStartBlock *big.Int
 
-	// The cumulative amount of RPL earned
+	// The cumulative amount of GGP earned
 	cumulativeRewards float64
 }
 
@@ -93,28 +93,28 @@ func NewNodeCollector(rp *rocketpool.RocketPool, bc beacon.Client, nodeAddress c
 
 	subsystem := "node"
 	return &NodeCollector{
-		totalStakedRpl: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_staked_rpl"),
-			"The total amount of RPL staked on the node",
+		totalStakedGgp: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_staked_ggp"),
+			"The total amount of GGP staked on the node",
 			nil, nil,
 		),
-		effectiveStakedRpl: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "effective_staked_rpl"),
-			"The effective amount of RPL staked on the node (honoring the 150% collateral cap)",
+		effectiveStakedGgp: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "effective_staked_ggp"),
+			"The effective amount of GGP staked on the node (honoring the 150% collateral cap)",
 			nil, nil,
 		),
-		rplCollateral: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "rpl_collateral"),
-			"The RPL collateral level for the node",
+		ggpCollateral: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "ggp_collateral"),
+			"The GGP collateral level for the node",
 			nil, nil,
 		),
-		cumulativeRplRewards: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "cumulative_rpl_rewards"),
-			"The cumulative RPL rewards earned by the node",
+		cumulativeGgpRewards: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "cumulative_ggp_rewards"),
+			"The cumulative GGP rewards earned by the node",
 			nil, nil,
 		),
-		expectedRplRewards: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "expected_rpl_rewards"),
-			"The expected RPL rewards for the node at the next rewards checkpoint",
+		expectedGgpRewards: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "expected_ggp_rewards"),
+			"The expected GGP rewards for the node at the next rewards checkpoint",
 			nil, nil,
 		),
-		rplApr: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "rpl_apr"),
-			"The estimated APR of RPL for the node from the next rewards checkpoint",
+		ggpApr: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "ggp_apr"),
+			"The estimated APR of GGP for the node from the next rewards checkpoint",
 			nil, nil,
 		),
 		balances: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "balance"),
@@ -138,7 +138,7 @@ func NewNodeCollector(rp *rocketpool.RocketPool, bc beacon.Client, nodeAddress c
 			nil, nil,
 		),
 		unclaimedRewards: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "unclaimed_rewards"),
-			"The RPL rewards from the last period that have not been claimed yet",
+			"The GGP rewards from the last period that have not been claimed yet",
 			nil, nil,
 		),
 		rp:               rp,
@@ -150,11 +150,11 @@ func NewNodeCollector(rp *rocketpool.RocketPool, bc beacon.Client, nodeAddress c
 
 // Write metric descriptions to the Prometheus channel
 func (collector *NodeCollector) Describe(channel chan<- *prometheus.Desc) {
-	channel <- collector.totalStakedRpl
-	channel <- collector.effectiveStakedRpl
-	channel <- collector.cumulativeRplRewards
-	channel <- collector.expectedRplRewards
-	channel <- collector.rplApr
+	channel <- collector.totalStakedGgp
+	channel <- collector.effectiveStakedGgp
+	channel <- collector.cumulativeGgpRewards
+	channel <- collector.expectedGgpRewards
+	channel <- collector.ggpApr
 	channel <- collector.balances
 	channel <- collector.activeMinipoolCount
 	channel <- collector.depositedEth
@@ -167,51 +167,51 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 
 	// Sync
 	var wg errgroup.Group
-	stakedRpl := float64(-1)
-	effectiveStakedRpl := float64(-1)
+	stakedGgp := float64(-1)
+	effectiveStakedGgp := float64(-1)
 	var rewardsInterval time.Duration
 	var inflationInterval *big.Int
-	var totalRplSupply *big.Int
+	var totalGgpSupply *big.Int
 	var totalEffectiveStake *big.Int
 	var nodeOperatorRewardsPercent float64
 	ethBalance := float64(-1)
-	oldRplBalance := float64(-1)
-	newRplBalance := float64(-1)
-	rethBalance := float64(-1)
+	oldGgpBalance := float64(-1)
+	newGgpBalance := float64(-1)
+	ggpavaxBalance := float64(-1)
 	var activeMinipoolCount float64
-	var rplPrice float64
+	var ggpPrice float64
 	collateralRatio := float64(-1)
 	var addresses []common.Address
 	var beaconHead beacon.BeaconHead
 	unclaimedRewards := float64(-1)
 
-	// Get the total staked RPL
+	// Get the total staked GGP
 	wg.Go(func() error {
-		stakedRplWei, err := node.GetNodeRPLStake(collector.rp, collector.nodeAddress, nil)
+		stakedGgpWei, err := node.GetNodeGGPStake(collector.rp, collector.nodeAddress, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting total staked RPL: %w", err)
+			return fmt.Errorf("Error getting total staked GGP: %w", err)
 		} else {
-			stakedRpl = eth.WeiToEth(stakedRplWei)
+			stakedGgp = eth.WeiToEth(stakedGgpWei)
 		}
 		return nil
 	})
 
-	// Get the effective staked RPL
+	// Get the effective staked GGP
 	wg.Go(func() error {
-		effectiveStakedRplWei, err := node.GetNodeEffectiveRPLStake(collector.rp, collector.nodeAddress, nil)
+		effectiveStakedGgpWei, err := node.GetNodeEffectiveGGPStake(collector.rp, collector.nodeAddress, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting effective staked RPL: %w", err)
+			return fmt.Errorf("Error getting effective staked GGP: %w", err)
 		} else {
-			effectiveStakedRpl = eth.WeiToEth(effectiveStakedRplWei)
+			effectiveStakedGgp = eth.WeiToEth(effectiveStakedGgpWei)
 		}
 		return nil
 	})
 
-	// Get the cumulative RPL rewards
+	// Get the cumulative GGP rewards
 	wg.Go(func() error {
 		cumulativeRewardsWei, err := rewards.CalculateLifetimeNodeRewards(collector.rp, collector.nodeAddress, collector.eventLogInterval, collector.nextRewardsStartBlock)
 		if err != nil {
-			return fmt.Errorf("Error getting cumulative RPL rewards: %w", err)
+			return fmt.Errorf("Error getting cumulative GGP rewards: %w", err)
 		}
 
 		header, err := collector.rp.Client.HeaderByNumber(context.Background(), nil)
@@ -234,29 +234,29 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 		return nil
 	})
 
-	// Get the RPL inflation interval
+	// Get the GGP inflation interval
 	wg.Go(func() error {
-		_inflationInterval, err := tokens.GetRPLInflationIntervalRate(collector.rp, nil)
+		_inflationInterval, err := tokens.GetGGPInflationIntervalRate(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting RPL inflation interval: %w", err)
+			return fmt.Errorf("Error getting GGP inflation interval: %w", err)
 		}
 		inflationInterval = _inflationInterval
 		return nil
 	})
 
-	// Get the total RPL supply
+	// Get the total GGP supply
 	wg.Go(func() error {
-		_totalRplSupply, err := tokens.GetRPLTotalSupply(collector.rp, nil)
+		_totalGgpSupply, err := tokens.GetGGPTotalSupply(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting total RPL supply: %w", err)
+			return fmt.Errorf("Error getting total GGP supply: %w", err)
 		}
-		totalRplSupply = _totalRplSupply
+		totalGgpSupply = _totalGgpSupply
 		return nil
 	})
 
 	// Get the total network effective stake
 	wg.Go(func() error {
-		_totalEffectiveStake, err := node.GetTotalEffectiveRPLStake(collector.rp, nil)
+		_totalEffectiveStake, err := node.GetTotalEffectiveGGPStake(collector.rp, nil)
 		if err != nil {
 			return fmt.Errorf("Error getting total network effective stake: %w", err)
 		}
@@ -281,9 +281,9 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 			return fmt.Errorf("Error getting node balances: %w", err)
 		}
 		ethBalance = eth.WeiToEth(balances.ETH)
-		oldRplBalance = eth.WeiToEth(balances.FixedSupplyRPL)
-		newRplBalance = eth.WeiToEth(balances.RPL)
-		rethBalance = eth.WeiToEth(balances.RETH)
+		oldGgpBalance = eth.WeiToEth(balances.FixedSupplyGGP)
+		newGgpBalance = eth.WeiToEth(balances.GGP)
+		ggpavaxBalance = eth.WeiToEth(balances.GGPAVAX)
 		return nil
 	})
 
@@ -297,13 +297,13 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 		return nil
 	})
 
-	// Get the RPL price
+	// Get the GGP price
 	wg.Go(func() error {
-		rplPriceWei, err := network.GetRPLPrice(collector.rp, nil)
+		ggpPriceWei, err := network.GetGGPPrice(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting RPL price: %w", err)
+			return fmt.Errorf("Error getting GGP price: %w", err)
 		}
-		rplPrice = eth.WeiToEth(rplPriceWei)
+		ggpPrice = eth.WeiToEth(ggpPriceWei)
 		return nil
 	})
 
@@ -327,11 +327,11 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 		return nil
 	})
 
-	// Get the RPL price
+	// Get the GGP price
 	wg.Go(func() error {
 		unclaimedRewardsWei, err := rewards.GetNodeClaimRewardsAmount(collector.rp, collector.nodeAddress, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting RPL price: %w", err)
+			return fmt.Errorf("Error getting GGP price: %w", err)
 		}
 		unclaimedRewards = eth.WeiToEth(unclaimedRewardsWei)
 		return nil
@@ -346,21 +346,21 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 	// Calculate the estimated rewards
 	rewardsIntervalDays := rewardsInterval.Seconds() / (60 * 60 * 24)
 	inflationPerDay := eth.WeiToEth(inflationInterval)
-	totalRplAtNextCheckpoint := (math.Pow(inflationPerDay, float64(rewardsIntervalDays)) - 1) * eth.WeiToEth(totalRplSupply)
-	if totalRplAtNextCheckpoint < 0 {
-		totalRplAtNextCheckpoint = 0
+	totalGgpAtNextCheckpoint := (math.Pow(inflationPerDay, float64(rewardsIntervalDays)) - 1) * eth.WeiToEth(totalGgpSupply)
+	if totalGgpAtNextCheckpoint < 0 {
+		totalGgpAtNextCheckpoint = 0
 	}
 	estimatedRewards := float64(0)
 	if totalEffectiveStake.Cmp(big.NewInt(0)) == 1 {
-		estimatedRewards = effectiveStakedRpl / eth.WeiToEth(totalEffectiveStake) * totalRplAtNextCheckpoint * nodeOperatorRewardsPercent
+		estimatedRewards = effectiveStakedGgp / eth.WeiToEth(totalEffectiveStake) * totalGgpAtNextCheckpoint * nodeOperatorRewardsPercent
 	}
 
-	// Calculate the RPL APR
-	rplApr := estimatedRewards / stakedRpl / rewardsInterval.Hours() * (24 * 365) * 100
+	// Calculate the GGP APR
+	ggpApr := estimatedRewards / stakedGgp / rewardsInterval.Hours() * (24 * 365) * 100
 
 	// Calculate the collateral ratio
 	if activeMinipoolCount > 0 {
-		collateralRatio = rplPrice * stakedRpl / (activeMinipoolCount * 16.0)
+		collateralRatio = ggpPrice * stakedGgp / (activeMinipoolCount * 16.0)
 	}
 
 	// Calculate the total deposits and corresponding beacon chain balance share
@@ -380,25 +380,25 @@ func (collector *NodeCollector) Collect(channel chan<- prometheus.Metric) {
 
 	// Update all the metrics
 	channel <- prometheus.MustNewConstMetric(
-		collector.totalStakedRpl, prometheus.GaugeValue, stakedRpl)
+		collector.totalStakedGgp, prometheus.GaugeValue, stakedGgp)
 	channel <- prometheus.MustNewConstMetric(
-		collector.effectiveStakedRpl, prometheus.GaugeValue, effectiveStakedRpl)
+		collector.effectiveStakedGgp, prometheus.GaugeValue, effectiveStakedGgp)
 	channel <- prometheus.MustNewConstMetric(
-		collector.rplCollateral, prometheus.GaugeValue, collateralRatio)
+		collector.ggpCollateral, prometheus.GaugeValue, collateralRatio)
 	channel <- prometheus.MustNewConstMetric(
-		collector.cumulativeRplRewards, prometheus.GaugeValue, collector.cumulativeRewards)
+		collector.cumulativeGgpRewards, prometheus.GaugeValue, collector.cumulativeRewards)
 	channel <- prometheus.MustNewConstMetric(
-		collector.expectedRplRewards, prometheus.GaugeValue, estimatedRewards)
+		collector.expectedGgpRewards, prometheus.GaugeValue, estimatedRewards)
 	channel <- prometheus.MustNewConstMetric(
-		collector.rplApr, prometheus.GaugeValue, rplApr)
+		collector.ggpApr, prometheus.GaugeValue, ggpApr)
 	channel <- prometheus.MustNewConstMetric(
 		collector.balances, prometheus.GaugeValue, ethBalance, "ETH")
 	channel <- prometheus.MustNewConstMetric(
-		collector.balances, prometheus.GaugeValue, oldRplBalance, "Legacy RPL")
+		collector.balances, prometheus.GaugeValue, oldGgpBalance, "Legacy GGP")
 	channel <- prometheus.MustNewConstMetric(
-		collector.balances, prometheus.GaugeValue, newRplBalance, "New RPL")
+		collector.balances, prometheus.GaugeValue, newGgpBalance, "New GGP")
 	channel <- prometheus.MustNewConstMetric(
-		collector.balances, prometheus.GaugeValue, rethBalance, "rETH")
+		collector.balances, prometheus.GaugeValue, ggpavaxBalance, "ggpAVAX")
 	channel <- prometheus.MustNewConstMetric(
 		collector.activeMinipoolCount, prometheus.GaugeValue, activeMinipoolCount)
 	channel <- prometheus.MustNewConstMetric(

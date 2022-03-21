@@ -40,7 +40,7 @@ func claimFromLot(c *cli.Context) error {
 
 	// Check for claimable lots
 	if len(claimableLots) == 0 {
-		fmt.Println("No lots are available for RPL claims.")
+		fmt.Println("No lots are available for GGP claims.")
 		return nil
 	}
 
@@ -69,7 +69,7 @@ func claimFromLot(c *cli.Context) error {
 			}
 		}
 		if !found {
-			return fmt.Errorf("Lot %d is not available for RPL claims.", selectedIndex)
+			return fmt.Errorf("Lot %d is not available for GGP claims.", selectedIndex)
 		}
 
 	} else {
@@ -78,9 +78,9 @@ func claimFromLot(c *cli.Context) error {
 		options := make([]string, len(claimableLots)+1)
 		options[0] = "All available lots"
 		for li, lot := range claimableLots {
-			options[li+1] = fmt.Sprintf("lot %d (%.6f ETH bid @ %.6f ETH per RPL)", lot.Details.Index, math.RoundDown(eth.WeiToEth(lot.Details.AddressBidAmount), 6), math.RoundDown(eth.WeiToEth(lot.Details.CurrentPrice), 6))
+			options[li+1] = fmt.Sprintf("lot %d (%.6f ETH bid @ %.6f ETH per GGP)", lot.Details.Index, math.RoundDown(eth.WeiToEth(lot.Details.AddressBidAmount), 6), math.RoundDown(eth.WeiToEth(lot.Details.CurrentPrice), 6))
 		}
-		selected, _ := cliutils.Select("Please select a lot to claim RPL from:", options)
+		selected, _ := cliutils.Select("Please select a lot to claim GGP from:", options)
 
 		// Get lots
 		if selected == 0 {
@@ -120,20 +120,20 @@ func claimFromLot(c *cli.Context) error {
 		return nil
 	}
 
-	// Claim RPL from lots
+	// Claim GGP from lots
 	for _, lot := range selectedLots {
 		response, err := rp.ClaimFromLot(lot.Details.Index)
 		if err != nil {
-			fmt.Printf("Could not claim RPL from lot %d: %s.\n", lot.Details.Index, err)
+			fmt.Printf("Could not claim GGP from lot %d: %s.\n", lot.Details.Index, err)
 			continue
 		}
 
 		fmt.Printf("Claiming from lot %d...\n", lot.Details.Index)
 		cliutils.PrintTransactionHash(rp, response.TxHash)
 		if _, err = rp.WaitForTransaction(response.TxHash); err != nil {
-			fmt.Printf("Could not claim RPL from lot %d: %s.\n", lot.Details.Index, err)
+			fmt.Printf("Could not claim GGP from lot %d: %s.\n", lot.Details.Index, err)
 		} else {
-			fmt.Printf("Successfully claimed RPL from lot %d.\n", lot.Details.Index)
+			fmt.Printf("Successfully claimed GGP from lot %d.\n", lot.Details.Index)
 		}
 	}
 

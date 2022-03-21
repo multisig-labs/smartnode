@@ -12,14 +12,14 @@ import (
 type AuctionStatusResponse struct {
 	Status              string   `json:"status"`
 	Error               string   `json:"error"`
-	TotalRPLBalance     *big.Int `json:"totalRPLBalance"`
-	AllottedRPLBalance  *big.Int `json:"allottedRPLBalance"`
-	RemainingRPLBalance *big.Int `json:"remainingRPLBalance"`
+	TotalGGPBalance     *big.Int `json:"totalGGPBalance"`
+	AllottedGGPBalance  *big.Int `json:"allottedGGPBalance"`
+	RemainingGGPBalance *big.Int `json:"remainingGGPBalance"`
 	CanCreateLot        bool     `json:"canCreateLot"`
 	LotCounts           struct {
 		ClaimAvailable       int `json:"claimAvailable"`
 		BiddingAvailable     int `json:"biddingAvailable"`
-		RPLRecoveryAvailable int `json:"rplRecoveryAvailable"`
+		GGPRecoveryAvailable int `json:"ggpRecoveryAvailable"`
 	} `json:"lotCounts"`
 }
 
@@ -32,7 +32,7 @@ type LotDetails struct {
 	Details              auction.LotDetails `json:"details"`
 	ClaimAvailable       bool               `json:"claimAvailable"`
 	BiddingAvailable     bool               `json:"biddingAvailable"`
-	RPLRecoveryAvailable bool               `json:"rplRecoveryAvailable"`
+	GGPRecoveryAvailable bool               `json:"ggpRecoveryAvailable"`
 }
 
 type CanCreateLotResponse struct {
@@ -56,7 +56,7 @@ type CanBidOnLotResponse struct {
 	CanBid           bool               `json:"canBid"`
 	DoesNotExist     bool               `json:"doesNotExist"`
 	BiddingEnded     bool               `json:"biddingEnded"`
-	RPLExhausted     bool               `json:"rplExhausted"`
+	GGPExhausted     bool               `json:"ggpExhausted"`
 	BidOnLotDisabled bool               `json:"bidOnLotDisabled"`
 	GasInfo          rocketpool.GasInfo `json:"gasInfo"`
 }
@@ -81,17 +81,17 @@ type ClaimFromLotResponse struct {
 	TxHash common.Hash `json:"txHash"`
 }
 
-type CanRecoverRPLFromLotResponse struct {
+type CanRecoverGGPFromLotResponse struct {
 	Status              string             `json:"status"`
 	Error               string             `json:"error"`
 	CanRecover          bool               `json:"canRecover"`
 	DoesNotExist        bool               `json:"doesNotExist"`
 	BiddingNotEnded     bool               `json:"biddingNotEnded"`
-	NoUnclaimedRPL      bool               `json:"noUnclaimedRpl"`
-	RPLAlreadyRecovered bool               `json:"rplAlreadyRecovered"`
+	NoUnclaimedGGP      bool               `json:"noUnclaimedGgp"`
+	GGPAlreadyRecovered bool               `json:"ggpAlreadyRecovered"`
 	GasInfo             rocketpool.GasInfo `json:"gasInfo"`
 }
-type RecoverRPLFromLotResponse struct {
+type RecoverGGPFromLotResponse struct {
 	Status string      `json:"status"`
 	Error  string      `json:"error"`
 	TxHash common.Hash `json:"txHash"`

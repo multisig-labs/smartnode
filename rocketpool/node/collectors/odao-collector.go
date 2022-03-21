@@ -19,8 +19,8 @@ type OdaoCollector struct {
 	// The ETH1 block that was used when reporting the latest prices
 	pricesBlock *prometheus.Desc
 
-	// The ETH1 block where the Effective RPL Stake was last updated
-	effectiveRplStakeBlock *prometheus.Desc
+	// The ETH1 block where the Effective GGP Stake was last updated
+	effectiveGgpStakeBlock *prometheus.Desc
 
 	// The latest ETH1 block where network prices were reportable by the ODAO
 	latestReportableBlock *prometheus.Desc
@@ -41,8 +41,8 @@ func NewOdaoCollector(rp *rocketpool.RocketPool) *OdaoCollector {
 			"The ETH1 block that was used when reporting the latest prices",
 			nil, nil,
 		),
-		effectiveRplStakeBlock: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "effective_rpl_stake_block"),
-			"The ETH1 block where the Effective RPL Stake was last updated",
+		effectiveGgpStakeBlock: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "effective_ggp_stake_block"),
+			"The ETH1 block where the Effective GGP Stake was last updated",
 			nil, nil,
 		),
 		latestReportableBlock: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "latest_reportable_block"),
@@ -57,7 +57,7 @@ func NewOdaoCollector(rp *rocketpool.RocketPool) *OdaoCollector {
 func (collector *OdaoCollector) Describe(channel chan<- *prometheus.Desc) {
 	channel <- collector.currentEth1Block
 	channel <- collector.pricesBlock
-	channel <- collector.effectiveRplStakeBlock
+	channel <- collector.effectiveGgpStakeBlock
 	channel <- collector.latestReportableBlock
 }
 
@@ -68,7 +68,7 @@ func (collector *OdaoCollector) Collect(channel chan<- prometheus.Metric) {
 	var wg errgroup.Group
 	blockNumberFloat := float64(-1)
 	pricesBlockFloat := float64(-1)
-	effectiveRplStakeBlockFloat := float64(-1)
+	effectiveGgpStakeBlockFloat := float64(-1)
 	latestReportableBlockFloat := float64(-1)
 
 	// Get the latest block reported by the ETH1 client
@@ -89,7 +89,7 @@ func (collector *OdaoCollector) Collect(channel chan<- prometheus.Metric) {
 			return fmt.Errorf("Error getting ETH1 prices block: %w", err)
 		} else {
 			pricesBlockFloat = float64(pricesBlock)
-			effectiveRplStakeBlockFloat = float64(pricesBlock)
+			effectiveGgpStakeBlockFloat = float64(pricesBlock)
 		}
 		return nil
 	})
@@ -116,7 +116,7 @@ func (collector *OdaoCollector) Collect(channel chan<- prometheus.Metric) {
 	channel <- prometheus.MustNewConstMetric(
 		collector.pricesBlock, prometheus.GaugeValue, pricesBlockFloat)
 	channel <- prometheus.MustNewConstMetric(
-		collector.effectiveRplStakeBlock, prometheus.GaugeValue, effectiveRplStakeBlockFloat)
+		collector.effectiveGgpStakeBlock, prometheus.GaugeValue, effectiveGgpStakeBlockFloat)
 	channel <- prometheus.MustNewConstMetric(
 		collector.latestReportableBlock, prometheus.GaugeValue, latestReportableBlockFloat)
 

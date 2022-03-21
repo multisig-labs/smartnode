@@ -46,14 +46,14 @@ func canNodeBurn(c *cli.Context, amountWei *big.Int, token string) (*api.CanNode
 	// Check node balance
 	wg.Go(func() error {
 		switch token {
-		case "reth":
+		case "ggpavax":
 
-			// Check node rETH balance
-			rethBalanceWei, err := tokens.GetRETHBalance(rp, nodeAccount.Address, nil)
+			// Check node ggpAVAX balance
+			ggpavaxBalanceWei, err := tokens.GetGGPAVAXBalance(rp, nodeAccount.Address, nil)
 			if err != nil {
 				return err
 			}
-			response.InsufficientBalance = (amountWei.Cmp(rethBalanceWei) > 0)
+			response.InsufficientBalance = (amountWei.Cmp(ggpavaxBalanceWei) > 0)
 
 		}
 		return nil
@@ -62,14 +62,14 @@ func canNodeBurn(c *cli.Context, amountWei *big.Int, token string) (*api.CanNode
 	// Check token contract collateral
 	wg.Go(func() error {
 		switch token {
-		case "reth":
+		case "ggpavax":
 
-			// Check rETH collateral
-			rethTotalCollateral, err := tokens.GetRETHTotalCollateral(rp, nil)
+			// Check ggpAVAX collateral
+			ggpavaxTotalCollateral, err := tokens.GetGGPAVAXTotalCollateral(rp, nil)
 			if err != nil {
 				return err
 			}
-			response.InsufficientCollateral = (amountWei.Cmp(rethTotalCollateral) > 0)
+			response.InsufficientCollateral = (amountWei.Cmp(ggpavaxTotalCollateral) > 0)
 
 		}
 		return nil
@@ -82,8 +82,8 @@ func canNodeBurn(c *cli.Context, amountWei *big.Int, token string) (*api.CanNode
 			return err
 		}
 		switch token {
-		case "reth":
-			gasInfo, err := tokens.EstimateBurnRETHGas(rp, amountWei, opts)
+		case "ggpavax":
+			gasInfo, err := tokens.EstimateBurnGGPAVAXGas(rp, amountWei, opts)
 			if err == nil {
 				response.GasInfo = gasInfo
 			}
@@ -138,10 +138,10 @@ func nodeBurn(c *cli.Context, amountWei *big.Int, token string) (*api.NodeBurnRe
 
 	// Handle token type
 	switch token {
-	case "reth":
+	case "ggpavax":
 
-		// Burn rETH
-		hash, err := tokens.BurnRETH(rp, amountWei, opts)
+		// Burn ggpAVAX
+		hash, err := tokens.BurnGGPAVAX(rp, amountWei, opts)
 		if err != nil {
 			return nil, err
 		}

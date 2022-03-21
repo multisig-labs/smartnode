@@ -69,10 +69,10 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			},
 
 			{
-				Name:      "rpl-price",
+				Name:      "ggp-price",
 				Aliases:   []string{"p"},
-				Usage:     "Get the current network RPL price in ETH",
-				UsageText: "rocketpool network rpl-price",
+				Usage:     "Get the current network GGP price in ETH",
+				UsageText: "rocketpool network ggp-price",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -81,7 +81,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return getRplPrice(c)
+					return getGgpPrice(c)
 
 				},
 			},

@@ -13,7 +13,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/eth1"
 )
 
-func canRecoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.CanRecoverRPLFromLotResponse, error) {
+func canRecoverGgpFromLot(c *cli.Context, lotIndex uint64) (*api.CanRecoverGGPFromLotResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeWallet(c); err != nil {
@@ -32,7 +32,7 @@ func canRecoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.CanRecoverRPLFr
 	}
 
 	// Response
-	response := api.CanRecoverRPLFromLotResponse{}
+	response := api.CanRecoverGGPFromLotResponse{}
 
 	// Sync
 	var wg errgroup.Group
@@ -55,20 +55,20 @@ func canRecoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.CanRecoverRPLFr
 		return err
 	})
 
-	// Check if lot contains unclaimed RPL
+	// Check if lot contains unclaimed GGP
 	wg.Go(func() error {
-		remainingRpl, err := auction.GetLotRemainingRPLAmount(rp, lotIndex, nil)
+		remainingGgp, err := auction.GetLotRemainingGGPAmount(rp, lotIndex, nil)
 		if err == nil {
-			response.NoUnclaimedRPL = (remainingRpl.Cmp(big.NewInt(0)) == 0)
+			response.NoUnclaimedGGP = (remainingGgp.Cmp(big.NewInt(0)) == 0)
 		}
 		return err
 	})
 
-	// Check if unclaimed RPL has already been recovered
+	// Check if unclaimed GGP has already been recovered
 	wg.Go(func() error {
-		rplRecovered, err := auction.GetLotRPLRecovered(rp, lotIndex, nil)
+		ggpRecovered, err := auction.GetLotGGPRecovered(rp, lotIndex, nil)
 		if err == nil {
-			response.RPLAlreadyRecovered = rplRecovered
+			response.GGPAlreadyRecovered = ggpRecovered
 		}
 		return err
 	})
@@ -79,7 +79,7 @@ func canRecoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.CanRecoverRPLFr
 		if err != nil {
 			return err
 		}
-		gasInfo, err := auction.EstimateRecoverUnclaimedRPLGas(rp, lotIndex, opts)
+		gasInfo, err := auction.EstimateRecoverUnclaimedGGPGas(rp, lotIndex, opts)
 		if err == nil {
 			response.GasInfo = gasInfo
 		}
@@ -92,12 +92,12 @@ func canRecoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.CanRecoverRPLFr
 	}
 
 	// Update & return response
-	response.CanRecover = !(response.DoesNotExist || response.BiddingNotEnded || response.NoUnclaimedRPL || response.RPLAlreadyRecovered)
+	response.CanRecover = !(response.DoesNotExist || response.BiddingNotEnded || response.NoUnclaimedGGP || response.GGPAlreadyRecovered)
 	return &response, nil
 
 }
 
-func recoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.RecoverRPLFromLotResponse, error) {
+func recoverGgpFromLot(c *cli.Context, lotIndex uint64) (*api.RecoverGGPFromLotResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeWallet(c); err != nil {
@@ -116,7 +116,7 @@ func recoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.RecoverRPLFromLotR
 	}
 
 	// Response
-	response := api.RecoverRPLFromLotResponse{}
+	response := api.RecoverGGPFromLotResponse{}
 
 	// Get transactor
 	opts, err := w.GetNodeAccountTransactor()
@@ -130,8 +130,8 @@ func recoverRplFromLot(c *cli.Context, lotIndex uint64) (*api.RecoverRPLFromLotR
 		return nil, fmt.Errorf("Error checking for nonce override: %w", err)
 	}
 
-	// Recover unclaimed RPL from lot
-	hash, err := auction.RecoverUnclaimedRPL(rp, lotIndex, opts)
+	// Recover unclaimed GGP from lot
+	hash, err := auction.RecoverUnclaimedGGP(rp, lotIndex, opts)
 	if err != nil {
 		return nil, err
 	}
