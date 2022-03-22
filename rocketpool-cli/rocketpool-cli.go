@@ -167,7 +167,7 @@ ______           _        _    ______           _
 		}
 
 		// Add the faucet if we're on a testnet and it has a contract address
-		if cfg.Rocketpool.GGPFaucetAddress != "" {
+		if cfg.Gogopool.GGPFaucetAddress != "" {
 			faucet.RegisterCommands(app, "faucet", []string{"f"})
 		}
 	}

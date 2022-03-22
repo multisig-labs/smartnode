@@ -288,7 +288,7 @@ func (t *submitGgpPrice) getGgpPrice(blockNumber uint64) (*big.Int, error) {
 	}
 
 	// Get GGP token address
-	ggpAddress := common.HexToAddress(t.cfg.Rocketpool.GgpTokenAddress)
+	ggpAddress := common.HexToAddress(t.cfg.Gogopool.GgpTokenAddress)
 
 	// Initialize call options
 	opts := &bind.CallOpts{

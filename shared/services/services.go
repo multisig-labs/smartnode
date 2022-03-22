@@ -209,7 +209,7 @@ func getEthClientProxy(cfg config.RocketPoolConfig) (*uc.EthClientProxy, error) 
 func getRocketPool(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*rocketpool.RocketPool, error) {
 	var err error
 	initRocketPool.Do(func() {
-		rocketPool, err = rocketpool.NewRocketPool(client, common.HexToAddress(cfg.Rocketpool.StorageAddress))
+		rocketPool, err = rocketpool.NewRocketPool(client, common.HexToAddress(cfg.Gogopool.StorageAddress))
 	})
 	return rocketPool, err
 }
@@ -217,7 +217,7 @@ func getRocketPool(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*roc
 func getOneInchOracle(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*contracts.OneInchOracle, error) {
 	var err error
 	initOneInchOracle.Do(func() {
-		oneInchOracle, err = contracts.NewOneInchOracle(common.HexToAddress(cfg.Rocketpool.OneInchOracleAddress), client)
+		oneInchOracle, err = contracts.NewOneInchOracle(common.HexToAddress(cfg.Gogopool.OneInchOracleAddress), client)
 	})
 	return oneInchOracle, err
 }
@@ -225,7 +225,7 @@ func getOneInchOracle(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*
 func getGgpFaucet(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*contracts.GGPFaucet, error) {
 	var err error
 	initGgpFaucet.Do(func() {
-		ggpFaucet, err = contracts.NewGGPFaucet(common.HexToAddress(cfg.Rocketpool.GGPFaucetAddress), client)
+		ggpFaucet, err = contracts.NewGGPFaucet(common.HexToAddress(cfg.Gogopool.GGPFaucetAddress), client)
 	})
 	return ggpFaucet, err
 }

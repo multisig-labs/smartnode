@@ -5,26 +5,25 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/rocket-pool/rocketpool-go/network"
-	"github.com/rocket-pool/rocketpool-go/settings/protocol"
-	"github.com/rocket-pool/smartnode/shared/types/api"
-	"golang.org/x/sync/errgroup"
-	"io/ioutil"
-	"math/big"
-	"os"
-	"testing"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/mitchellh/go-homedir"
 	"github.com/prysmaticlabs/prysm/v2/testing/require"
+	"github.com/rocket-pool/rocketpool-go/network"
+	"github.com/rocket-pool/rocketpool-go/settings/protocol"
 	"github.com/rocket-pool/rocketpool-go/utils"
 	"github.com/rocket-pool/smartnode/shared"
 	"github.com/rocket-pool/smartnode/shared/services"
 	"github.com/rocket-pool/smartnode/shared/services/config"
 	"github.com/rocket-pool/smartnode/shared/services/rocketpool"
+	"github.com/rocket-pool/smartnode/shared/types/api"
 	apitypes "github.com/rocket-pool/smartnode/shared/types/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
+	"golang.org/x/sync/errgroup"
+	"io/ioutil"
+	"math/big"
+	"os"
+	"testing"
 )
 
 func waitForTransaction(c *cli.Context, hash common.Hash) (*apitypes.APIResponse, error) {
@@ -175,10 +174,12 @@ func prettyPrintResponse(response interface{}) {
 
 func TestFirstSetup(t *testing.T) {
 	//TestNodeRegister(t)
-	TestNodeStatus(t)
-
-	TestNodeStakeGGP(t)
-	//TestNodeDepositAVAX(t)
+	//time.Sleep(1 * time.Second)
+	//TestNodeStatus(t)
+	//time.Sleep(1 * time.Second)
+	//TestNodeStakeGGP(t)
+	//time.Sleep(1 * time.Second)
+	TestNodeDepositAVAX(t)
 }
 
 func TestNodeStatus(t *testing.T) {
@@ -274,7 +275,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 	}
 
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("32000000000000000000", 10)
+	stakeAmount.SetString("3000000000000000000", 10)
 
 	// Calculate max uint256 value
 	maxApproval := big.NewInt(2)

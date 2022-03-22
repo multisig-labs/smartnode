@@ -273,7 +273,7 @@ func getRocketStorageLoaded(c *cli.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Rocketpool.StorageAddress), nil)
+	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Gogopool.StorageAddress), nil)
 	if err != nil {
 		return false, err
 	}
@@ -290,7 +290,7 @@ func getOneInchOracleLoaded(c *cli.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Rocketpool.OneInchOracleAddress), nil)
+	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Gogopool.OneInchOracleAddress), nil)
 	if err != nil {
 		return false, err
 	}
@@ -307,7 +307,7 @@ func getGgpFaucetLoaded(c *cli.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Rocketpool.GGPFaucetAddress), nil)
+	code, err := ec.CodeAt(context.Background(), common.HexToAddress(cfg.Gogopool.GGPFaucetAddress), nil)
 	if err != nil {
 		return false, err
 	}

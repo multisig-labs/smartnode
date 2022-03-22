@@ -16,12 +16,12 @@ import (
 
 // Rocket Pool config
 type RocketPoolConfig struct {
-	Rocketpool struct {
+	Gogopool struct {
 		StorageAddress       string `yaml:"storageAddress,omitempty"`
 		OneInchOracleAddress string `yaml:"oneInchOracleAddress,omitempty"`
 		GgpTokenAddress      string `yaml:"ggpTokenAddress,omitempty"`
 		GGPFaucetAddress     string `yaml:"ggpFaucetAddress,omitempty"`
-	} `yaml:"rocketpool,omitempty"`
+	} `yaml:"gogopool,omitempty"`
 	Smartnode struct {
 		ProjectName               string  `yaml:"projectName,omitempty"`
 		GraffitiVersion           string  `yaml:"graffitiVersion,omitempty"`
@@ -312,10 +312,10 @@ func loadFile(path string, required bool) (RocketPoolConfig, error) {
 // Create config from CLI arguments
 func getCliConfig(c *cli.Context) RocketPoolConfig {
 	var config RocketPoolConfig
-	config.Rocketpool.StorageAddress = c.GlobalString("storageAddress")
-	config.Rocketpool.OneInchOracleAddress = c.GlobalString("oneInchOracleAddress")
-	config.Rocketpool.GgpTokenAddress = c.GlobalString("ggpTokenAddress")
-	config.Rocketpool.GGPFaucetAddress = c.GlobalString("ggpFaucetAddress")
+	config.Gogopool.StorageAddress = c.GlobalString("storageAddress")
+	config.Gogopool.OneInchOracleAddress = c.GlobalString("oneInchOracleAddress")
+	config.Gogopool.GgpTokenAddress = c.GlobalString("ggpTokenAddress")
+	config.Gogopool.GGPFaucetAddress = c.GlobalString("ggpFaucetAddress")
 	config.Smartnode.PasswordPath = c.GlobalString("password")
 	config.Smartnode.WalletPath = c.GlobalString("wallet")
 	config.Smartnode.ValidatorKeychainPath = c.GlobalString("validatorKeychain")
