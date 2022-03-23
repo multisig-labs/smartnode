@@ -7,6 +7,7 @@ import (
 	"github.com/rocket-pool/rocketpool-go/rocketpool"
 	"github.com/rocket-pool/smartnode/shared/services"
 	"github.com/urfave/cli"
+	"time"
 )
 
 // Submit scrub minipools
@@ -62,31 +63,22 @@ func WithdrawAndStake(c *cli.Context) error {
 
 }
 
-const exportCChainParams = "{ \"to\":\"P-local192yta3e8v9j3em8lxa28w5pnj6m3ga9hqdygtj\", \"amount\": 2000, \"assetID\": \"AVAX\", \"username\":\"admin\", \"password\":\"adminadmin\" }"
-const importPChainParams = "{ \"to\": \"P-local192yta3e8v9j3em8lxa28w5pnj6m3ga9hqdygtj\", \"from\": [\"P-local192yta3e8v9j3em8lxa28w5pnj6m3ga9hqdygtj\"], \"changeAddr\": \"P-local192yta3e8v9j3em8lxa28w5pnj6m3ga9hqdygtj\", \"username\": \"admin\", \"password\": \"adminadmin\" }"
+const exportCChainParams = "{ \"to\":\"P-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\", \"assetID\": \"AVAX\", \"amount\": 7000000000, \"username\":\"admin\", \"password\":\"Lolsaldkfjxckmnvipop123!@#\" }"
+const importPChainParams = "{ \"username\":\"admin\", \"password\":\"Lolsaldkfjxckmnvipop123!@#\", \"sourceChain\": \"C\", \"to\":\"P-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\" }"
 
-const importKey = "{ \"username\" :\"admin\", \"password\":\"adminadmin\", \"privateKey\":\"PrivateKey-vTsBQDa1rD4XnS8akLz1Ba4uDDT3awfB8j9X15gQMg8yBRPFf\"}"
+var stakePChainParams = "{ \"nodeID\":\"NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg\", \"rewardAddress\":\"P-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\", \"from\": [\"P-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\"], \"changeAddr\": \"P-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\", \"startTime\":'" + fmt.Sprintf("%d", time.Now().Unix()+60) + "', \"endTime\":'" + fmt.Sprintf("%d", time.Now().AddDate(0, 0, 14).Unix()) + "', \"stakeAmount\":7000000000, \"delegationFeeRate\":10, \"username\":\"admin\", \"password\":\"Lolsaldkfjxckmnvipop123!@#\" }"
+
+//const importXChainParams = "{ \"to\":\"X-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\", \"sourceChain\":\"C\", \"username\":\"admin\", \"password\":\"Lolsaldkfjxckmnvipop123!@#\" }"
+//const exportXChainParams = "{ \"to\":\"P-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\", \"amount\": 1000000000000, \"assetID\": \"AVAX\", \"from\":[\"X-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\"], \"changeAddr\":\"X-local12hnt0379l7vpfxryyf8guwgh7afyqfm0kwhm7u\", \"username\":\"admin\", \"password\":\"Lolsaldkfjxckmnvipop123!@#\" }"
 
 // Get the correct withdrawal credentials and pubkeys for each minipool
 func stakeMinipools(c *cli.Context, rp *rocketpool.RocketPool, minipoolAddresses []common.Address) error {
 
-	//ac, err := services.GetBeaconClient(c)
-	//if err != nil {
-	//	return err
-	//}
+	ac, err := services.GetBeaconClient(c)
+	if err != nil {
+		return err
+	}
 
-	// ONE TIME import keys
-	//cKeyImport, err := ac.MakeRPCCall("avax.importKey", "/ext/bc/C/avax", importKey)
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println(cKeyImport)
-	//
-	//pKeyImport, err := ac.MakeRPCCall("platform.importKey", "/ext/C", importKey)
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Println(pKeyImport)
 	for _, minipoolAddress := range minipoolAddresses {
 		// Create a minipool contract wrapper for the given address
 		mp, err := minipool.NewMinipool(rp, minipoolAddress)
@@ -107,26 +99,33 @@ func stakeMinipools(c *cli.Context, rp *rocketpool.RocketPool, minipoolAddresses
 		//cChainAddress := common.HexToAddress("0x3b7e31510e84988222f4a63db260d36c503d57d2")
 
 		// Withdraw balance to this C Chain address
-
-		// Export funds to P Chain address
-		//exportResp, err := ac.MakeRPCCall("avax.export", "/ext/bc/C/avax", exportCChainParams)
+		//err = mp.WithdrawBalanceForStaking(nil)
 		//if err != nil {
 		//	return err
 		//}
-		//
-		//fmt.Println(exportResp)
-		//
-		//wait for transaction?
-		//importResp, err := ac.MakeRPCCall("platform.importAVAX", "/ext/P", importPChainParams)
-		//if err != nil {
-		//	return err
-		//}
-		//fmt.Println(importResp)
 
-		// Move balance to P Chain address
+		// Export funds to X Chain address
+		exportResp, err := ac.MakeRPCCall("avax.exportAVAX", "/ext/bc/C/avax", exportCChainParams)
+		if err != nil {
+			return err
+		}
 
-		// Construct staking request object
+		fmt.Println(exportResp)
+		time.Sleep(5 * time.Second)
 
+		// Import to P Chain address
+		importPResp, err := ac.MakeRPCCall("platform.importAVAX", "/ext/P", importPChainParams)
+		if err != nil {
+			return err
+		}
+		fmt.Println(importPResp)
+		time.Sleep(5 * time.Second)
+		time.Sleep(5)
+		stakePChainResp, err := ac.MakeRPCCall("platform.addValidator", "/ext/P", importPChainParams)
+		if err != nil {
+			return err
+		}
+		fmt.Println(stakePChainResp)
 		// Make RPC call to start staking
 	}
 
