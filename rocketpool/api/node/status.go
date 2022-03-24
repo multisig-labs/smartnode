@@ -1,8 +1,6 @@
 package node
 
 import (
-	"bytes"
-
 	"github.com/rocket-pool/rocketpool-go/dao/trustednode"
 	"github.com/rocket-pool/rocketpool-go/network"
 	"github.com/rocket-pool/rocketpool-go/node"
@@ -143,14 +141,20 @@ func getStatus(c *cli.Context) (*api.NodeStatusResponse, error) {
 		return nil, err
 	}
 
-	// Get withdrawal address balances
-	if !bytes.Equal(nodeAccount.Address.Bytes(), response.WithdrawalAddress.Bytes()) {
-		withdrawalBalances, err := tokens.GetBalances(rp, response.WithdrawalAddress, nil)
-		if err != nil {
-			return nil, err
-		}
-		response.WithdrawalBalances = withdrawalBalances
+	withdrawalBalances, err := tokens.GetBalances(rp, response.WithdrawalAddress, nil)
+	if err != nil {
+		return nil, err
 	}
+	response.WithdrawalBalances = withdrawalBalances
+
+	// Get withdrawal address balances
+	//if !bytes.Equal(nodeAccount.Address.Bytes(), response.WithdrawalAddress.Bytes()) {
+	//	withdrawalBalances, err := tokens.GetBalances(rp, response.WithdrawalAddress, nil)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	response.WithdrawalBalances = withdrawalBalances
+	//}
 
 	// Get the collateral ratio
 	ggpPrice, err := network.GetGGPPrice(rp, nil)

@@ -34,6 +34,7 @@ func (c *Client) MinipoolStatus() (api.MinipoolStatusResponse, error) {
 		if mp.User.DepositBalance == nil {
 			mp.User.DepositBalance = big.NewInt(0)
 		}
+		// change to AVAX eventually
 		if mp.Balances.ETH == nil {
 			mp.Balances.ETH = big.NewInt(0)
 		}
