@@ -23,34 +23,34 @@ func (c *Client) FaucetStatus() (api.FaucetStatusResponse, error) {
 	return response, nil
 }
 
-// Check whether the node can withdraw RPL from the faucet
-func (c *Client) CanFaucetWithdrawRpl() (api.CanFaucetWithdrawRplResponse, error) {
-	responseBytes, err := c.callAPI("faucet can-withdraw-rpl")
+// Check whether the node can withdraw GGP from the faucet
+func (c *Client) CanFaucetWithdrawGgp() (api.CanFaucetWithdrawGgpResponse, error) {
+	responseBytes, err := c.callAPI("faucet can-withdraw-ggp")
 	if err != nil {
-		return api.CanFaucetWithdrawRplResponse{}, fmt.Errorf("Could not get can withdraw RPL from faucet status: %w", err)
+		return api.CanFaucetWithdrawGgpResponse{}, fmt.Errorf("Could not get can withdraw GGP from faucet status: %w", err)
 	}
-	var response api.CanFaucetWithdrawRplResponse
+	var response api.CanFaucetWithdrawGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanFaucetWithdrawRplResponse{}, fmt.Errorf("Could not decode can withdraw RPL from faucet response: %w", err)
+		return api.CanFaucetWithdrawGgpResponse{}, fmt.Errorf("Could not decode can withdraw GGP from faucet response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanFaucetWithdrawRplResponse{}, fmt.Errorf("Could not get can withdraw RPL from faucet status: %s", response.Error)
+		return api.CanFaucetWithdrawGgpResponse{}, fmt.Errorf("Could not get can withdraw GGP from faucet status: %s", response.Error)
 	}
 	return response, nil
 }
 
-// Withdraw RPL from the faucet
-func (c *Client) FaucetWithdrawRpl() (api.FaucetWithdrawRplResponse, error) {
-	responseBytes, err := c.callAPI("faucet withdraw-rpl")
+// Withdraw GGP from the faucet
+func (c *Client) FaucetWithdrawGgp() (api.FaucetWithdrawGgpResponse, error) {
+	responseBytes, err := c.callAPI("faucet withdraw-ggp")
 	if err != nil {
-		return api.FaucetWithdrawRplResponse{}, fmt.Errorf("Could not withdraw RPL from faucet: %w", err)
+		return api.FaucetWithdrawGgpResponse{}, fmt.Errorf("Could not withdraw GGP from faucet: %w", err)
 	}
-	var response api.FaucetWithdrawRplResponse
+	var response api.FaucetWithdrawGgpResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.FaucetWithdrawRplResponse{}, fmt.Errorf("Could not decode withdraw RPL from faucet response: %w", err)
+		return api.FaucetWithdrawGgpResponse{}, fmt.Errorf("Could not decode withdraw GGP from faucet response: %w", err)
 	}
 	if response.Error != "" {
-		return api.FaucetWithdrawRplResponse{}, fmt.Errorf("Could not withdraw RPL from faucet: %s", response.Error)
+		return api.FaucetWithdrawGgpResponse{}, fmt.Errorf("Could not withdraw GGP from faucet: %s", response.Error)
 	}
 	return response, nil
 }

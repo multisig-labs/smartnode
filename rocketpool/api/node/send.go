@@ -68,43 +68,43 @@ func canNodeSend(c *cli.Context, amountWei *big.Int, token string) (*api.CanNode
 		}
 		response.GasInfo = gasInfo
 
-	case "rpl":
+	case "ggp":
 
-		// Check node RPL balance
-		rplBalanceWei, err := tokens.GetRPLBalance(rp, nodeAccount.Address, nil)
+		// Check node GGP balance
+		ggpBalanceWei, err := tokens.GetGGPBalance(rp, nodeAccount.Address, nil)
 		if err != nil {
 			return nil, err
 		}
-		response.InsufficientBalance = (amountWei.Cmp(rplBalanceWei) > 0)
-		gasInfo, err := tokens.EstimateTransferRPLGas(rp, nodeAccount.Address, amountWei, opts)
-		if err != nil {
-			return nil, err
-		}
-		response.GasInfo = gasInfo
-
-	case "fsrpl":
-
-		// Check node fixed-supply RPL balance
-		fixedSupplyRplBalanceWei, err := tokens.GetFixedSupplyRPLBalance(rp, nodeAccount.Address, nil)
-		if err != nil {
-			return nil, err
-		}
-		response.InsufficientBalance = (amountWei.Cmp(fixedSupplyRplBalanceWei) > 0)
-		gasInfo, err := tokens.EstimateTransferFixedSupplyRPLGas(rp, nodeAccount.Address, amountWei, opts)
+		response.InsufficientBalance = (amountWei.Cmp(ggpBalanceWei) > 0)
+		gasInfo, err := tokens.EstimateTransferGGPGas(rp, nodeAccount.Address, amountWei, opts)
 		if err != nil {
 			return nil, err
 		}
 		response.GasInfo = gasInfo
 
-	case "reth":
+	case "fsggp":
 
-		// Check node rETH balance
-		rethBalanceWei, err := tokens.GetRETHBalance(rp, nodeAccount.Address, nil)
+		// Check node fixed-supply GGP balance
+		fixedSupplyGgpBalanceWei, err := tokens.GetFixedSupplyGGPBalance(rp, nodeAccount.Address, nil)
 		if err != nil {
 			return nil, err
 		}
-		response.InsufficientBalance = (amountWei.Cmp(rethBalanceWei) > 0)
-		gasInfo, err := tokens.EstimateTransferRETHGas(rp, nodeAccount.Address, amountWei, opts)
+		response.InsufficientBalance = (amountWei.Cmp(fixedSupplyGgpBalanceWei) > 0)
+		gasInfo, err := tokens.EstimateTransferFixedSupplyGGPGas(rp, nodeAccount.Address, amountWei, opts)
+		if err != nil {
+			return nil, err
+		}
+		response.GasInfo = gasInfo
+
+	case "ggpavax":
+
+		// Check node ggpAVAX balance
+		ggpavaxBalanceWei, err := tokens.GetGGPAVAXBalance(rp, nodeAccount.Address, nil)
+		if err != nil {
+			return nil, err
+		}
+		response.InsufficientBalance = (amountWei.Cmp(ggpavaxBalanceWei) > 0)
+		gasInfo, err := tokens.EstimateTransferGGPAVAXGas(rp, nodeAccount.Address, amountWei, opts)
 		if err != nil {
 			return nil, err
 		}
@@ -167,28 +167,28 @@ func nodeSend(c *cli.Context, amountWei *big.Int, token string, to common.Addres
 		}
 		response.TxHash = hash
 
-	case "rpl":
+	case "ggp":
 
-		// Transfer RPL
-		hash, err := tokens.TransferRPL(rp, to, amountWei, opts)
+		// Transfer GGP
+		hash, err := tokens.TransferGGP(rp, to, amountWei, opts)
 		if err != nil {
 			return nil, err
 		}
 		response.TxHash = hash
 
-	case "fsrpl":
+	case "fsggp":
 
-		// Transfer fixed-supply RPL
-		hash, err := tokens.TransferFixedSupplyRPL(rp, to, amountWei, opts)
+		// Transfer fixed-supply GGP
+		hash, err := tokens.TransferFixedSupplyGGP(rp, to, amountWei, opts)
 		if err != nil {
 			return nil, err
 		}
 		response.TxHash = hash
 
-	case "reth":
+	case "ggpavax":
 
-		// Transfer rETH
-		hash, err := tokens.TransferRETH(rp, to, amountWei, opts)
+		// Transfer ggpAVAX
+		hash, err := tokens.TransferGGPAVAX(rp, to, amountWei, opts)
 		if err != nil {
 			return nil, err
 		}

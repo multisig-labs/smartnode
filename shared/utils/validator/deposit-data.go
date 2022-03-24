@@ -21,7 +21,7 @@ func GetDepositData(validatorKey *rsa.PrivateKey, withdrawalCredentials common.H
 
 	// Build deposit data
 	dd := eth2.DepositDataNoSignature{
-		PublicKey:             x509.MarshalPKCS1PublicKey(&validatorKey.PublicKey),
+		PublicKey:             x509.MarshalPKCS1PublicKey(&validatorKey.PublicKey)[:48],
 		WithdrawalCredentials: withdrawalCredentials[:],
 		Amount:                DepositAmount,
 	}
@@ -31,10 +31,13 @@ func GetDepositData(validatorKey *rsa.PrivateKey, withdrawalCredentials common.H
 	if err != nil {
 		return eth2.DepositData{}, common.Hash{}, err
 	}
-
+	domain, err := eth2types.ComputeDomain(eth2types.DomainDeposit, eth2Config.GenesisForkVersion, eth2types.ZeroGenesisValidatorsRoot)
+	if err != nil {
+		return eth2.DepositData{}, common.Hash{}, err
+	}
 	sr := eth2.SigningRoot{
 		ObjectRoot: or[:],
-		Domain:     eth2types.Domain(eth2types.DomainDeposit, eth2Config.GenesisForkVersion, eth2types.ZeroGenesisValidatorsRoot),
+		Domain:     domain,
 	}
 
 	// Get signing root with domain
@@ -49,6 +52,7 @@ func GetDepositData(validatorKey *rsa.PrivateKey, withdrawalCredentials common.H
 	}
 
 	// Build deposit data struct (with signature)
+	sig = sig[:96]
 	var depositData = eth2.DepositData{
 		PublicKey:             dd.PublicKey,
 		WithdrawalCredentials: dd.WithdrawalCredentials,

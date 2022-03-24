@@ -190,7 +190,7 @@ func (collector *TrustedNodeCollector) Collect(channel chan<- prometheus.Metric)
 	defeatedCount := float64(0)
 	expiredCount := float64(0)
 
-	// Get the total staked RPL
+	// Get the total staked GGP
 	wg.Go(func() error {
 		proposals, err = dao.GetProposalsWithMember(collector.rp, collector.nodeAddress, nil)
 		if err != nil {

@@ -16,7 +16,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/eth1"
 )
 
-func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdrawRplResponse, error) {
+func canNodeWithdrawGgp(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdrawGgpResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeRegistered(c); err != nil {
@@ -36,7 +36,7 @@ func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdra
 	}
 
 	// Response
-	response := api.CanNodeWithdrawRplResponse{}
+	response := api.CanNodeWithdrawGgpResponse{}
 
 	// Get node account
 	nodeAccount, err := w.GetNodeAccount()
@@ -46,23 +46,23 @@ func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdra
 
 	// Data
 	var wg errgroup.Group
-	var rplStake *big.Int
-	var minimumRplStake *big.Int
+	var ggpStake *big.Int
+	var minimumGgpStake *big.Int
 	var currentTime uint64
-	var rplStakedTime uint64
+	var ggpStakedTime uint64
 	var withdrawalDelay uint64
 
-	// Get RPL stake
+	// Get GGP stake
 	wg.Go(func() error {
 		var err error
-		rplStake, err = node.GetNodeRPLStake(rp, nodeAccount.Address, nil)
+		ggpStake, err = node.GetNodeGGPStake(rp, nodeAccount.Address, nil)
 		return err
 	})
 
-	// Get minimum RPL stake
+	// Get minimum GGP stake
 	wg.Go(func() error {
 		var err error
-		minimumRplStake, err = node.GetNodeMinimumRPLStake(rp, nodeAccount.Address, nil)
+		minimumGgpStake, err = node.GetNodeMinimumGGPStake(rp, nodeAccount.Address, nil)
 		return err
 	})
 
@@ -75,10 +75,10 @@ func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdra
 		return err
 	})
 
-	// Get RPL staked time
+	// Get GGP staked time
 	wg.Go(func() error {
 		var err error
-		rplStakedTime, err = node.GetNodeRPLStakedTime(rp, nodeAccount.Address, nil)
+		ggpStakedTime, err = node.GetNodeGGPStakedTime(rp, nodeAccount.Address, nil)
 		return err
 	})
 
@@ -102,7 +102,7 @@ func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdra
 		if err != nil {
 			return err
 		}
-		gasInfo, err := node.EstimateWithdrawRPLGas(rp, amountWei, opts)
+		gasInfo, err := node.EstimateWithdrawGGPGas(rp, amountWei, opts)
 		if err == nil {
 			response.GasInfo = gasInfo
 		}
@@ -115,11 +115,11 @@ func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdra
 	}
 
 	// Check data
-	var remainingRplStake big.Int
-	remainingRplStake.Sub(rplStake, amountWei)
-	response.InsufficientBalance = (amountWei.Cmp(rplStake) > 0)
-	response.MinipoolsUndercollateralized = (remainingRplStake.Cmp(minimumRplStake) < 0)
-	response.WithdrawalDelayActive = ((currentTime - rplStakedTime) < withdrawalDelay)
+	var remainingGgpStake big.Int
+	remainingGgpStake.Sub(ggpStake, amountWei)
+	response.InsufficientBalance = (amountWei.Cmp(ggpStake) > 0)
+	response.MinipoolsUndercollateralized = (remainingGgpStake.Cmp(minimumGgpStake) < 0)
+	response.WithdrawalDelayActive = ((currentTime - ggpStakedTime) < withdrawalDelay)
 
 	// Update & return response
 	response.CanWithdraw = !(response.InsufficientBalance || response.MinipoolsUndercollateralized || response.WithdrawalDelayActive || !response.InConsensus)
@@ -127,7 +127,7 @@ func canNodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.CanNodeWithdra
 
 }
 
-func nodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.NodeWithdrawRplResponse, error) {
+func nodeWithdrawGgp(c *cli.Context, amountWei *big.Int) (*api.NodeWithdrawGgpResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeRegistered(c); err != nil {
@@ -143,7 +143,7 @@ func nodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.NodeWithdrawRplRe
 	}
 
 	// Response
-	response := api.NodeWithdrawRplResponse{}
+	response := api.NodeWithdrawGgpResponse{}
 
 	// Get transactor
 	opts, err := w.GetNodeAccountTransactor()
@@ -157,8 +157,8 @@ func nodeWithdrawRpl(c *cli.Context, amountWei *big.Int) (*api.NodeWithdrawRplRe
 		return nil, fmt.Errorf("Error checking for nonce override: %w", err)
 	}
 
-	// Withdraw RPL
-	hash, err := node.WithdrawRPL(rp, amountWei, opts)
+	// Withdraw GGP
+	hash, err := node.WithdrawGGP(rp, amountWei, opts)
 	if err != nil {
 		return nil, err
 	}

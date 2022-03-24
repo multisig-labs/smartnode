@@ -64,8 +64,8 @@ func proposeKick(c *cli.Context) error {
 	var fineAmountWei *big.Int
 	if c.String("fine") == "max" {
 
-		// Set fine amount to member's entire RPL bond
-		fineAmountWei = selectedMember.RPLBondAmount
+		// Set fine amount to member's entire GGP bond
+		fineAmountWei = selectedMember.GGPBondAmount
 
 	} else if c.String("fine") != "" {
 
@@ -79,7 +79,7 @@ func proposeKick(c *cli.Context) error {
 	} else {
 
 		// Prompt for custom amount
-		inputAmount := cliutils.Prompt(fmt.Sprintf("Please enter an RPL fine amount to propose (max %.6f RPL):", math.RoundDown(eth.WeiToEth(selectedMember.RPLBondAmount), 6)), "^\\d+(\\.\\d+)?$", "Invalid amount")
+		inputAmount := cliutils.Prompt(fmt.Sprintf("Please enter an GGP fine amount to propose (max %.6f GGP):", math.RoundDown(eth.WeiToEth(selectedMember.GGPBondAmount), 6)), "^\\d+(\\.\\d+)?$", "Invalid amount")
 		fineAmount, err := strconv.ParseFloat(inputAmount, 64)
 		if err != nil {
 			return fmt.Errorf("Invalid fine amount '%s': %w", inputAmount, err)
@@ -98,8 +98,8 @@ func proposeKick(c *cli.Context) error {
 		if canPropose.ProposalCooldownActive {
 			fmt.Println("The node must wait for the proposal cooldown period to pass before making another proposal.")
 		}
-		if canPropose.InsufficientRplBond {
-			fmt.Printf("The fine amount of %.6f RPL is greater than the member's bond of %.6f RPL.\n", math.RoundDown(eth.WeiToEth(fineAmountWei), 6), math.RoundDown(eth.WeiToEth(selectedMember.RPLBondAmount), 6))
+		if canPropose.InsufficientGgpBond {
+			fmt.Printf("The fine amount of %.6f GGP is greater than the member's bond of %.6f GGP.\n", math.RoundDown(eth.WeiToEth(fineAmountWei), 6), math.RoundDown(eth.WeiToEth(selectedMember.GGPBondAmount), 6))
 		}
 		return nil
 	}
@@ -129,7 +129,7 @@ func proposeKick(c *cli.Context) error {
 	}
 
 	// Log & return
-	fmt.Printf("Successfully submitted a kick proposal with ID %d for node %s, with a fine of %.6f RPL.\n", response.ProposalId, selectedMember.Address.Hex(), math.RoundDown(eth.WeiToEth(fineAmountWei), 6))
+	fmt.Printf("Successfully submitted a kick proposal with ID %d for node %s, with a fine of %.6f GGP.\n", response.ProposalId, selectedMember.Address.Hex(), math.RoundDown(eth.WeiToEth(fineAmountWei), 6))
 	return nil
 
 }

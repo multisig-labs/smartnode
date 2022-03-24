@@ -14,18 +14,18 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// Represents the collector for the RPL metrics
-type RplCollector struct {
-	// The RPL price (in terms of ETH)
-	rplPrice *prometheus.Desc
+// Represents the collector for the GGP metrics
+type GgpCollector struct {
+	// The GGP price (in terms of ETH)
+	ggpPrice *prometheus.Desc
 
-	// The total amount of RPL staked on the network
+	// The total amount of GGP staked on the network
 	totalValueStaked *prometheus.Desc
 
-	// The total effective amount of RPL staked on the network
+	// The total effective amount of GGP staked on the network
 	totalEffectiveStaked *prometheus.Desc
 
-	// The date and time of the next RPL rewards checkpoint
+	// The date and time of the next GGP rewards checkpoint
 	checkpointTime *prometheus.Desc
 
 	// The Rocket Pool contract manager
@@ -33,23 +33,23 @@ type RplCollector struct {
 }
 
 // Create a new DemandCollector instance
-func NewRplCollector(rp *rocketpool.RocketPool) *RplCollector {
-	subsystem := "rpl"
-	return &RplCollector{
-		rplPrice: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "rpl_price"),
-			"The RPL price (in terms of ETH)",
+func NewGgpCollector(rp *rocketpool.RocketPool) *GgpCollector {
+	subsystem := "ggp"
+	return &GgpCollector{
+		ggpPrice: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "ggp_price"),
+			"The GGP price (in terms of ETH)",
 			nil, nil,
 		),
 		totalValueStaked: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_value_staked"),
-			"The total amount of RPL staked on the network",
+			"The total amount of GGP staked on the network",
 			nil, nil,
 		),
 		totalEffectiveStaked: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_effective_staked"),
-			"The total effective amount of RPL staked on the network",
+			"The total effective amount of GGP staked on the network",
 			nil, nil,
 		),
 		checkpointTime: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "checkpoint_time"),
-			"The date and time of the next RPL rewards checkpoint",
+			"The date and time of the next GGP rewards checkpoint",
 			nil, nil,
 		),
 		rp: rp,
@@ -57,51 +57,51 @@ func NewRplCollector(rp *rocketpool.RocketPool) *RplCollector {
 }
 
 // Write metric descriptions to the Prometheus channel
-func (collector *RplCollector) Describe(channel chan<- *prometheus.Desc) {
-	channel <- collector.rplPrice
+func (collector *GgpCollector) Describe(channel chan<- *prometheus.Desc) {
+	channel <- collector.ggpPrice
 	channel <- collector.totalValueStaked
 	channel <- collector.totalEffectiveStaked
 	channel <- collector.checkpointTime
 }
 
 // Collect the latest metric values and pass them to Prometheus
-func (collector *RplCollector) Collect(channel chan<- prometheus.Metric) {
+func (collector *GgpCollector) Collect(channel chan<- prometheus.Metric) {
 
 	// Sync
 	var wg errgroup.Group
-	rplPriceFloat := float64(-1)
+	ggpPriceFloat := float64(-1)
 	totalValueStakedFloat := float64(-1)
 	totalEffectiveStakedFloat := float64(-1)
 	var lastCheckpoint time.Time
 	var rewardsInterval time.Duration
 
-	// Get the RPL price (in terms of ETH)
+	// Get the GGP price (in terms of ETH)
 	wg.Go(func() error {
-		rplPrice, err := network.GetRPLPrice(collector.rp, nil)
+		ggpPrice, err := network.GetGGPPrice(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting RPL price: %w", err)
+			return fmt.Errorf("Error getting GGP price: %w", err)
 		} else {
-			rplPriceFloat = eth.WeiToEth(rplPrice)
+			ggpPriceFloat = eth.WeiToEth(ggpPrice)
 		}
 		return nil
 	})
 
-	// Get the total amount of RPL staked on the network
+	// Get the total amount of GGP staked on the network
 	wg.Go(func() error {
-		totalValueStaked, err := node.GetTotalRPLStake(collector.rp, nil)
+		totalValueStaked, err := node.GetTotalGGPStake(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting total amount of RPL staked on the network: %w", err)
+			return fmt.Errorf("Error getting total amount of GGP staked on the network: %w", err)
 		} else {
 			totalValueStakedFloat = eth.WeiToEth(totalValueStaked)
 		}
 		return nil
 	})
 
-	// Get the total effective amount of RPL staked on the network
+	// Get the total effective amount of GGP staked on the network
 	wg.Go(func() error {
-		totalEffectiveStaked, err := node.GetTotalEffectiveRPLStake(collector.rp, nil)
+		totalEffectiveStaked, err := node.GetTotalEffectiveGGPStake(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting total effective amount of RPL staked on the network: %w", err)
+			return fmt.Errorf("Error getting total effective amount of GGP staked on the network: %w", err)
 		} else {
 			totalEffectiveStakedFloat = eth.WeiToEth(totalEffectiveStaked)
 		}
@@ -139,7 +139,7 @@ func (collector *RplCollector) Collect(channel chan<- prometheus.Metric) {
 	nextRewardsTime := float64(lastCheckpoint.Add(rewardsInterval).Unix()) * 1000
 
 	channel <- prometheus.MustNewConstMetric(
-		collector.rplPrice, prometheus.GaugeValue, rplPriceFloat)
+		collector.ggpPrice, prometheus.GaugeValue, ggpPriceFloat)
 	channel <- prometheus.MustNewConstMetric(
 		collector.totalValueStaked, prometheus.GaugeValue, totalValueStakedFloat)
 	channel <- prometheus.MustNewConstMetric(

@@ -41,8 +41,8 @@ func (c *Client) TNDAOMembers() (api.TNDAOMembersResponse, error) {
 	}
 	for i := 0; i < len(response.Members); i++ {
 		member := &response.Members[i]
-		if member.RPLBondAmount == nil {
-			member.RPLBondAmount = big.NewInt(0)
+		if member.GGPBondAmount == nil {
+			member.GGPBondAmount = big.NewInt(0)
 		}
 	}
 	return response, nil
@@ -321,17 +321,17 @@ func (c *Client) CanJoinTNDAO() (api.CanJoinTNDAOResponse, error) {
 }
 
 // Join the oracle DAO (requires an executed invite proposal)
-func (c *Client) ApproveRPLToJoinTNDAO() (api.JoinTNDAOApproveResponse, error) {
-	responseBytes, err := c.callAPI("odao join-approve-rpl")
+func (c *Client) ApproveGGPToJoinTNDAO() (api.JoinTNDAOApproveResponse, error) {
+	responseBytes, err := c.callAPI("odao join-approve-ggp")
 	if err != nil {
-		return api.JoinTNDAOApproveResponse{}, fmt.Errorf("Could not approve RPL for joining oracle DAO: %w", err)
+		return api.JoinTNDAOApproveResponse{}, fmt.Errorf("Could not approve GGP for joining oracle DAO: %w", err)
 	}
 	var response api.JoinTNDAOApproveResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.JoinTNDAOApproveResponse{}, fmt.Errorf("Could not decode approve RPL for joining oracle DAO response: %w", err)
+		return api.JoinTNDAOApproveResponse{}, fmt.Errorf("Could not decode approve GGP for joining oracle DAO response: %w", err)
 	}
 	if response.Error != "" {
-		return api.JoinTNDAOApproveResponse{}, fmt.Errorf("Could not approve RPL for joining oracle DAO: %s", response.Error)
+		return api.JoinTNDAOApproveResponse{}, fmt.Errorf("Could not approve GGP for joining oracle DAO: %s", response.Error)
 	}
 	return response, nil
 }
@@ -445,17 +445,17 @@ func (c *Client) CanProposeTNDAOSettingMembersQuorum(quorum float64) (api.CanPro
 	}
 	return response, nil
 }
-func (c *Client) CanProposeTNDAOSettingMembersRplBond(bondAmountWei *big.Int) (api.CanProposeTNDAOSettingResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("odao can-propose-members-rplbond %s", bondAmountWei.String()))
+func (c *Client) CanProposeTNDAOSettingMembersGgpBond(bondAmountWei *big.Int) (api.CanProposeTNDAOSettingResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("odao can-propose-members-ggpbond %s", bondAmountWei.String()))
 	if err != nil {
-		return api.CanProposeTNDAOSettingResponse{}, fmt.Errorf("Could not get can propose setting members.rplbond: %w", err)
+		return api.CanProposeTNDAOSettingResponse{}, fmt.Errorf("Could not get can propose setting members.ggpbond: %w", err)
 	}
 	var response api.CanProposeTNDAOSettingResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.CanProposeTNDAOSettingResponse{}, fmt.Errorf("Could not decode can propose setting members.rplbond response: %w", err)
+		return api.CanProposeTNDAOSettingResponse{}, fmt.Errorf("Could not decode can propose setting members.ggpbond response: %w", err)
 	}
 	if response.Error != "" {
-		return api.CanProposeTNDAOSettingResponse{}, fmt.Errorf("Could not get can propose setting members.rplbond: %s", response.Error)
+		return api.CanProposeTNDAOSettingResponse{}, fmt.Errorf("Could not get can propose setting members.ggpbond: %s", response.Error)
 	}
 	return response, nil
 }
@@ -573,17 +573,17 @@ func (c *Client) ProposeTNDAOSettingMembersQuorum(quorum float64) (api.ProposeTN
 	}
 	return response, nil
 }
-func (c *Client) ProposeTNDAOSettingMembersRplBond(bondAmountWei *big.Int) (api.ProposeTNDAOSettingMembersRplBondResponse, error) {
-	responseBytes, err := c.callAPI(fmt.Sprintf("odao propose-members-rplbond %s", bondAmountWei.String()))
+func (c *Client) ProposeTNDAOSettingMembersGgpBond(bondAmountWei *big.Int) (api.ProposeTNDAOSettingMembersGgpBondResponse, error) {
+	responseBytes, err := c.callAPI(fmt.Sprintf("odao propose-members-ggpbond %s", bondAmountWei.String()))
 	if err != nil {
-		return api.ProposeTNDAOSettingMembersRplBondResponse{}, fmt.Errorf("Could not propose oracle DAO setting members.rplbond: %w", err)
+		return api.ProposeTNDAOSettingMembersGgpBondResponse{}, fmt.Errorf("Could not propose oracle DAO setting members.ggpbond: %w", err)
 	}
-	var response api.ProposeTNDAOSettingMembersRplBondResponse
+	var response api.ProposeTNDAOSettingMembersGgpBondResponse
 	if err := json.Unmarshal(responseBytes, &response); err != nil {
-		return api.ProposeTNDAOSettingMembersRplBondResponse{}, fmt.Errorf("Could not decode propose oracle DAO setting members.rplbond response: %w", err)
+		return api.ProposeTNDAOSettingMembersGgpBondResponse{}, fmt.Errorf("Could not decode propose oracle DAO setting members.ggpbond response: %w", err)
 	}
 	if response.Error != "" {
-		return api.ProposeTNDAOSettingMembersRplBondResponse{}, fmt.Errorf("Could not propose oracle DAO setting members.rplbond: %s", response.Error)
+		return api.ProposeTNDAOSettingMembersGgpBondResponse{}, fmt.Errorf("Could not propose oracle DAO setting members.ggpbond: %s", response.Error)
 	}
 	return response, nil
 }
@@ -699,8 +699,8 @@ func (c *Client) GetTNDAOMemberSettings() (api.GetTNDAOMemberSettingsResponse, e
 	if response.Error != "" {
 		return api.GetTNDAOMemberSettingsResponse{}, fmt.Errorf("Could not get oracle DAO member settings: %s", response.Error)
 	}
-	if response.RPLBond == nil {
-		response.RPLBond = big.NewInt(0)
+	if response.GGPBond == nil {
+		response.GGPBond = big.NewInt(0)
 	}
 	if response.ChallengeCost == nil {
 		response.ChallengeCost = big.NewInt(0)

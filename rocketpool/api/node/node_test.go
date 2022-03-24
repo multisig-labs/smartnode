@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"math/big"
-	"os"
-	"testing"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/mitchellh/go-homedir"
 	"github.com/prysmaticlabs/prysm/v2/testing/require"
+	"github.com/rocket-pool/rocketpool-go/network"
+	"github.com/rocket-pool/rocketpool-go/settings/protocol"
 	"github.com/rocket-pool/rocketpool-go/utils"
 	"github.com/rocket-pool/smartnode/shared"
 	"github.com/rocket-pool/smartnode/shared/services"
@@ -22,6 +19,11 @@ import (
 	apitypes "github.com/rocket-pool/smartnode/shared/types/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
+	"golang.org/x/sync/errgroup"
+	"io/ioutil"
+	"math/big"
+	"os"
+	"testing"
 )
 
 func waitForTransaction(c *cli.Context, hash common.Hash) (*apitypes.APIResponse, error) {
@@ -142,24 +144,6 @@ func TestCanNodeRegister(t *testing.T) {
 
 }
 
-func TestNodeRegister(t *testing.T) {
-	timezone := "Etc/UTC"
-	app, configPath, settingsPath := initApp()
-	set := flag.NewFlagSet("config-path", 0)
-	set.String("config", configPath, "doc")
-	set.String("settings", settingsPath, "doc")
-	c := cli.NewContext(app, set, nil)
-
-	nodeResponse, err := registerNode(c, timezone)
-	if err != nil {
-		fmt.Println(err)
-	}
-	assert.Nil(t, err, "node register should not return error")
-
-	fmt.Println(nodeResponse)
-
-}
-
 func TestCanNodeStake(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
@@ -168,7 +152,7 @@ func TestCanNodeStake(t *testing.T) {
 	c := cli.NewContext(app, set, nil)
 	stakeAmount := new(big.Int)
 	stakeAmount.SetString("100", 10)
-	nodeResponse, err := canNodeStakeRpl(c, stakeAmount)
+	nodeResponse, err := canNodeStakeGgp(c, stakeAmount)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -177,6 +161,27 @@ func TestCanNodeStake(t *testing.T) {
 	fmt.Println(nodeResponse)
 
 }
+
+func prettyPrintResponse(response interface{}) {
+	formattedResponse, err := json.MarshalIndent(response, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(formattedResponse))
+
+}
+
+func TestFirstSetup(t *testing.T) {
+	//TestNodeRegister(t)
+	//time.Sleep(1 * time.Second)
+	//TestNodeStatus(t)
+	//time.Sleep(1 * time.Second)
+	//TestNodeStakeGGP(t)
+	//time.Sleep(1 * time.Second)
+	TestNodeDepositAVAX(t)
+}
+
 func TestNodeStatus(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
@@ -186,6 +191,23 @@ func TestNodeStatus(t *testing.T) {
 	stakeAmount := new(big.Int)
 	stakeAmount.SetString("100", 10)
 	nodeResponse, err := getStatus(c)
+	if err != nil {
+		fmt.Println(err)
+	}
+	prettyPrintResponse(nodeResponse)
+	assert.Nil(t, err, "node status should not return error")
+
+}
+
+func TestNodeRegister(t *testing.T) {
+	timezone := "Etc/UTC"
+	app, configPath, settingsPath := initApp()
+	set := flag.NewFlagSet("config-path", 0)
+	set.String("config", configPath, "doc")
+	set.String("settings", settingsPath, "doc")
+	c := cli.NewContext(app, set, nil)
+
+	nodeResponse, err := registerNode(c, timezone)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -205,7 +227,7 @@ func prettyPrintResponse(response interface{}) {
 
 }
 
-func TestNodeStakeRPL(t *testing.T) {
+func TestNodeStakeGGP(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 
 	set := flag.NewFlagSet("config-path", 0)
@@ -218,32 +240,32 @@ func TestNodeStakeRPL(t *testing.T) {
 	}
 
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("100000000", 10)
+	stakeAmount.SetString("1800000000000000000000", 10)
 
 	// Calculate max uint256 value
 	maxApproval := big.NewInt(2)
 	maxApproval = maxApproval.Exp(maxApproval, big.NewInt(256), nil)
 	maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
 
-	// Approve RPL for staking
-	response, err := approveRpl(c, maxApproval)
+	// Approve GGP for staking
+	response, err := approveGgp(c, maxApproval)
 	if err != nil {
 		fmt.Println(err)
 	}
 	hash := response.ApproveTxHash
 
-	fmt.Printf("Approving RPL for staking...\n")
+	fmt.Printf("Approving GGP for staking...\n")
 
 	if _, err = waitForTransaction(c, hash); err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Successfully approved staking access to RPL.")
+	fmt.Println("Successfully approved staking access to GGP.")
 
-	nodeResponse, err := stakeRpl(c, stakeAmount)
+	nodeResponse, err := stakeGgp(c, stakeAmount)
 	if err != nil {
 		fmt.Println(err)
 	}
-	assert.Nil(t, err, "node register should not return error")
+	assert.Nil(t, err, "node stake-rpl should not return error")
 	require.NoError(t, err)
 	fmt.Println(nodeResponse)
 
@@ -280,7 +302,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 	}
 
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("100000000", 10)
+	stakeAmount.SetString("3000000000000000000", 10)
 
 	// Calculate max uint256 value
 	maxApproval := big.NewInt(2)
@@ -293,11 +315,14 @@ func TestNodeDepositAVAX(t *testing.T) {
 		fmt.Println(fmt.Errorf("Error generating random salt: %w", err))
 	}
 	var salt = big.NewInt(0).SetBytes(buffer)
-	var minNodeFee float64
 
-	nodeFees := api.NodeFeeResponse{}
-	nodeFees.MaxNodeFee = 100
-	nodeFees.MaxNodeFee = 20
+	nodeFees, err := getNodeFee(c)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var minNodeFee float64
 
 	// Use default max slippage
 
@@ -305,13 +330,71 @@ func TestNodeDepositAVAX(t *testing.T) {
 
 	depositResponse, err := nodeDeposit(c, stakeAmount, minNodeFee, salt)
 	if err != nil {
+		fmt.Println(err)
+
 		return
 	}
 
-	fmt.Println(depositResponse)
+	prettyPrintResponse(depositResponse)
 
 }
 
+func getNodeFee(c *cli.Context) (*api.NodeFeeResponse, error) {
+
+	// Get services
+	if err := services.RequireRocketStorage(c); err != nil {
+		return nil, err
+	}
+	rp, err := services.GetRocketPool(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// Response
+	response := api.NodeFeeResponse{}
+
+	// Sync
+	var wg errgroup.Group
+
+	// Get data
+	wg.Go(func() error {
+		nodeFee, err := network.GetNodeFee(rp, nil)
+		if err == nil {
+			response.NodeFee = nodeFee
+		}
+		return err
+	})
+	wg.Go(func() error {
+		minNodeFee, err := protocol.GetMinimumNodeFee(rp, nil)
+		if err == nil {
+			response.MinNodeFee = minNodeFee
+		}
+		return err
+	})
+	wg.Go(func() error {
+		targetNodeFee, err := protocol.GetTargetNodeFee(rp, nil)
+		if err == nil {
+			response.TargetNodeFee = targetNodeFee
+		}
+		return err
+	})
+	wg.Go(func() error {
+		maxNodeFee, err := protocol.GetMaximumNodeFee(rp, nil)
+		if err == nil {
+			response.MaxNodeFee = maxNodeFee
+		}
+		return err
+	})
+
+	// Wait for data
+	if err := wg.Wait(); err != nil {
+		return nil, err
+	}
+
+	// Return response
+	return &response, nil
+
+}
 func TestContractCall(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 	set := flag.NewFlagSet("config-path", 0)
@@ -436,7 +519,7 @@ func setNewBondPrice(c *cli.Context) {
 
 	newBond := big.NewInt(0)
 	newBond.SetString("1000000000000000000000", 10)
-	if err := contract.Call(nil, newBond, "setSettingUint", "members.rplbond", newBond); err != nil {
+	if err := contract.Call(nil, newBond, "setSettingUint", "members.ggpbond", newBond); err != nil {
 		fmt.Errorf("Could not get bond amount: %w", err)
 	}
 
@@ -454,7 +537,7 @@ func getAndPrintBond(c *cli.Context) {
 	}
 
 	bond := new(*big.Int)
-	if err := contract.Call(nil, bond, "getRPLBond"); err != nil {
+	if err := contract.Call(nil, bond, "getGGPBond"); err != nil {
 		fmt.Errorf("Could not get bond amount: %w", err)
 	}
 

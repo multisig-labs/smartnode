@@ -17,7 +17,7 @@ type FaucetStatusResponse struct {
 	ResetsInBlocks     uint64   `json:"resetsInBlocks"`
 }
 
-type CanFaucetWithdrawRplResponse struct {
+type CanFaucetWithdrawGgpResponse struct {
 	Status                    string             `json:"status"`
 	Error                     string             `json:"error"`
 	CanWithdraw               bool               `json:"canWithdraw"`
@@ -26,7 +26,7 @@ type CanFaucetWithdrawRplResponse struct {
 	InsufficientNodeBalance   bool               `json:"insufficientNodeBalance"`
 	GasInfo                   rocketpool.GasInfo `json:"gasInfo"`
 }
-type FaucetWithdrawRplResponse struct {
+type FaucetWithdrawGgpResponse struct {
 	Status string      `json:"status"`
 	Error  string      `json:"error"`
 	Amount *big.Int    `json:"amount"`

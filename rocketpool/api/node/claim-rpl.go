@@ -12,7 +12,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/eth1"
 )
 
-func canNodeClaimRpl(c *cli.Context) (*api.CanNodeClaimRplResponse, error) {
+func canNodeClaimGgp(c *cli.Context) (*api.CanNodeClaimGgpResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeWallet(c); err != nil {
@@ -31,7 +31,7 @@ func canNodeClaimRpl(c *cli.Context) (*api.CanNodeClaimRplResponse, error) {
 	}
 
 	// Response
-	response := api.CanNodeClaimRplResponse{}
+	response := api.CanNodeClaimGgpResponse{}
 
 	// Get node account
 	nodeAccount, err := w.GetNodeAccount()
@@ -42,17 +42,17 @@ func canNodeClaimRpl(c *cli.Context) (*api.CanNodeClaimRplResponse, error) {
 	// Check for rewards
 	rewardsAmountWei, err := rewards.GetNodeClaimRewardsAmount(rp, nodeAccount.Address, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting RPL rewards amount: %w", err)
+		return nil, fmt.Errorf("Error getting GGP rewards amount: %w", err)
 	}
-	response.RplAmount = rewardsAmountWei
+	response.GgpAmount = rewardsAmountWei
 
 	// Don't claim unless the oDAO has claimed first (prevent known issue yet to be patched in smart contracts)
 	trustedNodeClaimed, err := rewards.GetTrustedNodeTotalClaimed(rp, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error checking if trusted node has already minted RPL: %w", err)
+		return nil, fmt.Errorf("Error checking if trusted node has already minted GGP: %w", err)
 	}
 	if trustedNodeClaimed.Cmp(big.NewInt(0)) == 0 {
-		response.RplAmount = big.NewInt(0)
+		response.GgpAmount = big.NewInt(0)
 	}
 
 	// Get gas estimate
@@ -62,14 +62,14 @@ func canNodeClaimRpl(c *cli.Context) (*api.CanNodeClaimRplResponse, error) {
 	}
 	gasInfo, err := rewards.EstimateClaimNodeRewardsGas(rp, opts)
 	if err != nil {
-		return nil, fmt.Errorf("Could not estimate the gas required to claim RPL: %w", err)
+		return nil, fmt.Errorf("Could not estimate the gas required to claim GGP: %w", err)
 	}
 	response.GasInfo = gasInfo
 
 	return &response, nil
 }
 
-func nodeClaimRpl(c *cli.Context) (*api.NodeClaimRplResponse, error) {
+func nodeClaimGgp(c *cli.Context) (*api.NodeClaimGgpResponse, error) {
 
 	// Get services
 	if err := services.RequireNodeWallet(c); err != nil {
@@ -88,7 +88,7 @@ func nodeClaimRpl(c *cli.Context) (*api.NodeClaimRplResponse, error) {
 	}
 
 	// Response
-	response := api.NodeClaimRplResponse{}
+	response := api.NodeClaimGgpResponse{}
 
 	// Get transactor
 	opts, err := w.GetNodeAccountTransactor()

@@ -33,34 +33,34 @@ func getStatus(c *cli.Context) (*api.AuctionStatusResponse, error) {
 	// Sync
 	var wg errgroup.Group
 
-	// Get auction contract RPL balances
+	// Get auction contract GGP balances
 	wg.Go(func() error {
-		totalRplBalance, err := auction.GetTotalRPLBalance(rp, nil)
+		totalGgpBalance, err := auction.GetTotalGGPBalance(rp, nil)
 		if err == nil {
-			response.TotalRPLBalance = totalRplBalance
+			response.TotalGGPBalance = totalGgpBalance
 		}
 		return err
 	})
 	wg.Go(func() error {
-		allottedRplBalance, err := auction.GetAllottedRPLBalance(rp, nil)
+		allottedGgpBalance, err := auction.GetAllottedGGPBalance(rp, nil)
 		if err == nil {
-			response.AllottedRPLBalance = allottedRplBalance
+			response.AllottedGGPBalance = allottedGgpBalance
 		}
 		return err
 	})
 	wg.Go(func() error {
-		remainingRplBalance, err := auction.GetRemainingRPLBalance(rp, nil)
+		remainingGgpBalance, err := auction.GetRemainingGGPBalance(rp, nil)
 		if err == nil {
-			response.RemainingRPLBalance = remainingRplBalance
+			response.RemainingGGPBalance = remainingGgpBalance
 		}
 		return err
 	})
 
 	// Check if lot can be created
 	wg.Go(func() error {
-		sufficientRemainingRplForLot, err := getSufficientRemainingRPLForLot(rp)
+		sufficientRemainingGgpForLot, err := getSufficientRemainingGGPForLot(rp)
 		if err == nil {
-			response.CanCreateLot = sufficientRemainingRplForLot
+			response.CanCreateLot = sufficientRemainingGgpForLot
 		}
 		return err
 	})
@@ -77,11 +77,11 @@ func getStatus(c *cli.Context) (*api.AuctionStatusResponse, error) {
 				if details.AddressHasBid && details.Cleared {
 					response.LotCounts.ClaimAvailable++
 				}
-				if !details.Cleared && details.HasRemainingRpl {
+				if !details.Cleared && details.HasRemainingGgp {
 					response.LotCounts.BiddingAvailable++
 				}
-				if details.Cleared && details.HasRemainingRpl && !details.RplRecovered {
-					response.LotCounts.RPLRecoveryAvailable++
+				if details.Cleared && details.HasRemainingGgp && !details.GgpRecovered {
+					response.LotCounts.GGPRecoveryAvailable++
 				}
 			}
 		}

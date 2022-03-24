@@ -13,7 +13,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/types/api"
 )
 
-func getRplPrice(c *cli.Context) (*api.RplPriceResponse, error) {
+func getGgpPrice(c *cli.Context) (*api.GgpPriceResponse, error) {
 
 	// Get services
 	if err := services.RequireRocketStorage(c); err != nil {
@@ -25,20 +25,20 @@ func getRplPrice(c *cli.Context) (*api.RplPriceResponse, error) {
 	}
 
 	// Response
-	response := api.RplPriceResponse{}
+	response := api.GgpPriceResponse{}
 
 	// Data
 	var wg errgroup.Group
-	var rplPrice *big.Int
+	var ggpPrice *big.Int
 	var minipoolUserAmount *big.Int
 	var minPerMinipoolStake float64
 	var maxPerMinipoolStake float64
 
-	// Get RPL price set block
+	// Get GGP price set block
 	wg.Go(func() error {
 		pricesBlock, err := network.GetPricesBlock(rp, nil)
 		if err == nil {
-			response.RplPriceBlock = pricesBlock
+			response.GgpPriceBlock = pricesBlock
 		}
 		return err
 	})
@@ -46,7 +46,7 @@ func getRplPrice(c *cli.Context) (*api.RplPriceResponse, error) {
 	// Get data
 	wg.Go(func() error {
 		var err error
-		rplPrice, err = network.GetRPLPrice(rp, nil)
+		ggpPrice, err = network.GetGGPPrice(rp, nil)
 		return err
 	})
 	wg.Go(func() error {
@@ -72,19 +72,19 @@ func getRplPrice(c *cli.Context) (*api.RplPriceResponse, error) {
 
 	// Calculate min & max per minipool stake amounts
 	var tmp big.Int
-	var minPerMinipoolRplStake big.Int
-	var maxPerMinipoolRplStake big.Int
+	var minPerMinipoolGgpStake big.Int
+	var maxPerMinipoolGgpStake big.Int
 	tmp.Mul(minipoolUserAmount, eth.EthToWei(minPerMinipoolStake))
-	minPerMinipoolRplStake.Quo(&tmp, rplPrice)
-	minPerMinipoolRplStake.Add(&minPerMinipoolRplStake, big.NewInt(1))
+	minPerMinipoolGgpStake.Quo(&tmp, ggpPrice)
+	minPerMinipoolGgpStake.Add(&minPerMinipoolGgpStake, big.NewInt(1))
 	tmp.Mul(minipoolUserAmount, eth.EthToWei(maxPerMinipoolStake))
-	maxPerMinipoolRplStake.Quo(&tmp, rplPrice)
-	maxPerMinipoolRplStake.Add(&maxPerMinipoolRplStake, big.NewInt(1))
+	maxPerMinipoolGgpStake.Quo(&tmp, ggpPrice)
+	maxPerMinipoolGgpStake.Add(&maxPerMinipoolGgpStake, big.NewInt(1))
 
 	// Update & return response
-	response.RplPrice = rplPrice
-	response.MinPerMinipoolRplStake = &minPerMinipoolRplStake
-	response.MaxPerMinipoolRplStake = &maxPerMinipoolRplStake
+	response.GgpPrice = ggpPrice
+	response.MinPerMinipoolGgpStake = &minPerMinipoolGgpStake
+	response.MaxPerMinipoolGgpStake = &maxPerMinipoolGgpStake
 	return &response, nil
 
 }

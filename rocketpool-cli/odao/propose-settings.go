@@ -64,7 +64,7 @@ func proposeSettingMembersQuorum(c *cli.Context, quorumPercent float64) error {
 
 }
 
-func proposeSettingMembersRplBond(c *cli.Context, bondAmountEth float64) error {
+func proposeSettingMembersGgpBond(c *cli.Context, bondAmountEth float64) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -74,7 +74,7 @@ func proposeSettingMembersRplBond(c *cli.Context, bondAmountEth float64) error {
 	defer rp.Close()
 
 	// Check if proposal can be made
-	canPropose, err := rp.CanProposeTNDAOSettingMembersRplBond(eth.EthToWei(bondAmountEth))
+	canPropose, err := rp.CanProposeTNDAOSettingMembersGgpBond(eth.EthToWei(bondAmountEth))
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func proposeSettingMembersRplBond(c *cli.Context, bondAmountEth float64) error {
 	}
 
 	// Submit proposal
-	response, err := rp.ProposeTNDAOSettingMembersRplBond(eth.EthToWei(bondAmountEth))
+	response, err := rp.ProposeTNDAOSettingMembersGgpBond(eth.EthToWei(bondAmountEth))
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func proposeSettingMembersRplBond(c *cli.Context, bondAmountEth float64) error {
 	}
 
 	// Log & return
-	fmt.Printf("Successfully submitted a members.rplbond setting update proposal with ID %d.\n", response.ProposalId)
+	fmt.Printf("Successfully submitted a members.ggpbond setting update proposal with ID %d.\n", response.ProposalId)
 	return nil
 
 }

@@ -97,38 +97,38 @@ func getStats(c *cli.Context) (*api.NetworkStatsResponse, error) {
 		return nil
 	})
 
-	// Get RPL price
+	// Get GGP price
 	wg.Go(func() error {
-		rplPrice, err := network.GetRPLPrice(rp, nil)
+		ggpPrice, err := network.GetGGPPrice(rp, nil)
 		if err == nil {
-			response.RplPrice = eth.WeiToEth(rplPrice)
+			response.GgpPrice = eth.WeiToEth(ggpPrice)
 		}
 		return err
 	})
 
-	// Get total RPL staked
+	// Get total GGP staked
 	wg.Go(func() error {
-		totalStaked, err := node.GetTotalRPLStake(rp, nil)
+		totalStaked, err := node.GetTotalGGPStake(rp, nil)
 		if err == nil {
-			response.TotalRplStaked = eth.WeiToEth(totalStaked)
+			response.TotalGgpStaked = eth.WeiToEth(totalStaked)
 		}
 		return err
 	})
 
-	// Get total effective RPL staked
+	// Get total effective GGP staked
 	wg.Go(func() error {
-		effectiveStaked, err := node.GetTotalEffectiveRPLStake(rp, nil)
+		effectiveStaked, err := node.GetTotalEffectiveGGPStake(rp, nil)
 		if err == nil {
-			response.EffectiveRplStaked = eth.WeiToEth(effectiveStaked)
+			response.EffectiveGgpStaked = eth.WeiToEth(effectiveStaked)
 		}
 		return err
 	})
 
-	// Get rETH price
+	// Get ggpAVAX price
 	wg.Go(func() error {
-		rethPrice, err := tokens.GetRETHExchangeRate(rp, nil)
+		ggpavaxPrice, err := tokens.GetGGPAVAXExchangeRate(rp, nil)
 		if err == nil {
-			response.RethPrice = rethPrice
+			response.GgpavaxPrice = ggpavaxPrice
 		}
 		return err
 	})
@@ -144,7 +144,7 @@ func getStats(c *cli.Context) (*api.NetworkStatsResponse, error) {
 		response.StakingMinipoolCount +
 		response.WithdrawableMinipoolCount +
 		response.DissolvedMinipoolCount
-	tvl := float64(activeMinipools)*32 + response.DepositPoolBalance + response.MinipoolCapacity + (response.TotalRplStaked * response.RplPrice)
+	tvl := float64(activeMinipools)*32 + response.DepositPoolBalance + response.MinipoolCapacity + (response.TotalGgpStaked * response.GgpPrice)
 	response.TotalValueLocked = tvl
 
 	// Return response

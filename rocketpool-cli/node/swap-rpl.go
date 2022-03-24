@@ -14,7 +14,7 @@ import (
 	"github.com/rocket-pool/smartnode/shared/utils/math"
 )
 
-func nodeSwapRpl(c *cli.Context) error {
+func nodeSwapGgp(c *cli.Context) error {
 
 	// Get RP client
 	rp, err := rocketpool.NewClientFromCtx(c)
@@ -27,12 +27,12 @@ func nodeSwapRpl(c *cli.Context) error {
 	var amountWei *big.Int
 	if c.String("amount") == "all" {
 
-		// Set amount to node's entire fixed-supply RPL balance
+		// Set amount to node's entire fixed-supply GGP balance
 		status, err := rp.NodeStatus()
 		if err != nil {
 			return err
 		}
-		amountWei = status.AccountBalances.FixedSupplyRPL
+		amountWei = status.AccountBalances.FixedSupplyGGP
 
 	} else if c.String("amount") != "" {
 
@@ -45,20 +45,20 @@ func nodeSwapRpl(c *cli.Context) error {
 
 	} else {
 
-		// Get entire fixed-supply RPL balance amount
+		// Get entire fixed-supply GGP balance amount
 		status, err := rp.NodeStatus()
 		if err != nil {
 			return err
 		}
-		entireAmount := status.AccountBalances.FixedSupplyRPL
+		entireAmount := status.AccountBalances.FixedSupplyGGP
 
 		// Prompt for entire amount
-		if cliutils.Confirm(fmt.Sprintf("Would you like to swap your entire old RPL balance (%.6f RPL)?", math.RoundDown(eth.WeiToEth(entireAmount), 6))) {
+		if cliutils.Confirm(fmt.Sprintf("Would you like to swap your entire old GGP balance (%.6f GGP)?", math.RoundDown(eth.WeiToEth(entireAmount), 6))) {
 			amountWei = entireAmount
 		} else {
 
 			// Prompt for custom amount
-			inputAmount := cliutils.Prompt("Please enter an amount of old RPL to swap:", "^\\d+(\\.\\d+)?$", "Invalid amount")
+			inputAmount := cliutils.Prompt("Please enter an amount of old GGP to swap:", "^\\d+(\\.\\d+)?$", "Invalid amount")
 			swapAmount, err := strconv.ParseFloat(inputAmount, 64)
 			if err != nil {
 				return fmt.Errorf("Invalid swap amount '%s': %w", inputAmount, err)
@@ -70,13 +70,13 @@ func nodeSwapRpl(c *cli.Context) error {
 	}
 
 	// Check allowance
-	allowance, err := rp.GetNodeSwapRplAllowance()
+	allowance, err := rp.GetNodeSwapGgpAllowance()
 	if err != nil {
 		return err
 	}
 
 	if allowance.Allowance.Cmp(amountWei) < 0 {
-		fmt.Println("Before swapping legacy RPL for new RPL, you must first give the new RPL contract approval to interact with your legacy RPL.")
+		fmt.Println("Before swapping legacy GGP for new GGP, you must first give the new GGP contract approval to interact with your legacy GGP.")
 		fmt.Println("This only needs to be done once for your node.")
 
 		// If a custom nonce is set, print the multi-transaction warning
@@ -90,7 +90,7 @@ func nodeSwapRpl(c *cli.Context) error {
 		maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
 
 		// Get approval gas
-		approvalGas, err := rp.NodeSwapRplApprovalGas(maxApproval)
+		approvalGas, err := rp.NodeSwapGgpApprovalGas(maxApproval)
 		if err != nil {
 			return err
 		}
@@ -101,23 +101,23 @@ func nodeSwapRpl(c *cli.Context) error {
 		}
 
 		// Prompt for confirmation
-		if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the new RPL contract interact with your legacy RPL?"))) {
+		if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the new GGP contract interact with your legacy GGP?"))) {
 			fmt.Println("Cancelled.")
 			return nil
 		}
 
-		// Approve RPL for swapping
-		response, err := rp.NodeSwapRplApprove(maxApproval)
+		// Approve GGP for swapping
+		response, err := rp.NodeSwapGgpApprove(maxApproval)
 		if err != nil {
 			return err
 		}
 		hash := response.ApproveTxHash
-		fmt.Printf("Approving legacy RPL for swapping...\n")
+		fmt.Printf("Approving legacy GGP for swapping...\n")
 		cliutils.PrintTransactionHash(rp, hash)
 		if _, err = rp.WaitForTransaction(hash); err != nil {
 			return err
 		}
-		fmt.Println("Successfully approved access to legacy RPL.")
+		fmt.Println("Successfully approved access to legacy GGP.")
 
 		// If a custom nonce is set, increment it for the next transaction
 		if c.GlobalUint64("nonce") != 0 {
@@ -125,19 +125,19 @@ func nodeSwapRpl(c *cli.Context) error {
 		}
 	}
 
-	// Check RPL can be swapped
-	canSwap, err := rp.CanNodeSwapRpl(amountWei)
+	// Check GGP can be swapped
+	canSwap, err := rp.CanNodeSwapGgp(amountWei)
 	if err != nil {
 		return err
 	}
 	if !canSwap.CanSwap {
-		fmt.Println("Cannot swap RPL:")
+		fmt.Println("Cannot swap GGP:")
 		if canSwap.InsufficientBalance {
-			fmt.Println("The node's old RPL balance is insufficient.")
+			fmt.Println("The node's old GGP balance is insufficient.")
 		}
 		return nil
 	}
-	fmt.Println("RPL Swap Gas Info:")
+	fmt.Println("GGP Swap Gas Info:")
 	// Assign max fees
 	err = gas.AssignMaxFeeAndLimit(canSwap.GasInfo, rp, c.Bool("yes"))
 	if err != nil {
@@ -145,25 +145,25 @@ func nodeSwapRpl(c *cli.Context) error {
 	}
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to swap %.6f old RPL for new RPL?", math.RoundDown(eth.WeiToEth(amountWei), 6)))) {
+	if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to swap %.6f old GGP for new GGP?", math.RoundDown(eth.WeiToEth(amountWei), 6)))) {
 		fmt.Println("Cancelled.")
 		return nil
 	}
 
-	// Swap RPL
-	swapResponse, err := rp.NodeSwapRpl(amountWei)
+	// Swap GGP
+	swapResponse, err := rp.NodeSwapGgp(amountWei)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Swapping old RPL for new RPL...\n")
+	fmt.Printf("Swapping old GGP for new GGP...\n")
 	cliutils.PrintTransactionHash(rp, swapResponse.SwapTxHash)
 	if _, err = rp.WaitForTransaction(swapResponse.SwapTxHash); err != nil {
 		return err
 	}
 
 	// Log & return
-	fmt.Printf("Successfully swapped %.6f old RPL for new RPL.\n", math.RoundDown(eth.WeiToEth(amountWei), 6))
+	fmt.Printf("Successfully swapped %.6f old GGP for new GGP.\n", math.RoundDown(eth.WeiToEth(amountWei), 6))
 	return nil
 
 }

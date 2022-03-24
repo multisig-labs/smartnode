@@ -11,13 +11,13 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 	app.Commands = append(app.Commands, cli.Command{
 		Name:    name,
 		Aliases: aliases,
-		Usage:   "Manage Rocket Pool RPL auctions",
+		Usage:   "Manage Rocket Pool GGP auctions",
 		Subcommands: []cli.Command{
 
 			{
 				Name:      "status",
 				Aliases:   []string{"s"},
-				Usage:     "Get RPL auction status",
+				Usage:     "Get GGP auction status",
 				UsageText: "rocketpool auction status",
 				Action: func(c *cli.Context) error {
 
@@ -35,7 +35,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			{
 				Name:      "lots",
 				Aliases:   []string{"l"},
-				Usage:     "Get RPL lots for auction",
+				Usage:     "Get GGP lots for auction",
 				UsageText: "rocketpool auction lots",
 				Action: func(c *cli.Context) error {
 
@@ -115,12 +115,12 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			{
 				Name:      "claim-lot",
 				Aliases:   []string{"c"},
-				Usage:     "Claim RPL from a lot",
+				Usage:     "Claim GGP from a lot",
 				UsageText: "rocketpool auction claim-lot [options]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "lot, l",
-						Usage: "The lot to claim RPL from (lot ID or 'all')",
+						Usage: "The lot to claim GGP from (lot ID or 'all')",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -146,12 +146,12 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 			{
 				Name:      "recover-lot",
 				Aliases:   []string{"r"},
-				Usage:     "Recover unclaimed RPL from a lot (returning it to the auction contract)",
+				Usage:     "Recover unclaimed GGP from a lot (returning it to the auction contract)",
 				UsageText: "rocketpool auction recover-lot [options]",
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "lot, l",
-						Usage: "The lot to recover unclaimed RPL from (lot ID or 'all')",
+						Usage: "The lot to recover unclaimed GGP from (lot ID or 'all')",
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -169,7 +169,7 @@ func RegisterCommands(app *cli.App, name string, aliases []string) {
 					}
 
 					// Run
-					return recoverRplFromLot(c)
+					return recoverGgpFromLot(c)
 
 				},
 			},

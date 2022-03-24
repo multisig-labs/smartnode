@@ -64,12 +64,12 @@ func main() {
 			Usage: "1inch exchange oracle contract `address`",
 		},
 		cli.StringFlag{
-			Name:  "rplTokenAddress, t",
-			Usage: "RPL token contract `address`",
+			Name:  "ggpTokenAddress, t",
+			Usage: "GGP token contract `address`",
 		},
 		cli.StringFlag{
-			Name:  "rplFaucetAddress, f",
-			Usage: "Rocket Pool RPL token faucet `address`",
+			Name:  "ggpFaucetAddress, f",
+			Usage: "Rocket Pool GGP token faucet `address`",
 		},
 		cli.StringFlag{
 			Name:  "password, p",

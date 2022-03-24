@@ -16,7 +16,7 @@ func getStatus(c *cli.Context) (*api.FaucetStatusResponse, error) {
 	if err := services.RequireNodeWallet(c); err != nil {
 		return nil, err
 	}
-	if err := services.RequireRplFaucet(c); err != nil {
+	if err := services.RequireGgpFaucet(c); err != nil {
 		return nil, err
 	}
 	w, err := services.GetWallet(c)
@@ -27,7 +27,7 @@ func getStatus(c *cli.Context) (*api.FaucetStatusResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	f, err := services.GetRplFaucet(c)
+	f, err := services.GetGgpFaucet(c)
 	if err != nil {
 		return nil, err
 	}

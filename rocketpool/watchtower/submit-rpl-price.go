@@ -32,8 +32,8 @@ import (
 const SubmitFollowDistancePrices = 2
 const ConfirmDistancePrices = 30
 
-// Submit RPL price task
-type submitRplPrice struct {
+// Submit GGP price task
+type submitGgpPrice struct {
 	c              *cli.Context
 	log            log.ColorLogger
 	cfg            config.RocketPoolConfig
@@ -46,8 +46,8 @@ type submitRplPrice struct {
 	gasLimit       uint64
 }
 
-// Create submit RPL price task
-func newSubmitRplPrice(c *cli.Context, logger log.ColorLogger) (*submitRplPrice, error) {
+// Create submit GGP price task
+func newSubmitGgpPrice(c *cli.Context, logger log.ColorLogger) (*submitGgpPrice, error) {
 
 	// Get services
 	cfg, err := services.GetConfig(c)
@@ -94,7 +94,7 @@ func newSubmitRplPrice(c *cli.Context, logger log.ColorLogger) (*submitRplPrice,
 	}
 
 	// Return task
-	return &submitRplPrice{
+	return &submitGgpPrice{
 		c:              c,
 		log:            logger,
 		cfg:            cfg,
@@ -109,8 +109,8 @@ func newSubmitRplPrice(c *cli.Context, logger log.ColorLogger) (*submitRplPrice,
 
 }
 
-// Submit RPL price
-func (t *submitRplPrice) run() error {
+// Submit GGP price
+func (t *submitGgpPrice) run() error {
 
 	// Wait for eth client to sync
 	if err := services.WaitEthClientSynced(t.c, true); err != nil {
@@ -151,7 +151,7 @@ func (t *submitRplPrice) run() error {
 	}
 
 	// Log
-	t.log.Println("Checking for RPL price checkpoint...")
+	t.log.Println("Checking for GGP price checkpoint...")
 
 	// Get block to submit price for
 	blockNumber, err := t.getLatestReportableBlock()
@@ -189,26 +189,26 @@ func (t *submitRplPrice) run() error {
 	}
 
 	// Log
-	t.log.Printlnf("Getting RPL price for block %d...", blockNumber)
+	t.log.Printlnf("Getting GGP price for block %d...", blockNumber)
 
-	// Get RPL price at block
-	rplPrice, err := t.getRplPrice(blockNumber)
+	// Get GGP price at block
+	ggpPrice, err := t.getGgpPrice(blockNumber)
 	if err != nil {
 		return err
 	}
 
-	// Calculate the total effective RPL stake on the network
+	// Calculate the total effective GGP stake on the network
 	zero := new(big.Int).SetUint64(0)
-	effectiveRplStake, err := node.CalculateTotalEffectiveRPLStake(t.rp, zero, zero, rplPrice, nil)
+	effectiveGgpStake, err := node.CalculateTotalEffectiveGGPStake(t.rp, zero, zero, ggpPrice, nil)
 	if err != nil {
-		return fmt.Errorf("Error getting total effective RPL stake: %w", err)
+		return fmt.Errorf("Error getting total effective GGP stake: %w", err)
 	}
 
 	// Log
-	t.log.Printlnf("RPL price: %.6f ETH", mathutils.RoundDown(eth.WeiToEth(rplPrice), 6))
+	t.log.Printlnf("GGP price: %.6f ETH", mathutils.RoundDown(eth.WeiToEth(ggpPrice), 6))
 
 	// Check if we have reported these specific values before
-	hasSubmittedSpecific, err := t.hasSubmittedSpecificBlockPrices(nodeAccount.Address, blockNumber, rplPrice, effectiveRplStake)
+	hasSubmittedSpecific, err := t.hasSubmittedSpecificBlockPrices(nodeAccount.Address, blockNumber, ggpPrice, effectiveGgpStake)
 	if err != nil {
 		return err
 	}
@@ -226,11 +226,11 @@ func (t *submitRplPrice) run() error {
 	}
 
 	// Log
-	t.log.Println("Submitting RPL price...")
+	t.log.Println("Submitting GGP price...")
 
-	// Submit RPL price
-	if err := t.submitRplPrice(blockNumber, rplPrice, effectiveRplStake); err != nil {
-		return fmt.Errorf("Could not submit RPL price: %w", err)
+	// Submit GGP price
+	if err := t.submitGgpPrice(blockNumber, ggpPrice, effectiveGgpStake); err != nil {
+		return fmt.Errorf("Could not submit GGP price: %w", err)
 	}
 
 	// Return
@@ -238,8 +238,8 @@ func (t *submitRplPrice) run() error {
 
 }
 
-// Get the latest block number to report RPL price for
-func (t *submitRplPrice) getLatestReportableBlock() (uint64, error) {
+// Get the latest block number to report GGP price for
+func (t *submitGgpPrice) getLatestReportableBlock() (uint64, error) {
 
 	// Require eth client synced
 	if err := services.RequireEthClientSynced(t.c); err != nil {
@@ -255,7 +255,7 @@ func (t *submitRplPrice) getLatestReportableBlock() (uint64, error) {
 }
 
 // Check whether prices for a block has already been submitted by the node
-func (t *submitRplPrice) hasSubmittedBlockPrices(nodeAddress common.Address, blockNumber uint64) (bool, error) {
+func (t *submitGgpPrice) hasSubmittedBlockPrices(nodeAddress common.Address, blockNumber uint64) (bool, error) {
 
 	blockNumberBuf := make([]byte, 32)
 	big.NewInt(int64(blockNumber)).FillBytes(blockNumberBuf)
@@ -264,53 +264,53 @@ func (t *submitRplPrice) hasSubmittedBlockPrices(nodeAddress common.Address, blo
 }
 
 // Check whether specific prices for a block has already been submitted by the node
-func (t *submitRplPrice) hasSubmittedSpecificBlockPrices(nodeAddress common.Address, blockNumber uint64, rplPrice, effectiveRplStake *big.Int) (bool, error) {
+func (t *submitGgpPrice) hasSubmittedSpecificBlockPrices(nodeAddress common.Address, blockNumber uint64, ggpPrice, effectiveGgpStake *big.Int) (bool, error) {
 
 	blockNumberBuf := make([]byte, 32)
 	big.NewInt(int64(blockNumber)).FillBytes(blockNumberBuf)
 
-	rplPriceBuf := make([]byte, 32)
-	rplPrice.FillBytes(rplPriceBuf)
+	ggpPriceBuf := make([]byte, 32)
+	ggpPrice.FillBytes(ggpPriceBuf)
 
-	effectiveRplStakeBuf := make([]byte, 32)
-	effectiveRplStake.FillBytes(effectiveRplStakeBuf)
+	effectiveGgpStakeBuf := make([]byte, 32)
+	effectiveGgpStake.FillBytes(effectiveGgpStakeBuf)
 
-	return t.rp.RocketStorage.GetBool(nil, crypto.Keccak256Hash([]byte("network.prices.submitted.node"), nodeAddress.Bytes(), blockNumberBuf, rplPriceBuf, effectiveRplStakeBuf))
+	return t.rp.RocketStorage.GetBool(nil, crypto.Keccak256Hash([]byte("network.prices.submitted.node"), nodeAddress.Bytes(), blockNumberBuf, ggpPriceBuf, effectiveGgpStakeBuf))
 
 }
 
-// Get RPL price at block
-func (t *submitRplPrice) getRplPrice(blockNumber uint64) (*big.Int, error) {
+// Get GGP price at block
+func (t *submitGgpPrice) getGgpPrice(blockNumber uint64) (*big.Int, error) {
 
 	// Require 1inch oracle contract
 	if err := services.RequireOneInchOracle(t.c); err != nil {
 		return nil, err
 	}
 
-	// Get RPL token address
-	rplAddress := common.HexToAddress(t.cfg.Rocketpool.RplTokenAddress)
+	// Get GGP token address
+	ggpAddress := common.HexToAddress(t.cfg.Gogopool.GgpTokenAddress)
 
 	// Initialize call options
 	opts := &bind.CallOpts{
 		BlockNumber: big.NewInt(int64(blockNumber)),
 	}
 
-	// Get RPL price
-	rplPrice, err := t.oio.GetRateToEth(opts, rplAddress, true)
+	// Get GGP price
+	ggpPrice, err := t.oio.GetRateToEth(opts, ggpAddress, true)
 	if err != nil {
-		return nil, fmt.Errorf("Could not get RPL price at block %d: %w", blockNumber, err)
+		return nil, fmt.Errorf("Could not get GGP price at block %d: %w", blockNumber, err)
 	}
 
 	// Return
-	return rplPrice, nil
+	return ggpPrice, nil
 
 }
 
-// Submit RPL price and total effective RPL stake
-func (t *submitRplPrice) submitRplPrice(blockNumber uint64, rplPrice, effectiveRplStake *big.Int) error {
+// Submit GGP price and total effective GGP stake
+func (t *submitGgpPrice) submitGgpPrice(blockNumber uint64, ggpPrice, effectiveGgpStake *big.Int) error {
 
 	// Log
-	t.log.Printlnf("Submitting RPL price for block %d...", blockNumber)
+	t.log.Printlnf("Submitting GGP price for block %d...", blockNumber)
 
 	// Get transactor
 	opts, err := t.w.GetNodeAccountTransactor()
@@ -319,9 +319,9 @@ func (t *submitRplPrice) submitRplPrice(blockNumber uint64, rplPrice, effectiveR
 	}
 
 	// Get the gas limit
-	gasInfo, err := network.EstimateSubmitPricesGas(t.rp, blockNumber, rplPrice, effectiveRplStake, opts)
+	gasInfo, err := network.EstimateSubmitPricesGas(t.rp, blockNumber, ggpPrice, effectiveGgpStake, opts)
 	if err != nil {
-		return fmt.Errorf("Could not estimate the gas required to submit RPL price: %w", err)
+		return fmt.Errorf("Could not estimate the gas required to submit GGP price: %w", err)
 	}
 	var gas *big.Int
 	if t.gasLimit != 0 {
@@ -348,8 +348,8 @@ func (t *submitRplPrice) submitRplPrice(blockNumber uint64, rplPrice, effectiveR
 	opts.GasTipCap = t.maxPriorityFee
 	opts.GasLimit = gas.Uint64()
 
-	// Submit RPL price
-	hash, err := network.SubmitPrices(t.rp, blockNumber, rplPrice, effectiveRplStake, opts)
+	// Submit GGP price
+	hash, err := network.SubmitPrices(t.rp, blockNumber, ggpPrice, effectiveGgpStake, opts)
 	if err != nil {
 		return err
 	}
@@ -361,7 +361,7 @@ func (t *submitRplPrice) submitRplPrice(blockNumber uint64, rplPrice, effectiveR
 	}
 
 	// Log
-	t.log.Printlnf("Successfully submitted RPL price for block %d.", blockNumber)
+	t.log.Printlnf("Successfully submitted GGP price for block %d.", blockNumber)
 
 	// Return
 	return nil

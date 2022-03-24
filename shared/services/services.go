@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/rocket-pool/smartnode/shared/services/beacon/avalanchego"
 	"math/big"
 	"os"
 	"sync"
@@ -14,10 +15,6 @@ import (
 	"github.com/urfave/cli"
 
 	"github.com/rocket-pool/smartnode/shared/services/beacon"
-	"github.com/rocket-pool/smartnode/shared/services/beacon/lighthouse"
-	"github.com/rocket-pool/smartnode/shared/services/beacon/nimbus"
-	"github.com/rocket-pool/smartnode/shared/services/beacon/prysm"
-	"github.com/rocket-pool/smartnode/shared/services/beacon/teku"
 	"github.com/rocket-pool/smartnode/shared/services/config"
 	"github.com/rocket-pool/smartnode/shared/services/contracts"
 	"github.com/rocket-pool/smartnode/shared/services/passwords"
@@ -39,7 +36,7 @@ var (
 	ethClientProxy  *uc.EthClientProxy
 	rocketPool      *rocketpool.RocketPool
 	oneInchOracle   *contracts.OneInchOracle
-	rplFaucet       *contracts.RPLFaucet
+	ggpFaucet       *contracts.GGPFaucet
 	beaconClient    beacon.Client
 	docker          *client.Client
 
@@ -49,7 +46,7 @@ var (
 	initEthClientProxy  sync.Once
 	initRocketPool      sync.Once
 	initOneInchOracle   sync.Once
-	initRplFaucet       sync.Once
+	initGgpFaucet       sync.Once
 	initBeaconClient    sync.Once
 	initDocker          sync.Once
 )
@@ -116,7 +113,7 @@ func GetOneInchOracle(c *cli.Context) (*contracts.OneInchOracle, error) {
 	return getOneInchOracle(cfg, ec)
 }
 
-func GetRplFaucet(c *cli.Context) (*contracts.RPLFaucet, error) {
+func GetGgpFaucet(c *cli.Context) (*contracts.GGPFaucet, error) {
 	cfg, err := getConfig(c)
 	if err != nil {
 		return nil, err
@@ -125,7 +122,7 @@ func GetRplFaucet(c *cli.Context) (*contracts.RPLFaucet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return getRplFaucet(cfg, ec)
+	return getGgpFaucet(cfg, ec)
 }
 
 func GetBeaconClient(c *cli.Context) (beacon.Client, error) {
@@ -212,7 +209,7 @@ func getEthClientProxy(cfg config.RocketPoolConfig) (*uc.EthClientProxy, error) 
 func getRocketPool(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*rocketpool.RocketPool, error) {
 	var err error
 	initRocketPool.Do(func() {
-		rocketPool, err = rocketpool.NewRocketPool(client, common.HexToAddress(cfg.Rocketpool.StorageAddress))
+		rocketPool, err = rocketpool.NewRocketPool(client, common.HexToAddress(cfg.Gogopool.StorageAddress))
 	})
 	return rocketPool, err
 }
@@ -220,31 +217,33 @@ func getRocketPool(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*roc
 func getOneInchOracle(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*contracts.OneInchOracle, error) {
 	var err error
 	initOneInchOracle.Do(func() {
-		oneInchOracle, err = contracts.NewOneInchOracle(common.HexToAddress(cfg.Rocketpool.OneInchOracleAddress), client)
+		oneInchOracle, err = contracts.NewOneInchOracle(common.HexToAddress(cfg.Gogopool.OneInchOracleAddress), client)
 	})
 	return oneInchOracle, err
 }
 
-func getRplFaucet(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*contracts.RPLFaucet, error) {
+func getGgpFaucet(cfg config.RocketPoolConfig, client *uc.EthClientProxy) (*contracts.GGPFaucet, error) {
 	var err error
-	initRplFaucet.Do(func() {
-		rplFaucet, err = contracts.NewRPLFaucet(common.HexToAddress(cfg.Rocketpool.RPLFaucetAddress), client)
+	initGgpFaucet.Do(func() {
+		ggpFaucet, err = contracts.NewGGPFaucet(common.HexToAddress(cfg.Gogopool.GGPFaucetAddress), client)
 	})
-	return rplFaucet, err
+	return ggpFaucet, err
 }
 
 func getBeaconClient(cfg config.RocketPoolConfig) (beacon.Client, error) {
 	var err error
 	initBeaconClient.Do(func() {
 		switch cfg.Chains.Platform.Client.Selected {
-		case "lighthouse":
-			beaconClient = lighthouse.NewClient(cfg.Chains.Platform.Provider)
-		case "nimbus":
-			beaconClient = nimbus.NewClient(cfg.Chains.Platform.Provider)
-		case "prysm":
-			beaconClient = prysm.NewClient(cfg.Chains.Platform.Provider)
-		case "teku":
-			beaconClient = teku.NewClient(cfg.Chains.Platform.Provider)
+		//case "lighthouse":
+		//	beaconClient = lighthouse.NewClient(cfg.Chains.Platform.Provider)
+		//case "nimbus":
+		//	beaconClient = nimbus.NewClient(cfg.Chains.Platform.Provider)
+		//case "prysm":
+		//	beaconClient = prysm.NewClient(cfg.Chains.Platform.Provider)
+		//case "teku":
+		//	beaconClient = teku.NewClient(cfg.Chains.Platform.Provider)
+		case "avalanchego":
+			beaconClient = avalanchego.NewClient(cfg.Chains.Platform.Provider)
 		default:
 			err = fmt.Errorf("Unknown Eth 2.0 client '%s' selected", cfg.Chains.Platform.Client.Selected)
 		}

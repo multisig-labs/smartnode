@@ -56,11 +56,11 @@ func canBidOnLot(c *cli.Context, lotIndex uint64, amountWei *big.Int) (*api.CanB
 		return err
 	})
 
-	// Check lot remaining RPL amount
+	// Check lot remaining GGP amount
 	wg.Go(func() error {
-		remainingRpl, err := auction.GetLotRemainingRPLAmount(rp, lotIndex, nil)
+		remainingGgp, err := auction.GetLotRemainingGGPAmount(rp, lotIndex, nil)
 		if err == nil {
-			response.RPLExhausted = (remainingRpl.Cmp(big.NewInt(0)) == 0)
+			response.GGPExhausted = (remainingGgp.Cmp(big.NewInt(0)) == 0)
 		}
 		return err
 	})
@@ -94,7 +94,7 @@ func canBidOnLot(c *cli.Context, lotIndex uint64, amountWei *big.Int) (*api.CanB
 	}
 
 	// Update & return response
-	response.CanBid = !(response.DoesNotExist || response.BiddingEnded || response.RPLExhausted || response.BidOnLotDisabled)
+	response.CanBid = !(response.DoesNotExist || response.BiddingEnded || response.GGPExhausted || response.BidOnLotDisabled)
 	return &response, nil
 
 }

@@ -1,4 +1,4 @@
-package teku
+package avalanchego
 
 import (
 	"encoding/hex"
@@ -22,20 +22,11 @@ type VoluntaryExitMessage struct {
 // Response types
 type SyncStatusResponse struct {
 	Data struct {
+		IsSyncing    bool     `json:"is_syncing"`
 		HeadSlot     uinteger `json:"head_slot"`
 		SyncDistance uinteger `json:"sync_distance"`
 	} `json:"data"`
 }
-
-type ResultResponse struct {
-	NodeID string `json:"nodeID"`
-}
-type GetNodeIdResponse struct {
-	JsonRPC string         `json:"jsonrpc"`
-	Result  ResultResponse `json:"result"`
-	Id      int            `json:"id"`
-}
-
 type Eth2ConfigResponse struct {
 	Data struct {
 		SecondsPerSlot               uinteger `json:"SECONDS_PER_SLOT"`
@@ -74,7 +65,7 @@ type ForkResponse struct {
 		PreviousVersion byteArray `json:"previous_version"`
 		CurrentVersion  byteArray `json:"current_version"`
 		Epoch           uinteger  `json:"epoch"`
-	} `json:"data"`
+	}
 }
 type BeaconBlockResponse struct {
 	Data struct {
@@ -93,9 +84,9 @@ type ValidatorsResponse struct {
 	Data []Validator `json:"data"`
 }
 type Validator struct {
-	Index     uinteger `json:"index"`
-	Balance   uinteger `json:"balance"`
-	Status    string   `json:"status"`
+	Index   uinteger `json:"index"`
+	Balance uinteger `json:"balance"`
+	//Status string                       `json:"status"`
 	Validator struct {
 		Pubkey                     byteArray `json:"pubkey"`
 		WithdrawalCredentials      byteArray `json:"withdrawal_credentials"`

@@ -128,7 +128,7 @@ func closeMinipools(c *cli.Context) error {
 				fmt.Println("The minipool is not in a closeable state.")
 			}
 			if !canResponse.InConsensus {
-				fmt.Println("The RPL price and total effective staked RPL of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
+				fmt.Println("The GGP price and total effective staked GGP of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
 			}
 			continue
 		}

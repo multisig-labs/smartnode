@@ -151,8 +151,8 @@ func nodeDeposit(c *cli.Context) error {
 		if canDeposit.InsufficientBalance {
 			fmt.Println("The node's ETH balance is insufficient.")
 		}
-		if canDeposit.InsufficientRplStake {
-			fmt.Println("The node has not staked enough RPL to collateralize a new minipool.")
+		if canDeposit.InsufficientGgpStake {
+			fmt.Println("The node has not staked enough GGP to collateralize a new minipool.")
 		}
 		if canDeposit.InvalidAmount {
 			fmt.Println("The deposit amount is invalid.")
@@ -164,7 +164,7 @@ func nodeDeposit(c *cli.Context) error {
 			fmt.Println("Node deposits are currently disabled.")
 		}
 		if !canDeposit.InConsensus {
-			fmt.Println("The RPL price and total effective staked RPL of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
+			fmt.Println("The GGP price and total effective staked GGP of the network are still being voted on by the Oracle DAO.\nPlease try again in a few minutes.")
 		}
 		return nil
 	}

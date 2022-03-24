@@ -34,17 +34,18 @@ func (c *Client) MinipoolStatus() (api.MinipoolStatusResponse, error) {
 		if mp.User.DepositBalance == nil {
 			mp.User.DepositBalance = big.NewInt(0)
 		}
+		// change to AVAX eventually
 		if mp.Balances.ETH == nil {
 			mp.Balances.ETH = big.NewInt(0)
 		}
-		if mp.Balances.RPL == nil {
-			mp.Balances.RPL = big.NewInt(0)
+		if mp.Balances.GGP == nil {
+			mp.Balances.GGP = big.NewInt(0)
 		}
-		if mp.Balances.RETH == nil {
-			mp.Balances.RETH = big.NewInt(0)
+		if mp.Balances.GGPAVAX == nil {
+			mp.Balances.GGPAVAX = big.NewInt(0)
 		}
-		if mp.Balances.FixedSupplyRPL == nil {
-			mp.Balances.FixedSupplyRPL = big.NewInt(0)
+		if mp.Balances.FixedSupplyGGP == nil {
+			mp.Balances.FixedSupplyGGP = big.NewInt(0)
 		}
 		if mp.Validator.Balance == nil {
 			mp.Validator.Balance = big.NewInt(0)

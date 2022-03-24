@@ -37,11 +37,11 @@ func canCreateLot(c *cli.Context) (*api.CanCreateLotResponse, error) {
 	// Sync
 	var wg errgroup.Group
 
-	// Check if sufficient remaining RPL is available to create a lot
+	// Check if sufficient remaining GGP is available to create a lot
 	wg.Go(func() error {
-		sufficientRemainingRplForLot, err := getSufficientRemainingRPLForLot(rp)
+		sufficientRemainingGgpForLot, err := getSufficientRemainingGGPForLot(rp)
 		if err == nil {
-			response.InsufficientBalance = !sufficientRemainingRplForLot
+			response.InsufficientBalance = !sufficientRemainingGgpForLot
 		}
 		return err
 	})

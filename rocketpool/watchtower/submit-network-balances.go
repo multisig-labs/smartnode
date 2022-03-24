@@ -58,8 +58,8 @@ type networkBalances struct {
 	DepositPool      *big.Int
 	MinipoolsTotal   *big.Int
 	MinipoolsStaking *big.Int
-	RETHContract     *big.Int
-	RETHSupply       *big.Int
+	GGPAVAXContract  *big.Int
+	GGPAVAXSupply    *big.Int
 }
 type minipoolBalanceDetails struct {
 	IsStaking   bool
@@ -224,8 +224,8 @@ func (t *submitNetworkBalances) run() error {
 	t.log.Printlnf("Deposit pool balance: %.6f ETH", math.RoundDown(eth.WeiToEth(balances.DepositPool), 6))
 	t.log.Printlnf("Total minipool user balance: %.6f ETH", math.RoundDown(eth.WeiToEth(balances.MinipoolsTotal), 6))
 	t.log.Printlnf("Staking minipool user balance: %.6f ETH", math.RoundDown(eth.WeiToEth(balances.MinipoolsStaking), 6))
-	t.log.Printlnf("rETH contract balance: %.6f ETH", math.RoundDown(eth.WeiToEth(balances.RETHContract), 6))
-	t.log.Printlnf("rETH token supply: %.6f rETH", math.RoundDown(eth.WeiToEth(balances.RETHSupply), 6))
+	t.log.Printlnf("ggpAVAX contract balance: %.6f ETH", math.RoundDown(eth.WeiToEth(balances.GGPAVAXContract), 6))
+	t.log.Printlnf("ggpAVAX token supply: %.6f ggpAVAX", math.RoundDown(eth.WeiToEth(balances.GGPAVAXSupply), 6))
 
 	// Check if we have reported these specific values before
 	hasSubmittedSpecific, err := t.hasSubmittedSpecificBlockBalances(nodeAccount.Address, blockNumber, balances)
@@ -290,7 +290,7 @@ func (t *submitNetworkBalances) hasSubmittedSpecificBlockBalances(nodeAddress co
 	totalEth := big.NewInt(0)
 	totalEth.Add(totalEth, balances.DepositPool)
 	totalEth.Add(totalEth, balances.MinipoolsTotal)
-	totalEth.Add(totalEth, balances.RETHContract)
+	totalEth.Add(totalEth, balances.GGPAVAXContract)
 
 	blockNumberBuf := make([]byte, 32)
 	big.NewInt(int64(blockNumber)).FillBytes(blockNumberBuf)
@@ -301,10 +301,10 @@ func (t *submitNetworkBalances) hasSubmittedSpecificBlockBalances(nodeAddress co
 	stakingBuf := make([]byte, 32)
 	balances.MinipoolsStaking.FillBytes(stakingBuf)
 
-	rethSupplyBuf := make([]byte, 32)
-	balances.RETHSupply.FillBytes(rethSupplyBuf)
+	ggpavaxSupplyBuf := make([]byte, 32)
+	balances.GGPAVAXSupply.FillBytes(ggpavaxSupplyBuf)
 
-	return t.rp.RocketStorage.GetBool(nil, crypto.Keccak256Hash([]byte("network.balances.submitted.node"), nodeAddress.Bytes(), blockNumberBuf, totalEthBuf, stakingBuf, rethSupplyBuf))
+	return t.rp.RocketStorage.GetBool(nil, crypto.Keccak256Hash([]byte("network.balances.submitted.node"), nodeAddress.Bytes(), blockNumberBuf, totalEthBuf, stakingBuf, ggpavaxSupplyBuf))
 
 }
 
@@ -320,8 +320,8 @@ func (t *submitNetworkBalances) getNetworkBalances(blockNumber uint64) (networkB
 	var wg errgroup.Group
 	var depositPoolBalance *big.Int
 	var minipoolBalanceDetails []minipoolBalanceDetails
-	var rethContractBalance *big.Int
-	var rethTotalSupply *big.Int
+	var ggpavaxContractBalance *big.Int
+	var ggpavaxTotalSupply *big.Int
 
 	// Get deposit pool balance
 	wg.Go(func() error {
@@ -337,20 +337,20 @@ func (t *submitNetworkBalances) getNetworkBalances(blockNumber uint64) (networkB
 		return err
 	})
 
-	// Get rETH contract balance
+	// Get ggpAVAX contract balance
 	wg.Go(func() error {
-		rethContractAddress, err := t.rp.GetAddress("rocketTokenRETH")
+		ggpavaxContractAddress, err := t.rp.GetAddress("gogoTokenGGPAVAX")
 		if err != nil {
 			return err
 		}
-		rethContractBalance, err = t.ec.BalanceAt(context.Background(), *rethContractAddress, opts.BlockNumber)
+		ggpavaxContractBalance, err = t.ec.BalanceAt(context.Background(), *ggpavaxContractAddress, opts.BlockNumber)
 		return err
 	})
 
-	// Get rETH token supply
+	// Get ggpAVAX token supply
 	wg.Go(func() error {
 		var err error
-		rethTotalSupply, err = tokens.GetRETHTotalSupply(t.rp, opts)
+		ggpavaxTotalSupply, err = tokens.GetGGPAVAXTotalSupply(t.rp, opts)
 		return err
 	})
 
@@ -365,8 +365,8 @@ func (t *submitNetworkBalances) getNetworkBalances(blockNumber uint64) (networkB
 		DepositPool:      depositPoolBalance,
 		MinipoolsTotal:   big.NewInt(0),
 		MinipoolsStaking: big.NewInt(0),
-		RETHContract:     rethContractBalance,
-		RETHSupply:       rethTotalSupply,
+		GGPAVAXContract:  ggpavaxContractBalance,
+		GGPAVAXSupply:    ggpavaxTotalSupply,
 	}
 
 	// Add minipool balances
@@ -593,7 +593,7 @@ func (t *submitNetworkBalances) submitBalances(balances networkBalances) error {
 	totalEth := big.NewInt(0)
 	totalEth.Add(totalEth, balances.DepositPool)
 	totalEth.Add(totalEth, balances.MinipoolsTotal)
-	totalEth.Add(totalEth, balances.RETHContract)
+	totalEth.Add(totalEth, balances.GGPAVAXContract)
 
 	// Get transactor
 	opts, err := t.w.GetNodeAccountTransactor()
@@ -602,7 +602,7 @@ func (t *submitNetworkBalances) submitBalances(balances networkBalances) error {
 	}
 
 	// Get the gas limit
-	gasInfo, err := network.EstimateSubmitBalancesGas(t.rp, balances.Block, totalEth, balances.MinipoolsStaking, balances.RETHSupply, opts)
+	gasInfo, err := network.EstimateSubmitBalancesGas(t.rp, balances.Block, totalEth, balances.MinipoolsStaking, balances.GGPAVAXSupply, opts)
 	if err != nil {
 		return fmt.Errorf("Could not estimate the gas required to submit network balances: %w", err)
 	}
@@ -632,7 +632,7 @@ func (t *submitNetworkBalances) submitBalances(balances networkBalances) error {
 	opts.GasLimit = gas.Uint64()
 
 	// Submit balances
-	hash, err := network.SubmitBalances(t.rp, balances.Block, totalEth, balances.MinipoolsStaking, balances.RETHSupply, opts)
+	hash, err := network.SubmitBalances(t.rp, balances.Block, totalEth, balances.MinipoolsStaking, balances.GGPAVAXSupply, opts)
 	if err != nil {
 		return err
 	}

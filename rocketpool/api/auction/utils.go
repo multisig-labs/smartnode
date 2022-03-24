@@ -23,8 +23,8 @@ const LotDetailsBatchSize = 10
 type lotCountDetails struct {
 	AddressHasBid   bool
 	Cleared         bool
-	HasRemainingRpl bool
-	RplRecovered    bool
+	HasRemainingGgp bool
+	GgpRecovered    bool
 }
 
 // Check if bidding has ended for a lot
@@ -61,19 +61,19 @@ func getLotBiddingEnded(rp *rocketpool.RocketPool, lotIndex uint64) (bool, error
 
 }
 
-// Check whether sufficient remaining RPL is available to create a lot
-func getSufficientRemainingRPLForLot(rp *rocketpool.RocketPool) (bool, error) {
+// Check whether sufficient remaining GGP is available to create a lot
+func getSufficientRemainingGGPForLot(rp *rocketpool.RocketPool) (bool, error) {
 
 	// Data
 	var wg errgroup.Group
-	var remainingRplBalance *big.Int
+	var remainingGgpBalance *big.Int
 	var lotMinimumEthValue *big.Int
-	var rplPrice *big.Int
+	var ggpPrice *big.Int
 
 	// Get data
 	wg.Go(func() error {
 		var err error
-		remainingRplBalance, err = auction.GetRemainingRPLBalance(rp, nil)
+		remainingGgpBalance, err = auction.GetRemainingGGPBalance(rp, nil)
 		return err
 	})
 	wg.Go(func() error {
@@ -83,7 +83,7 @@ func getSufficientRemainingRPLForLot(rp *rocketpool.RocketPool) (bool, error) {
 	})
 	wg.Go(func() error {
 		var err error
-		rplPrice, err = network.GetRPLPrice(rp, nil)
+		ggpPrice, err = network.GetGGPPrice(rp, nil)
 		return err
 	})
 
@@ -92,14 +92,14 @@ func getSufficientRemainingRPLForLot(rp *rocketpool.RocketPool) (bool, error) {
 		return false, err
 	}
 
-	// Calculate lot minimum RPL amount
+	// Calculate lot minimum GGP amount
 	var tmp big.Int
-	var lotMinimumRplAmount big.Int
+	var lotMinimumGgpAmount big.Int
 	tmp.Mul(lotMinimumEthValue, eth.EthToWei(1))
-	lotMinimumRplAmount.Quo(&tmp, rplPrice)
+	lotMinimumGgpAmount.Quo(&tmp, ggpPrice)
 
 	// Return
-	return (remainingRplBalance.Cmp(&lotMinimumRplAmount) >= 0), nil
+	return (remainingGgpBalance.Cmp(&lotMinimumGgpAmount) >= 0), nil
 
 }
 
@@ -153,8 +153,8 @@ func getLotCountDetails(rp *rocketpool.RocketPool, bidderAddress common.Address,
 	var wg errgroup.Group
 	var addressBidAmount *big.Int
 	var cleared bool
-	var remainingRpl *big.Int
-	var rplRecovered bool
+	var remainingGgp *big.Int
+	var ggpRecovered bool
 
 	// Get address bid amount
 	wg.Go(func() error {
@@ -170,17 +170,17 @@ func getLotCountDetails(rp *rocketpool.RocketPool, bidderAddress common.Address,
 		return err
 	})
 
-	// Get lot remaining RPL amount
+	// Get lot remaining GGP amount
 	wg.Go(func() error {
 		var err error
-		remainingRpl, err = auction.GetLotRemainingRPLAmount(rp, lotIndex, nil)
+		remainingGgp, err = auction.GetLotRemainingGGPAmount(rp, lotIndex, nil)
 		return err
 	})
 
-	// Get lot RPL recovered status
+	// Get lot GGP recovered status
 	wg.Go(func() error {
 		var err error
-		rplRecovered, err = auction.GetLotRPLRecovered(rp, lotIndex, nil)
+		ggpRecovered, err = auction.GetLotGGPRecovered(rp, lotIndex, nil)
 		return err
 	})
 
@@ -193,8 +193,8 @@ func getLotCountDetails(rp *rocketpool.RocketPool, bidderAddress common.Address,
 	return lotCountDetails{
 		AddressHasBid:   (addressBidAmount.Cmp(big.NewInt(0)) > 0),
 		Cleared:         cleared,
-		HasRemainingRpl: (remainingRpl.Cmp(big.NewInt(0)) > 0),
-		RplRecovered:    rplRecovered,
+		HasRemainingGgp: (remainingGgp.Cmp(big.NewInt(0)) > 0),
+		GgpRecovered:    ggpRecovered,
 	}, nil
 
 }
@@ -253,14 +253,14 @@ func getLotDetails(rp *rocketpool.RocketPool, bidderAddress common.Address, lotI
 
 	// Check lot conditions
 	addressHasBid := (details.AddressBidAmount.Cmp(big.NewInt(0)) > 0)
-	hasRemainingRpl := (details.RemainingRPLAmount.Cmp(big.NewInt(0)) > 0)
+	hasRemainingGgp := (details.RemainingGGPAmount.Cmp(big.NewInt(0)) > 0)
 
 	// Return
 	return api.LotDetails{
 		Details:              details,
 		ClaimAvailable:       (addressHasBid && details.Cleared),
-		BiddingAvailable:     (!details.Cleared && hasRemainingRpl),
-		RPLRecoveryAvailable: (details.Cleared && hasRemainingRpl && !details.RPLRecovered),
+		BiddingAvailable:     (!details.Cleared && hasRemainingGgp),
+		GGPRecoveryAvailable: (details.Cleared && hasRemainingGgp && !details.GGPRecovered),
 	}, nil
 
 }

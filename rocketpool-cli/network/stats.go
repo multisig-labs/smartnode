@@ -47,10 +47,10 @@ func getStats(c *cli.Context) error {
 	fmt.Printf("Inactive Minipools:      %d\n\n", response.FinalizedMinipoolCount)
 
 	fmt.Println("============== Tokens =============")
-	fmt.Printf("rETH Price (ETH / rETH): %f ETH\n", response.RethPrice)
-	fmt.Printf("RPL Price (ETH / RPL):   %f ETH\n", response.RplPrice)
-	fmt.Printf("Total RPL staked:        %f RPL\n", response.TotalRplStaked)
-	fmt.Printf("Effective RPL staked:    %f RPL\n", response.EffectiveRplStaked)
+	fmt.Printf("ggpAVAX Price (ETH / ggpAVAX): %f ETH\n", response.GgpavaxPrice)
+	fmt.Printf("GGP Price (ETH / GGP):   %f ETH\n", response.GgpPrice)
+	fmt.Printf("Total GGP staked:        %f GGP\n", response.TotalGgpStaked)
+	fmt.Printf("Effective GGP staked:    %f GGP\n", response.EffectiveGgpStaked)
 
 	return nil
 

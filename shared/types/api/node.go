@@ -22,10 +22,10 @@ type NodeStatusResponse struct {
 	TimezoneLocation         string          `json:"timezoneLocation"`
 	AccountBalances          tokens.Balances `json:"accountBalances"`
 	WithdrawalBalances       tokens.Balances `json:"withdrawalBalances"`
-	RplStake                 *big.Int        `json:"rplStake"`
-	EffectiveRplStake        *big.Int        `json:"effectiveRplStake"`
-	MinimumRplStake          *big.Int        `json:"minimumRplStake"`
-	MaximumRplStake          *big.Int        `json:"maximumRplStake"`
+	GgpStake                 *big.Int        `json:"ggpStake"`
+	EffectiveGgpStake        *big.Int        `json:"effectiveGgpStake"`
+	MinimumGgpStake          *big.Int        `json:"minimumGgpStake"`
+	MaximumGgpStake          *big.Int        `json:"maximumGgpStake"`
 	CollateralRatio          float64         `json:"collateralRatio"`
 	MinipoolLimit            uint64          `json:"minipoolLimit"`
 	MinipoolCounts           struct {
@@ -104,35 +104,35 @@ type SetNodeTimezoneResponse struct {
 	TxHash common.Hash `json:"txHash"`
 }
 
-type CanNodeSwapRplResponse struct {
+type CanNodeSwapGgpResponse struct {
 	Status              string             `json:"status"`
 	Error               string             `json:"error"`
 	CanSwap             bool               `json:"canSwap"`
 	InsufficientBalance bool               `json:"insufficientBalance"`
 	GasInfo             rocketpool.GasInfo `json:"GasInfo"`
 }
-type NodeSwapRplApproveGasResponse struct {
+type NodeSwapGgpApproveGasResponse struct {
 	Status  string             `json:"status"`
 	Error   string             `json:"error"`
 	GasInfo rocketpool.GasInfo `json:"gasInfo"`
 }
-type NodeSwapRplApproveResponse struct {
+type NodeSwapGgpApproveResponse struct {
 	Status        string      `json:"status"`
 	Error         string      `json:"error"`
 	ApproveTxHash common.Hash `json:"approveTxHash"`
 }
-type NodeSwapRplSwapResponse struct {
+type NodeSwapGgpSwapResponse struct {
 	Status     string      `json:"status"`
 	Error      string      `json:"error"`
 	SwapTxHash common.Hash `json:"swapTxHash"`
 }
-type NodeSwapRplAllowanceResponse struct {
+type NodeSwapGgpAllowanceResponse struct {
 	Status    string   `json:"status"`
 	Error     string   `json:"error"`
 	Allowance *big.Int `json:"allowance"`
 }
 
-type CanNodeStakeRplResponse struct {
+type CanNodeStakeGgpResponse struct {
 	Status              string             `json:"status"`
 	Error               string             `json:"error"`
 	CanStake            bool               `json:"canStake"`
@@ -140,28 +140,28 @@ type CanNodeStakeRplResponse struct {
 	InConsensus         bool               `json:"inConsensus"`
 	GasInfo             rocketpool.GasInfo `json:"gasInfo"`
 }
-type NodeStakeRplApproveGasResponse struct {
+type NodeStakeGgpApproveGasResponse struct {
 	Status  string             `json:"status"`
 	Error   string             `json:"error"`
 	GasInfo rocketpool.GasInfo `json:"gasInfo"`
 }
-type NodeStakeRplApproveResponse struct {
+type NodeStakeGgpApproveResponse struct {
 	Status        string      `json:"status"`
 	Error         string      `json:"error"`
 	ApproveTxHash common.Hash `json:"approveTxHash"`
 }
-type NodeStakeRplStakeResponse struct {
+type NodeStakeGgpStakeResponse struct {
 	Status      string      `json:"status"`
 	Error       string      `json:"error"`
 	StakeTxHash common.Hash `json:"stakeTxHash"`
 }
-type NodeStakeRplAllowanceResponse struct {
+type NodeStakeGgpAllowanceResponse struct {
 	Status    string   `json:"status"`
 	Error     string   `json:"error"`
 	Allowance *big.Int `json:"allowance"`
 }
 
-type CanNodeWithdrawRplResponse struct {
+type CanNodeWithdrawGgpResponse struct {
 	Status                       string             `json:"status"`
 	Error                        string             `json:"error"`
 	CanWithdraw                  bool               `json:"canWithdraw"`
@@ -171,7 +171,7 @@ type CanNodeWithdrawRplResponse struct {
 	InConsensus                  bool               `json:"inConsensus"`
 	GasInfo                      rocketpool.GasInfo `json:"gasInfo"`
 }
-type NodeWithdrawRplResponse struct {
+type NodeWithdrawGgpResponse struct {
 	Status string      `json:"status"`
 	Error  string      `json:"error"`
 	TxHash common.Hash `json:"txHash"`
@@ -182,7 +182,7 @@ type CanNodeDepositResponse struct {
 	Error                  string             `json:"error"`
 	CanDeposit             bool               `json:"canDeposit"`
 	InsufficientBalance    bool               `json:"insufficientBalance"`
-	InsufficientRplStake   bool               `json:"insufficientRplStake"`
+	InsufficientGgpStake   bool               `json:"insufficientGgpStake"`
 	InvalidAmount          bool               `json:"invalidAmount"`
 	UnbondedMinipoolsAtMax bool               `json:"unbondedMinipoolsAtMax"`
 	DepositDisabled        bool               `json:"depositDisabled"`
@@ -236,13 +236,13 @@ type NodeSyncProgressResponse struct {
 	Eth1LatestBlockTime uint64  `json:"eth1LatestBlockTime"`
 }
 
-type CanNodeClaimRplResponse struct {
+type CanNodeClaimGgpResponse struct {
 	Status    string             `json:"status"`
 	Error     string             `json:"error"`
-	RplAmount *big.Int           `json:"rplAmount"`
+	GgpAmount *big.Int           `json:"ggpAmount"`
 	GasInfo   rocketpool.GasInfo `json:"gasInfo"`
 }
-type NodeClaimRplResponse struct {
+type NodeClaimGgpResponse struct {
 	Status string      `json:"status"`
 	Error  string      `json:"error"`
 	TxHash common.Hash `json:"txHash"`
@@ -257,9 +257,9 @@ type NodeRewardsResponse struct {
 	LastCheckpoint              time.Time     `json:"lastCheckpoint"`
 	Trusted                     bool          `json:"trusted"`
 	Registered                  bool          `json:"registered"`
-	EffectiveRplStake           float64       `json:"effectiveRplStake"`
-	TotalRplStake               float64       `json:"totalRplStake"`
-	TrustedRplBond              float64       `json:"trustedRplBond"`
+	EffectiveGgpStake           float64       `json:"effectiveGgpStake"`
+	TotalGgpStake               float64       `json:"totalGgpStake"`
+	TrustedGgpBond              float64       `json:"trustedGgpBond"`
 	EstimatedRewards            float64       `json:"estimatedRewards"`
 	CumulativeRewards           float64       `json:"cumulativeRewards"`
 	EstimatedTrustedRewards     float64       `json:"estimatedTrustedRewards"`

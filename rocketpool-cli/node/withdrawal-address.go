@@ -27,7 +27,7 @@ func setWithdrawalAddress(c *cli.Context, withdrawalAddress common.Address) erro
 	colorRed := "\033[31m"
 	colorYellow := "\033[33m"
 	var confirm bool
-	fmt.Println("You are about to change your withdrawal address. All future ETH & RPL rewards/refunds will be sent here.")
+	fmt.Println("You are about to change your withdrawal address. All future ETH & GGP rewards/refunds will be sent here.")
 	if !c.Bool("force") {
 		confirm = false
 		fmt.Println("By default, this will put your new withdrawal address into a \"pending\" state.")

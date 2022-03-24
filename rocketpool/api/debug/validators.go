@@ -30,7 +30,7 @@ func ExportValidators(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	rpl, err := services.GetRocketPool(c)
+	ggp, err := services.GetRocketPool(c)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func ExportValidators(c *cli.Context) error {
 	// Get minipool addresses
 	wg1.Go(func() error {
 		var err error
-		addresses, err = minipool.GetMinipoolAddresses(rpl, opts)
+		addresses, err = minipool.GetMinipoolAddresses(ggp, opts)
 		return err
 	})
 
@@ -88,7 +88,7 @@ func ExportValidators(c *cli.Context) error {
 	}
 
 	// Get minipool validator statuses
-	validators, err := rp.GetMinipoolValidators(rpl, bc, addresses, opts, &beacon.ValidatorStatusOptions{Epoch: blockEpoch})
+	validators, err := rp.GetMinipoolValidators(ggp, bc, addresses, opts, &beacon.ValidatorStatusOptions{Epoch: blockEpoch})
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func ExportValidators(c *cli.Context) error {
 			wg.Go(func() error {
 				address := addresses[mi]
 				validator := validators[address]
-				err := getMinipoolBalanceDetails(rpl, address, opts, validator, eth2Config, blockEpoch)
+				err := getMinipoolBalanceDetails(ggp, address, opts, validator, eth2Config, blockEpoch)
 				return err
 			})
 		}

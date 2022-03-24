@@ -435,7 +435,7 @@ func pruneExecutionClient(c *cli.Context) error {
 		fmt.Printf("If you are using Infura's free tier, you may hit its rate limit if pruning takes a long time.\n")
 		fmt.Printf("If this happens, you should temporarily disable the `%s` container until pruning is complete. This will:\n", prefix+NodeContainerSuffix)
 		fmt.Println("\t- Stop collecting Rocket Pool's network metrics in the Grafana dashboard")
-		fmt.Println("\t- Stop automatic operations (claiming RPL rewards and staking new minipools)\n")
+		fmt.Println("\t- Stop automatic operations (claiming GGP rewards and staking new minipools)\n")
 		fmt.Printf("To disable the container, run: `docker stop %s`\n", prefix+NodeContainerSuffix)
 		fmt.Printf("To re-enable the container one pruning is complete, run: `docker start %s`%s\n\n", prefix+NodeContainerSuffix, colorReset)
 	}
@@ -698,7 +698,7 @@ func resyncEth1(c *cli.Context) error {
 		fmt.Printf("If you are using Infura's free tier, you will very likely hit its rate limit while resyncing.\n")
 		fmt.Printf("You should temporarily disable the `%s` container until resyncing is complete. This will:\n", prefix+NodeContainerSuffix)
 		fmt.Println("\t- Stop collecting Rocket Pool's network metrics in the Grafana dashboard")
-		fmt.Println("\t- Stop automatic operations (claiming RPL rewards and staking new minipools)\n")
+		fmt.Println("\t- Stop automatic operations (claiming GGP rewards and staking new minipools)\n")
 		fmt.Printf("To disable the container, run: `docker stop %s`\n", prefix+NodeContainerSuffix)
 		fmt.Printf("To re-enable the container one resyncing is complete, run: `docker start %s`%s\n\n", prefix+NodeContainerSuffix, colorReset)
 	}

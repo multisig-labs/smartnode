@@ -33,20 +33,20 @@ func join(c *cli.Context) error {
 		cliutils.PrintMultiTransactionNonceWarning()
 	}
 
-	// Check for fixed-supply RPL balance
-	if status.AccountBalances.FixedSupplyRPL.Cmp(big.NewInt(0)) > 0 {
+	// Check for fixed-supply GGP balance
+	if status.AccountBalances.FixedSupplyGGP.Cmp(big.NewInt(0)) > 0 {
 
-		// Confirm swapping RPL
-		if c.Bool("swap") || cliutils.Confirm(fmt.Sprintf("The node has a balance of %.6f old RPL. Would you like to swap it for new RPL before transferring your bond?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6))) {
+		// Confirm swapping GGP
+		if c.Bool("swap") || cliutils.Confirm(fmt.Sprintf("The node has a balance of %.6f old GGP. Would you like to swap it for new GGP before transferring your bond?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6))) {
 
 			// Check allowance
-			allowance, err := rp.GetNodeSwapRplAllowance()
+			allowance, err := rp.GetNodeSwapGgpAllowance()
 			if err != nil {
 				return err
 			}
 
-			if allowance.Allowance.Cmp(status.AccountBalances.FixedSupplyRPL) < 0 {
-				fmt.Println("Before swapping legacy RPL for new RPL, you must first give the new RPL contract approval to interact with your legacy RPL.")
+			if allowance.Allowance.Cmp(status.AccountBalances.FixedSupplyGGP) < 0 {
+				fmt.Println("Before swapping legacy GGP for new GGP, you must first give the new GGP contract approval to interact with your legacy GGP.")
 				fmt.Println("This only needs to be done once for your node.")
 
 				// If a custom nonce is set, print the multi-transaction warning
@@ -60,7 +60,7 @@ func join(c *cli.Context) error {
 				maxApproval = maxApproval.Sub(maxApproval, big.NewInt(1))
 
 				// Get approval gas
-				approvalGas, err := rp.NodeSwapRplApprovalGas(maxApproval)
+				approvalGas, err := rp.NodeSwapGgpApprovalGas(maxApproval)
 				if err != nil {
 					return err
 				}
@@ -71,23 +71,23 @@ func join(c *cli.Context) error {
 				}
 
 				// Prompt for confirmation
-				if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the new RPL contract interact with your legacy RPL?"))) {
+				if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Do you want to let the new GGP contract interact with your legacy GGP?"))) {
 					fmt.Println("Cancelled.")
 					return nil
 				}
 
-				// Approve RPL for swapping
-				response, err := rp.NodeSwapRplApprove(maxApproval)
+				// Approve GGP for swapping
+				response, err := rp.NodeSwapGgpApprove(maxApproval)
 				if err != nil {
 					return err
 				}
 				hash := response.ApproveTxHash
-				fmt.Printf("Approving legacy RPL for swapping...\n")
+				fmt.Printf("Approving legacy GGP for swapping...\n")
 				cliutils.PrintTransactionHash(rp, hash)
 				if _, err = rp.WaitForTransaction(hash); err != nil {
 					return err
 				}
-				fmt.Println("Successfully approved access to legacy RPL.")
+				fmt.Println("Successfully approved access to legacy GGP.")
 
 				// If a custom nonce is set, increment it for the next transaction
 				if c.GlobalUint64("nonce") != 0 {
@@ -95,19 +95,19 @@ func join(c *cli.Context) error {
 				}
 			}
 
-			// Check RPL can be swapped
-			canSwap, err := rp.CanNodeSwapRpl(status.AccountBalances.FixedSupplyRPL)
+			// Check GGP can be swapped
+			canSwap, err := rp.CanNodeSwapGgp(status.AccountBalances.FixedSupplyGGP)
 			if err != nil {
 				return err
 			}
 			if !canSwap.CanSwap {
-				fmt.Println("Cannot swap RPL:")
+				fmt.Println("Cannot swap GGP:")
 				if canSwap.InsufficientBalance {
-					fmt.Println("The node's old RPL balance is insufficient.")
+					fmt.Println("The node's old GGP balance is insufficient.")
 				}
 				return nil
 			}
-			fmt.Println("RPL Swap Gas Info:")
+			fmt.Println("GGP Swap Gas Info:")
 			// Assign max fees
 			err = gas.AssignMaxFeeAndLimit(canSwap.GasInfo, rp, c.Bool("yes"))
 			if err != nil {
@@ -115,25 +115,25 @@ func join(c *cli.Context) error {
 			}
 
 			// Prompt for confirmation
-			if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to swap %.6f old RPL for new RPL?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6)))) {
+			if !(c.Bool("yes") || cliutils.Confirm(fmt.Sprintf("Are you sure you want to swap %.6f old GGP for new GGP?", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6)))) {
 				fmt.Println("Cancelled.")
 				return nil
 			}
 
-			// Swap RPL
-			swapResponse, err := rp.NodeSwapRpl(status.AccountBalances.FixedSupplyRPL)
+			// Swap GGP
+			swapResponse, err := rp.NodeSwapGgp(status.AccountBalances.FixedSupplyGGP)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("Swapping old RPL for new RPL...\n")
+			fmt.Printf("Swapping old GGP for new GGP...\n")
 			cliutils.PrintTransactionHash(rp, swapResponse.SwapTxHash)
 			if _, err = rp.WaitForTransaction(swapResponse.SwapTxHash); err != nil {
 				return err
 			}
 
 			// Log
-			fmt.Printf("Successfully swapped %.6f old RPL for new RPL.\n", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyRPL), 6))
+			fmt.Printf("Successfully swapped %.6f old GGP for new GGP.\n", math.RoundDown(eth.WeiToEth(status.AccountBalances.FixedSupplyGGP), 6))
 			fmt.Println("")
 
 			// If a custom nonce is set, increment it for the next transaction
@@ -156,8 +156,8 @@ func join(c *cli.Context) error {
 		if canJoin.AlreadyMember {
 			fmt.Println("The node is already a member of the oracle DAO.")
 		}
-		if canJoin.InsufficientRplBalance {
-			fmt.Println("The node does not have enough RPL to pay the RPL bond.")
+		if canJoin.InsufficientGgpBalance {
+			fmt.Println("The node does not have enough GGP to pay the GGP bond.")
 		}
 		return nil
 	}
@@ -171,18 +171,18 @@ func join(c *cli.Context) error {
 	rp.PrintMultiTxWarning()
 
 	// Prompt for confirmation
-	if !(c.Bool("yes") || cliutils.Confirm("Are you sure you want to join the oracle DAO? Your RPL bond will be locked until you leave.")) {
+	if !(c.Bool("yes") || cliutils.Confirm("Are you sure you want to join the oracle DAO? Your GGP bond will be locked until you leave.")) {
 		fmt.Println("Cancelled.")
 		return nil
 	}
 
-	// Approve RPL for joining the ODAO
-	response, err := rp.ApproveRPLToJoinTNDAO()
+	// Approve GGP for joining the ODAO
+	response, err := rp.ApproveGGPToJoinTNDAO()
 	if err != nil {
 		return err
 	}
 	hash := response.ApproveTxHash
-	fmt.Printf("Approving RPL for joining the Oracle DAO...\n")
+	fmt.Printf("Approving GGP for joining the Oracle DAO...\n")
 	cliutils.PrintTransactionHashNoCancel(rp, hash)
 
 	// If a custom nonce is set, increment it for the next transaction

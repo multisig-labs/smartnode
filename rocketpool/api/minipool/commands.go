@@ -278,7 +278,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			{
 				Name:      "finalize",
 				Aliases:   []string{"f"},
-				Usage:     "Finalize a minipool after it has been withdrawn from, unlocking its RPL stake",
+				Usage:     "Finalize a minipool after it has been withdrawn from, unlocking its GGP stake",
 				UsageText: "rocketpool api minipool finalize minipool-address",
 				Action: func(c *cli.Context) error {
 

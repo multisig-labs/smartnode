@@ -204,13 +204,13 @@ func (t *submitScrubMinipools) run() error {
 		t.printFinalTally()
 		return nil
 	}
-
-	// Get various elements needed to do eth1 prestake and deposit contract searches
-	err = t.getEth1SearchArtifacts()
-	if err != nil {
-		return err
-	}
-
+	/*
+		// Get various elements needed to do eth1 prestake and deposit contract searches
+		err = t.getEth1SearchArtifacts()
+		if err != nil {
+			return err
+		}
+	*/
 	// Step 2: Verify the MinipoolPrestaked events
 	t.verifyPrestakeEvents()
 

@@ -97,7 +97,7 @@ type CanProposeTNDAOKickResponse struct {
 	Error                  string             `json:"error"`
 	CanPropose             bool               `json:"canPropose"`
 	ProposalCooldownActive bool               `json:"proposalCooldownActive"`
-	InsufficientRplBond    bool               `json:"insufficientRplBond"`
+	InsufficientGgpBond    bool               `json:"insufficientGgpBond"`
 	GasInfo                rocketpool.GasInfo `json:"gasInfo"`
 }
 type ProposeTNDAOKickResponse struct {
@@ -158,7 +158,7 @@ type CanJoinTNDAOResponse struct {
 	CanJoin                bool               `json:"canJoin"`
 	ProposalExpired        bool               `json:"proposalExpired"`
 	AlreadyMember          bool               `json:"alreadyMember"`
-	InsufficientRplBalance bool               `json:"insufficientRplBalance"`
+	InsufficientGgpBalance bool               `json:"insufficientGgpBalance"`
 	GasInfo                rocketpool.GasInfo `json:"gasInfo"`
 }
 type JoinTNDAOApproveResponse struct {
@@ -213,7 +213,7 @@ type ProposeTNDAOSettingMembersQuorumResponse struct {
 	ProposalId uint64      `json:"proposalId"`
 	TxHash     common.Hash `json:"txHash"`
 }
-type ProposeTNDAOSettingMembersRplBondResponse struct {
+type ProposeTNDAOSettingMembersGgpBondResponse struct {
 	Status     string      `json:"status"`
 	Error      string      `json:"error"`
 	ProposalId uint64      `json:"proposalId"`
@@ -266,7 +266,7 @@ type GetTNDAOMemberSettingsResponse struct {
 	Status              string   `json:"status"`
 	Error               string   `json:"error"`
 	Quorum              float64  `json:"quorum"`
-	RPLBond             *big.Int `json:"rplBond"`
+	GGPBond             *big.Int `json:"ggpBond"`
 	MinipoolUnbondedMax uint64   `json:"minipoolUnbondedMax"`
 	ChallengeCooldown   uint64   `json:"challengeCooldown"`
 	ChallengeWindow     uint64   `json:"challengeWindow"`

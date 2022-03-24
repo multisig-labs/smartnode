@@ -231,9 +231,9 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			},
 
 			{
-				Name:      "can-swap-rpl",
-				Usage:     "Check whether the node can swap old RPL for new RPL",
-				UsageText: "rocketpool api node can-swap-rpl amount",
+				Name:      "can-swap-ggp",
+				Usage:     "Check whether the node can swap old GGP for new GGP",
+				UsageText: "rocketpool api node can-swap-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -246,16 +246,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(canNodeSwapRpl(c, amountWei))
+					api.PrintResponse(canNodeSwapGgp(c, amountWei))
 					return nil
 
 				},
 			},
 			{
-				Name:      "swap-rpl-approve-rpl",
+				Name:      "swap-ggp-approve-ggp",
 				Aliases:   []string{"p1"},
-				Usage:     "Approve fixed-supply RPL for swapping to new RPL",
-				UsageText: "rocketpool api node swap-rpl-approve-rpl amount",
+				Usage:     "Approve fixed-supply GGP for swapping to new GGP",
+				UsageText: "rocketpool api node swap-ggp-approve-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -268,16 +268,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(approveFsRpl(c, amountWei))
+					api.PrintResponse(approveFsGgp(c, amountWei))
 					return nil
 
 				},
 			},
 			{
-				Name:      "wait-and-swap-rpl",
+				Name:      "wait-and-swap-ggp",
 				Aliases:   []string{"p2"},
-				Usage:     "Swap old RPL for new RPL, waiting for the approval TX hash to be mined first",
-				UsageText: "rocketpool api node wait-and-swap-rpl amount tx-hash",
+				Usage:     "Swap old GGP for new GGP, waiting for the approval TX hash to be mined first",
+				UsageText: "rocketpool api node wait-and-swap-ggp amount tx-hash",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -294,15 +294,15 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(waitForApprovalAndSwapFsRpl(c, amountWei, hash))
+					api.PrintResponse(waitForApprovalAndSwapFsGgp(c, amountWei, hash))
 					return nil
 
 				},
 			},
 			{
-				Name:      "get-swap-rpl-approval-gas",
-				Usage:     "Estimate the gas cost of legacy RPL interaction approval",
-				UsageText: "rocketpool api node get-swap-rpl-approval-gas",
+				Name:      "get-swap-ggp-approval-gas",
+				Usage:     "Estimate the gas cost of legacy GGP interaction approval",
+				UsageText: "rocketpool api node get-swap-ggp-approval-gas",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -321,9 +321,9 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 				},
 			},
 			{
-				Name:      "swap-rpl-allowance",
-				Usage:     "Get the node's legacy RPL allowance for new RPL contract",
-				UsageText: "rocketpool api node swap-allowance-rpl",
+				Name:      "swap-ggp-allowance",
+				Usage:     "Get the node's legacy GGP allowance for new GGP contract",
+				UsageText: "rocketpool api node swap-allowance-ggp",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -332,16 +332,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(allowanceFsRpl(c))
+					api.PrintResponse(allowanceFsGgp(c))
 					return nil
 
 				},
 			},
 			{
-				Name:      "swap-rpl",
+				Name:      "swap-ggp",
 				Aliases:   []string{"p3"},
-				Usage:     "Swap old RPL for new RPL",
-				UsageText: "rocketpool api node swap-rpl amount",
+				Usage:     "Swap old GGP for new GGP",
+				UsageText: "rocketpool api node swap-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -354,16 +354,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(swapRpl(c, amountWei))
+					api.PrintResponse(swapGgp(c, amountWei))
 					return nil
 
 				},
 			},
 
 			{
-				Name:      "can-stake-rpl",
-				Usage:     "Check whether the node can stake RPL",
-				UsageText: "rocketpool api node can-stake-rpl amount",
+				Name:      "can-stake-ggp",
+				Usage:     "Check whether the node can stake GGP",
+				UsageText: "rocketpool api node can-stake-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -376,16 +376,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(canNodeStakeRpl(c, amountWei))
+					api.PrintResponse(canNodeStakeGgp(c, amountWei))
 					return nil
 
 				},
 			},
 			{
-				Name:      "stake-rpl-approve-rpl",
+				Name:      "stake-ggp-approve-ggp",
 				Aliases:   []string{"k1"},
-				Usage:     "Approve RPL for staking against the node",
-				UsageText: "rocketpool api node stake-rpl-approve-rpl amount",
+				Usage:     "Approve GGP for staking against the node",
+				UsageText: "rocketpool api node stake-ggp-approve-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -398,16 +398,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(approveRpl(c, amountWei))
+					api.PrintResponse(approveGgp(c, amountWei))
 					return nil
 
 				},
 			},
 			{
-				Name:      "wait-and-stake-rpl",
+				Name:      "wait-and-stake-ggp",
 				Aliases:   []string{"k2"},
-				Usage:     "Stake RPL against the node, waiting for approval tx-hash to be mined first",
-				UsageText: "rocketpool api node wait-and-stake-rpl amount tx-hash",
+				Usage:     "Stake GGP against the node, waiting for approval tx-hash to be mined first",
+				UsageText: "rocketpool api node wait-and-stake-ggp amount tx-hash",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -424,15 +424,15 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(waitForApprovalAndStakeRpl(c, amountWei, hash))
+					api.PrintResponse(waitForApprovalAndStakeGgp(c, amountWei, hash))
 					return nil
 
 				},
 			},
 			{
-				Name:      "get-stake-rpl-approval-gas",
-				Usage:     "Estimate the gas cost of new RPL interaction approval",
-				UsageText: "rocketpool api node get-stake-rpl-approval-gas",
+				Name:      "get-stake-ggp-approval-gas",
+				Usage:     "Estimate the gas cost of new GGP interaction approval",
+				UsageText: "rocketpool api node get-stake-ggp-approval-gas",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -451,9 +451,9 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 				},
 			},
 			{
-				Name:      "stake-rpl-allowance",
-				Usage:     "Get the node's RPL allowance for the staking contract",
-				UsageText: "rocketpool api node stake-allowance-rpl",
+				Name:      "stake-ggp-allowance",
+				Usage:     "Get the node's GGP allowance for the staking contract",
+				UsageText: "rocketpool api node stake-allowance-ggp",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -462,16 +462,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(allowanceRpl(c))
+					api.PrintResponse(allowanceGgp(c))
 					return nil
 
 				},
 			},
 			{
-				Name:      "stake-rpl",
+				Name:      "stake-ggp",
 				Aliases:   []string{"k3"},
-				Usage:     "Stake RPL against the node",
-				UsageText: "rocketpool api node stake-rpl amount",
+				Usage:     "Stake GGP against the node",
+				UsageText: "rocketpool api node stake-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -484,16 +484,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(stakeRpl(c, amountWei))
+					api.PrintResponse(stakeGgp(c, amountWei))
 					return nil
 
 				},
 			},
 
 			{
-				Name:      "can-withdraw-rpl",
-				Usage:     "Check whether the node can withdraw staked RPL",
-				UsageText: "rocketpool api node can-withdraw-rpl amount",
+				Name:      "can-withdraw-ggp",
+				Usage:     "Check whether the node can withdraw staked GGP",
+				UsageText: "rocketpool api node can-withdraw-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -506,16 +506,16 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(canNodeWithdrawRpl(c, amountWei))
+					api.PrintResponse(canNodeWithdrawGgp(c, amountWei))
 					return nil
 
 				},
 			},
 			{
-				Name:      "withdraw-rpl",
+				Name:      "withdraw-ggp",
 				Aliases:   []string{"i"},
-				Usage:     "Withdraw RPL staked against the node",
-				UsageText: "rocketpool api node withdraw-rpl amount",
+				Usage:     "Withdraw GGP staked against the node",
+				UsageText: "rocketpool api node withdraw-ggp amount",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -528,7 +528,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(nodeWithdrawRpl(c, amountWei))
+					api.PrintResponse(nodeWithdrawGgp(c, amountWei))
 					return nil
 
 				},
@@ -703,9 +703,9 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 			},
 
 			{
-				Name:      "can-claim-rpl-rewards",
-				Usage:     "Check whether the node has RPL rewards available to claim",
-				UsageText: "rocketpool api node can-claim-rpl-rewards",
+				Name:      "can-claim-ggp-rewards",
+				Usage:     "Check whether the node has GGP rewards available to claim",
+				UsageText: "rocketpool api node can-claim-ggp-rewards",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -714,15 +714,15 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(canNodeClaimRpl(c))
+					api.PrintResponse(canNodeClaimGgp(c))
 					return nil
 
 				},
 			},
 			{
-				Name:      "claim-rpl-rewards",
-				Usage:     "Claim available RPL rewards",
-				UsageText: "rocketpool api node claim-rpl-rewards",
+				Name:      "claim-ggp-rewards",
+				Usage:     "Claim available GGP rewards",
+				UsageText: "rocketpool api node claim-ggp-rewards",
 				Action: func(c *cli.Context) error {
 
 					// Validate args
@@ -731,7 +731,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 					}
 
 					// Run
-					api.PrintResponse(nodeClaimRpl(c))
+					api.PrintResponse(nodeClaimGgp(c))
 					return nil
 
 				},
@@ -739,7 +739,7 @@ func RegisterSubcommands(command *cli.Command, name string, aliases []string) {
 
 			{
 				Name:      "rewards",
-				Usage:     "Get RPL rewards info",
+				Usage:     "Get GGP rewards info",
 				UsageText: "rocketpool api node rewards",
 				Action: func(c *cli.Context) error {
 

@@ -21,17 +21,17 @@ type PerformanceCollector struct {
 	// The total amount of ETH staked
 	totalStakingBalanceEth *prometheus.Desc
 
-	// The ETH / rETH ratio
-	ethRethExchangeRate *prometheus.Desc
+	// The ETH / ggpAVAX ratio
+	ethGgpavaxExchangeRate *prometheus.Desc
 
 	// The total amount of ETH locked (TVL)
 	totalValueLockedEth *prometheus.Desc
 
-	// The total rETH supply
-	totalRethSupply *prometheus.Desc
+	// The total ggpAVAX supply
+	totalGgpavaxSupply *prometheus.Desc
 
-	// The ETH balance of the rETH contract address
-	rethContractBalance *prometheus.Desc
+	// The ETH balance of the ggpAVAX contract address
+	ggpavaxContractBalance *prometheus.Desc
 
 	// The Rocket Pool contract manager
 	rp *rocketpool.RocketPool
@@ -49,20 +49,20 @@ func NewPerformanceCollector(rp *rocketpool.RocketPool) *PerformanceCollector {
 			"The total amount of ETH staked",
 			nil, nil,
 		),
-		ethRethExchangeRate: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "eth_reth_exchange_rate"),
-			"The ETH / rETH ratio",
+		ethGgpavaxExchangeRate: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "eth_ggpavax_exchange_rate"),
+			"The ETH / ggpAVAX ratio",
 			nil, nil,
 		),
 		totalValueLockedEth: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_value_locked_eth"),
 			"The total amount of ETH locked (TVL)",
 			nil, nil,
 		),
-		rethContractBalance: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "reth_contract_balance"),
-			"The ETH balance of the rETH contract address",
+		ggpavaxContractBalance: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "ggpavax_contract_balance"),
+			"The ETH balance of the ggpAVAX contract address",
 			nil, nil,
 		),
-		totalRethSupply: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_reth_supply"),
-			"The total rETH supply",
+		totalGgpavaxSupply: prometheus.NewDesc(prometheus.BuildFQName(namespace, subsystem, "total_ggpavax_supply"),
+			"The total ggpAVAX supply",
 			nil, nil,
 		),
 		rp: rp,
@@ -73,10 +73,10 @@ func NewPerformanceCollector(rp *rocketpool.RocketPool) *PerformanceCollector {
 func (collector *PerformanceCollector) Describe(channel chan<- *prometheus.Desc) {
 	channel <- collector.ethUtilizationRate
 	channel <- collector.totalStakingBalanceEth
-	channel <- collector.ethRethExchangeRate
+	channel <- collector.ethGgpavaxExchangeRate
 	channel <- collector.totalValueLockedEth
-	channel <- collector.rethContractBalance
-	channel <- collector.totalRethSupply
+	channel <- collector.ggpavaxContractBalance
+	channel <- collector.totalGgpavaxSupply
 }
 
 // Collect the latest metric values and pass them to Prometheus
@@ -88,8 +88,8 @@ func (collector *PerformanceCollector) Collect(channel chan<- prometheus.Metric)
 	balanceFloat := float64(-1)
 	exchangeRate := float64(-1)
 	tvlFloat := float64(-1)
-	rETHBalance := float64(-1)
-	rethFloat := float64(-1)
+	ggpAVAXBalance := float64(-1)
+	ggpavaxFloat := float64(-1)
 
 	// Get the ETH utilization rate
 	wg.Go(func() error {
@@ -113,11 +113,11 @@ func (collector *PerformanceCollector) Collect(channel chan<- prometheus.Metric)
 		return nil
 	})
 
-	// Get the ETH-rETH exchange rate
+	// Get the ETH-ggpAVAX exchange rate
 	wg.Go(func() error {
-		_exchangeRate, err := tokens.GetRETHExchangeRate(collector.rp, nil)
+		_exchangeRate, err := tokens.GetGGPAVAXExchangeRate(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting ETH-rETH exchange rate: %w", err)
+			return fmt.Errorf("Error getting ETH-ggpAVAX exchange rate: %w", err)
 		} else {
 			exchangeRate = _exchangeRate
 		}
@@ -135,29 +135,29 @@ func (collector *PerformanceCollector) Collect(channel chan<- prometheus.Metric)
 		return nil
 	})
 
-	// Get the ETH balance of the rETH contract
+	// Get the ETH balance of the ggpAVAX contract
 	wg.Go(func() error {
-		rETHContract, err := collector.rp.GetContract("rocketTokenRETH")
+		ggpAVAXContract, err := collector.rp.GetContract("gogoTokenGGPAVAX")
 		if err != nil {
-			return fmt.Errorf("Error getting ETH balance of rETH staking contract: %w", err)
+			return fmt.Errorf("Error getting ETH balance of ggpAVAX staking contract: %w", err)
 		} else {
-			balance, err := collector.rp.Client.BalanceAt(context.Background(), *rETHContract.Address, nil)
+			balance, err := collector.rp.Client.BalanceAt(context.Background(), *ggpAVAXContract.Address, nil)
 			if err != nil {
-				return fmt.Errorf("Error getting ETH balance of rETH staking contract: %w", err)
+				return fmt.Errorf("Error getting ETH balance of ggpAVAX staking contract: %w", err)
 			} else {
-				rETHBalance = eth.WeiToEth(balance)
+				ggpAVAXBalance = eth.WeiToEth(balance)
 			}
 		}
 		return nil
 	})
 
-	// Get the total rETH supply
+	// Get the total ggpAVAX supply
 	wg.Go(func() error {
-		totalRethSupply, err := tokens.GetRETHTotalSupply(collector.rp, nil)
+		totalGgpavaxSupply, err := tokens.GetGGPAVAXTotalSupply(collector.rp, nil)
 		if err != nil {
-			return fmt.Errorf("Error getting total rETH supply: %w", err)
+			return fmt.Errorf("Error getting total ggpAVAX supply: %w", err)
 		} else {
-			rethFloat = eth.WeiToEth(totalRethSupply)
+			ggpavaxFloat = eth.WeiToEth(totalGgpavaxSupply)
 		}
 		return nil
 	})
@@ -173,12 +173,12 @@ func (collector *PerformanceCollector) Collect(channel chan<- prometheus.Metric)
 	channel <- prometheus.MustNewConstMetric(
 		collector.totalStakingBalanceEth, prometheus.GaugeValue, balanceFloat)
 	channel <- prometheus.MustNewConstMetric(
-		collector.ethRethExchangeRate, prometheus.GaugeValue, exchangeRate)
+		collector.ethGgpavaxExchangeRate, prometheus.GaugeValue, exchangeRate)
 	channel <- prometheus.MustNewConstMetric(
 		collector.totalValueLockedEth, prometheus.GaugeValue, tvlFloat)
 	channel <- prometheus.MustNewConstMetric(
-		collector.rethContractBalance, prometheus.GaugeValue, rETHBalance)
+		collector.ggpavaxContractBalance, prometheus.GaugeValue, ggpAVAXBalance)
 	channel <- prometheus.MustNewConstMetric(
-		collector.totalRethSupply, prometheus.GaugeValue, rethFloat)
+		collector.totalGgpavaxSupply, prometheus.GaugeValue, ggpavaxFloat)
 
 }
