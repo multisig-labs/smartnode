@@ -188,7 +188,7 @@ func TestWalletStatusWhenInitialized(t *testing.T) {
 	assert.Truef(t, resp.WalletInitialized, "wallet should be initialized")
 	assert.Truef(t, resp.PasswordSet, "wallet password should be set")
 
-	// clean up
+	//clean up
 	//removeWalletAndPassword()
 }
 

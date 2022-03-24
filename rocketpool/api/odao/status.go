@@ -1,6 +1,7 @@
 package odao
 
 import (
+	"fmt"
 	"github.com/rocket-pool/rocketpool-go/dao/trustednode"
 	rptypes "github.com/rocket-pool/rocketpool-go/types"
 	"github.com/urfave/cli"
@@ -46,7 +47,8 @@ func getStatus(c *cli.Context) (*api.TNDAOStatusResponse, error) {
 
 	// Sync
 	var wg errgroup.Group
-
+	fmt.Println(nodeAccount.Address)
+	fmt.Println(nodeAccount.URL)
 	// Get pending executed proposal statuses
 	if isMember {
 
