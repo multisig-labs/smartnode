@@ -540,6 +540,32 @@ func (c *Client) GetNodeId() (beacon.ResultResponse, error) {
 	return responseObject, nil
 }
 
+func (c *Client) MakeTxStatusRPCCall(method string, chainExt string, jsonParams string) (beacon.TransactionStatusResponse, error) {
+
+	// Unmarshall jsonParams
+	var jsonMap map[string]interface{}
+	json.Unmarshal([]byte(jsonParams), &jsonMap)
+
+	// make RPC call to local node
+	rpcClient := jsonrpc.NewRPCClient("http://127.0.0.1:9650" + chainExt)
+
+	response, err := rpcClient.Call(method, jsonMap)
+	if err != nil {
+		return beacon.TransactionStatusResponse{}, err
+	}
+	if response.Error != nil {
+		return beacon.TransactionStatusResponse{}, err
+	}
+
+	responseObject := beacon.TransactionStatusResponse{}
+	err = response.GetObject(&responseObject)
+	if err != nil {
+		return beacon.TransactionStatusResponse{}, err
+	}
+
+	return responseObject, nil
+}
+
 func (c *Client) MakeRPCCall(method string, chainExt string, jsonParams string) (beacon.TransactionResponse, error) {
 
 	// Unmarshall jsonParams

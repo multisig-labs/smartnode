@@ -78,6 +78,11 @@ type TransactionResponse struct {
 	TxId string `json:"txID"`
 }
 
+type TransactionStatusResponse struct {
+	Status      string `json:"status"`
+	BlockHeight string `json:"blockHeight"`
+}
+
 // Beacon client interface
 type Client interface {
 	GetClientType() BeaconClientType
@@ -96,4 +101,5 @@ type Client interface {
 	GetEth1DataForEth2Block(blockId string) (Eth1Data, error)
 	GetNodeId() (ResultResponse, error)
 	MakeRPCCall(method string, chainExt string, jsonParams string) (TransactionResponse, error)
+	MakeTxStatusRPCCall(method string, chainExt string, jsonParams string) (TransactionStatusResponse, error)
 }
