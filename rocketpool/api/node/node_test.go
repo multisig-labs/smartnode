@@ -302,11 +302,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 	minNodeFee = nodeFees.NodeFee - DefaultMaxNodeFeeSlippage
 
 	depositResponse, err := nodeDeposit(c, stakeAmount, minNodeFee, salt)
-	if err != nil {
-		fmt.Println(err)
-
-		return
-	}
+	require.NoError(t, err)
 
 	prettyPrintResponse(depositResponse)
 

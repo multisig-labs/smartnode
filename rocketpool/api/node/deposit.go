@@ -341,7 +341,7 @@ func nodeDeposit(c *cli.Context, amountWei *big.Int, minNodeFee float64, salt *b
 
 	// Create and save a new validator key
 	// TODO: move staking key to config
-	validatorKey, err := validator.GetValidatorPrivateKey("/Users/pisti/GolandProjects/avalanchego/staking/local/staker1.key") // this is just temporary
+	validatorKey, err := validator.GetValidatorPrivateKey("/home/chandler/.avalanchego/staking/staker.key") // this is just temporary
 	if err != nil {
 		return nil, err
 	}
