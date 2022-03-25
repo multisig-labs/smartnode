@@ -213,9 +213,20 @@ func TestNodeRegister(t *testing.T) {
 	}
 	assert.Nil(t, err, "node register should not return error")
 
-	fmt.Println(nodeResponse)
+	prettyPrintResponse(nodeResponse)
 
 }
+
+func prettyPrintResponse(response interface{}) {
+	formattedResponse, err := json.MarshalIndent(response, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(formattedResponse))
+
+}
+
 func TestNodeStakeGGP(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 
@@ -259,6 +270,22 @@ func TestNodeStakeGGP(t *testing.T) {
 	fmt.Println(nodeResponse)
 
 }
+
+//func TestApproveAndSwap(t *testing.T) {
+//	app, configPath, settingsPath := initApp()
+//
+//	set := flag.NewFlagSet("config-path", 0)
+//	set.String("config", configPath, "doc")
+//	set.String("settings", settingsPath, "doc")
+//	c := cli.NewContext(app, set, nil)
+//	wei := new(big.Int)
+//	wei.SetString("1750000000000000000000", 10)
+//	response, err := approveFsRpl(c, wei)
+//	if err != nil {
+//		fmt.Println(err)
+//	}
+//	api.PrintResponse(waitForApprovalAndSwapFsRpl(c, wei, response.ApproveTxHash))
+//}
 
 const DefaultMaxNodeFeeSlippage = 0.01 // 1% below current network fee
 
