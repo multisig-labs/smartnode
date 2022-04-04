@@ -27,6 +27,5 @@ func GetValidatorPrivateKey(path string) (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return rsaKey, nil
 }

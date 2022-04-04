@@ -22,11 +22,8 @@ import (
 	"github.com/rocket-pool/smartnode/shared/services"
 	"github.com/rocket-pool/smartnode/shared/services/beacon"
 	"github.com/rocket-pool/smartnode/shared/services/config"
-	rpgas "github.com/rocket-pool/smartnode/shared/services/gas"
 	"github.com/rocket-pool/smartnode/shared/services/wallet"
-	"github.com/rocket-pool/smartnode/shared/utils/api"
 	"github.com/rocket-pool/smartnode/shared/utils/log"
-	"github.com/rocket-pool/smartnode/shared/utils/validator"
 )
 
 // Settings
@@ -149,7 +146,7 @@ func (t *stakePrelaunchMinipools) run() error {
 	}
 
 	// Get eth2 config
-	eth2Config, err := t.bc.GetEth2Config()
+	//eth2Config, err := t.bc.GetEth2Config()
 	if err != nil {
 		return err
 	}
@@ -159,16 +156,16 @@ func (t *stakePrelaunchMinipools) run() error {
 
 	// Stake minipools
 	successCount := 0
-	for _, mp := range minipools {
-		success, err := t.stakeMinipool(mp, eth2Config)
-		if err != nil {
-			t.log.Println(fmt.Errorf("Could not stake minipool %s: %w", mp.Address.Hex(), err))
-			return err
-		}
-		if success {
-			successCount++
-		}
-	}
+	//for _, mp := range minipools {
+	//	//success, err := t.stakeMinipool(mp, eth2Config)
+	//	if err != nil {
+	//		t.log.Println(fmt.Errorf("Could not stake minipool %s: %w", mp.Address.Hex(), err))
+	//		return err
+	//	}
+	//	if success {
+	//		successCount++
+	//	}
+	//}
 
 	// Restart validator process if any minipools were staked successfully
 	if successCount > 0 {
@@ -255,6 +252,7 @@ func (t *stakePrelaunchMinipools) getPrelaunchMinipools(nodeAddress common.Addre
 
 }
 
+/*
 // Stake a minipool
 func (t *stakePrelaunchMinipools) stakeMinipool(mp *minipool.Minipool, eth2Config beacon.Eth2Config) (bool, error) {
 
@@ -357,7 +355,7 @@ func (t *stakePrelaunchMinipools) stakeMinipool(mp *minipool.Minipool, eth2Confi
 	return true, nil
 
 }
-
+*/
 // Restart validator process
 func (t *stakePrelaunchMinipools) restartValidator() error {
 

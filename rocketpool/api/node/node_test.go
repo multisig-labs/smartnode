@@ -173,11 +173,11 @@ func prettyPrintResponse(response interface{}) {
 }
 
 func TestFirstSetup(t *testing.T) {
-	//TestNodeRegister(t)
+	TestNodeRegister(t)
 	//time.Sleep(1 * time.Second)
-	//TestNodeStatus(t)
+	TestNodeStatus(t)
 	//time.Sleep(1 * time.Second)
-	//TestNodeStakeGGP(t)
+	TestNodeStakeGGP(t)
 	//time.Sleep(1 * time.Second)
 	TestNodeDepositAVAX(t)
 }
@@ -275,7 +275,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 	}
 
 	stakeAmount := new(big.Int)
-	stakeAmount.SetString("3000000000000000000", 10)
+	stakeAmount.SetString("6000000000000000000", 10)
 
 	// Calculate max uint256 value
 	maxApproval := big.NewInt(2)

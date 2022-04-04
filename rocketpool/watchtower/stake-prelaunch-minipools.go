@@ -163,7 +163,7 @@ func stakeMinipools(c *cli.Context, rp *rocketpool.RocketPool, minipoolAddresses
 		if err != nil {
 			return err
 		}
-		
+
 		// Import to P Chain address
 		importPResp, err := ac.MakeRPCCall("platform.importAVAX", "/ext/P", importPChainParams)
 		if err != nil {

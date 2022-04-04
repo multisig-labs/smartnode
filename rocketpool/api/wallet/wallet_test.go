@@ -193,19 +193,21 @@ func TestWalletStatusWhenInitialized(t *testing.T) {
 }
 
 func TestWalletExport(t *testing.T) {
+	//removeWalletAndPassword()
+	//app, configPath, settingsPath := initApp()
+	//set := flag.NewFlagSet("config-path", 0)
+	//set.String("config", configPath, "doc")
+	//set.String("settings", settingsPath, "doc")
+	//c := cli.NewContext(app, set, nil)
 	removeWalletAndPassword()
-	app, configPath, settingsPath := initApp()
-	set := flag.NewFlagSet("config-path", 0)
-	set.String("config", configPath, "doc")
-	set.String("settings", settingsPath, "doc")
-	c := cli.NewContext(app, set, nil)
-	_, err := initializeWallet(c)
+
+	//_, err := initializeWallet(c)
 	//assert.Nil(t, err, "wallet init should not return error")
 
-	wR, err := exportWallet(c)
-	assert.Nil(t, err, "wallet export should not return error")
-	fmt.Println(wR.AccountPrivateKey)
-	fmt.Println(wR.Password)
-	fmt.Println(wR.Wallet)
+	//wR, err := exportWallet(c)
+	//assert.Nil(t, err, "wallet export should not return error")
+	//fmt.Println(wR.AccountPrivateKey)
+	//fmt.Println(wR.Password)
+	//fmt.Println(wR.Wallet)
 
 }
