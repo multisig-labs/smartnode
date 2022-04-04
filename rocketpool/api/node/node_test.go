@@ -213,9 +213,10 @@ func TestNodeRegister(t *testing.T) {
 	}
 	assert.Nil(t, err, "node register should not return error")
 
-	fmt.Println(nodeResponse)
+	prettyPrintResponse(nodeResponse)
 
 }
+
 func TestNodeStakeGGP(t *testing.T) {
 	app, configPath, settingsPath := initApp()
 
@@ -260,6 +261,22 @@ func TestNodeStakeGGP(t *testing.T) {
 
 }
 
+//func TestApproveAndSwap(t *testing.T) {
+//	app, configPath, settingsPath := initApp()
+//
+//	set := flag.NewFlagSet("config-path", 0)
+//	set.String("config", configPath, "doc")
+//	set.String("settings", settingsPath, "doc")
+//	c := cli.NewContext(app, set, nil)
+//	wei := new(big.Int)
+//	wei.SetString("1750000000000000000000", 10)
+//	response, err := approveFsRpl(c, wei)
+//	if err != nil {
+//		fmt.Println(err)
+//	}
+//	api.PrintResponse(waitForApprovalAndSwapFsRpl(c, wei, response.ApproveTxHash))
+//}
+
 const DefaultMaxNodeFeeSlippage = 0.01 // 1% below current network fee
 
 func TestNodeDepositAVAX(t *testing.T) {
@@ -302,11 +319,7 @@ func TestNodeDepositAVAX(t *testing.T) {
 	minNodeFee = nodeFees.NodeFee - DefaultMaxNodeFeeSlippage
 
 	depositResponse, err := nodeDeposit(c, stakeAmount, minNodeFee, salt)
-	if err != nil {
-		fmt.Println(err)
-
-		return
-	}
+	require.NoError(t, err)
 
 	prettyPrintResponse(depositResponse)
 

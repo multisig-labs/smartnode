@@ -18,14 +18,23 @@ func GetValidatorPrivateKey(path string) (*rsa.PrivateKey, error) {
 	// decode raw bytes into private key
 	block, _ := pem.Decode(raw)
 
-	if block.Type != "RSA PRIVATE KEY" {
+	if block.Type != "PRIVATE KEY" && block.Type != "RSA PRIVATE KEY" {
 		return nil, errors.New("private key not found")
 	}
 
 	// decode into x509 private key
-	rsaKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	rsaKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
-	return rsaKey, nil
+	//return rsaKey, nil
+
+	// cast to rsa private key
+	rsaPrivateKey, ok := rsaKey.(*rsa.PrivateKey)
+
+	if !ok {
+		return nil, errors.New("private key not found")
+	}
+
+	return rsaPrivateKey, nil
 }
